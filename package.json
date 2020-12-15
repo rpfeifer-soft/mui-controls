@@ -2,7 +2,6 @@
   "name": "@rpfeifer-soft/mui-controls",
   "version": "0.2.1",
   "private": false,
-  "homepage": "https://github.com/rpfeifer-soft/mui-controls#readme",
   "repository": {
     "url": "git://github.com/rpfeifer-soft/mui-controls.git"
   },
