@@ -31,21 +31,24 @@ class TestState {
       this.variant = variant;
    }
 }
-
+const options = ["Almuth", "Anastasia", "André", "Andreas", "Angelika", "Anke", "Anna", "Birgit", "Britta", "Caro", "Carsten", "Chrissi", "Christiane", "Christoph", "Christopher", "Clemens", "Dani", "David", "Dennis", "Didi", "Dirk", "Dmitrij", "Erhard", "Fabian", "Fee", "Franzi H.", "Franzi Z.", "Gabi H.", "Gabi Ho.", "Gabi R.", "Georgia", "Hagen", "Hamid", "Hannah", "Hannah R.", "Hanni", "Harald", "Helmuth", "Holger", "Irina", "Ivo", "Jakob H.", "Jane Doe (72)", "Jannik", "Jens M.", "Jochen", "Johannes K.", "Jonathan", "Jörg", "Juli", "Julia A.", "Julia F.", "Jürgen K.", "Jürgen R.", "Kai", "Katja", "Lisa", "Manfredo", "Manuela", "Marc", "Marie", "Marie M.", "Mario", "Mark M.", "Martin", "Matthias", "Milena B.", "Mira", "Moritz", "Naomi", "Nora R.", "Nora S.", "Norbert", "Norm", "Patrick", "Philipp", "Ralf S.", "Ralf Schä.", "René", "Rolf", "Rudi", "Sabine D.", "Sarah", "Sarah L.", "Sebastian", "Sebastian R.", "Sergey", "Siggi", "Steffen", "Sternchen", "Susann", "Sylvie", "Tamara", "Tim E.", "Timme", "Timo", "Tom", "Tony M.", "Ute", "Wolfgang", "Wolfram", "Yvonne"];
 const AutoCompleteTest = observer(({children, ...props}: React.PropsWithChildren<AutoCompleteTestProps>) => {
    const [state] = React.useState(new TestState());
    return (
       <div {...props}>
          <Autocomplete
+            label="Autocomplete of strings"
+            options={options}
+            selected={state.value}
+            onChange={(value) => state.setValue(value || '')}
+            getLabel={(entry) => entry}
             textProps={{
                autoFocus: true,
                fullWidth: true,
-               value: state.value,
-               onChange: (event) => state.setValue(event.target.value),
                variant: state.variant
             }} 
          />
-         <hr/>
+         <hr style={{ marginTop: 256}}/>
          Value: '{state.value}'
          <hr/>
          <ButtonGroup>
