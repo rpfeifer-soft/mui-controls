@@ -2,7 +2,7 @@ import React from 'react';
 import './App.css';
 import { observer } from 'mobx-react';
 import { Button, createMuiTheme, CssBaseline, ThemeProvider, useMediaQuery } from '@material-ui/core';
-import AutoCompleteTest from './autocomplete';
+import AutoCompleteTest from './package/autocomplete/test';
 
 interface ThemeProps {
 

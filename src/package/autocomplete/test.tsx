@@ -2,10 +2,13 @@
 
 import * as React from 'react';
 import { observer } from 'mobx-react';
-import { HtmlDivProps } from '../types';
 import { makeAutoObservable } from 'mobx';
-import { Button, ButtonGroup, TextField } from '@material-ui/core';
-import Autocomplete from './autocomplete';
+import { Button, ButtonGroup } from '@material-ui/core';
+import Autocomplete from '.';
+
+type HtmlDivProps = React.DetailedHTMLProps<
+   React.HtmlHTMLAttributes<HTMLDivElement>, HTMLDivElement
+>;
 
 export interface AutoCompleteTestProps extends HtmlDivProps {
 }

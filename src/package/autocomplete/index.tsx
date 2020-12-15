@@ -2,8 +2,11 @@
 
 import * as React from 'react';
 import { observer } from 'mobx-react';
-import { HtmlDivProps } from '../types';
 import { TextField, TextFieldProps } from '@material-ui/core';
+
+type HtmlDivProps = React.DetailedHTMLProps<
+   React.HtmlHTMLAttributes<HTMLDivElement>, HTMLDivElement
+>;
 
 export interface AutocompleteProps extends HtmlDivProps {
    textProps?: TextFieldProps;
