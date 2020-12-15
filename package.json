@@ -24,8 +24,9 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "compile": "tsc --build ./src/package/tsconfig.json",
-    "clean": "tsc --build ./src/package/tsconfig.json --clean",
-    "clear": "clear-package-json package.json > package/package.json"
+    "clean": "rimraf package/",
+    "publish:prepare": "npm run clean && npm run compile && clear-package-json package.json > package/package.json && cp .npmignore package",
+    "publish:try": "npm run publish:prepare && npm publish package --dry-run"
   },
   "eslintConfig": {
     "extends": [
