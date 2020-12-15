@@ -22,6 +22,11 @@ const useStyles = makeStyles(() => ({
 
 export interface AutocompleteProps<T> extends Omit<HtmlDivProps, 'onChange'> {
    label?: string;
+   variant?: "standard" | "outlined" | "filled";
+   autoFocus?: boolean;
+   required?: boolean;
+   fullwidth?: boolean;
+   elevation?: number;
    options?: T[];
    selected: T | undefined;
    onChange?: (selected: T | undefined) => void;
@@ -30,7 +35,7 @@ export interface AutocompleteProps<T> extends Omit<HtmlDivProps, 'onChange'> {
    getKey?: (entry: T) => string;
    hasMatch?: (entry: T, filter: string) => boolean;
 
-   textProps?: Omit<TextFieldProps, 'value' | 'onChange' | 'label'>;
+   textProps?: Omit<TextFieldProps, 'value' | 'onChange' | 'label' | 'autoFocus' | 'fullwidth' | 'required' | 'variant'>;
 }
 
 class State<T> {
@@ -165,7 +170,12 @@ export function typedAutocomplete<T>() {
       const {
          label,
          options,
+         variant,
          selected,
+         autoFocus,
+         required,
+         fullwidth,
+         elevation = 8,
          onChange,
          getLabel,
          getKey = getLabel,
@@ -179,6 +189,10 @@ export function typedAutocomplete<T>() {
             <TextField {...textProps}
                ref={textAnchor}
                label={label}
+               variant={variant}
+               autoFocus={autoFocus}
+               required={required}
+               fullWidth={fullwidth}
                value={state.filter !== false 
                   ? state.filter 
                   : (state.selected ? getLabel(state.selected) : '')}
@@ -191,8 +205,9 @@ export function typedAutocomplete<T>() {
                anchorEl={textAnchor.current}
                placement="bottom-start"
                className={styles.popper}
+               container={document.body}
                >
-                  <Paper elevation={8}>
+                  <Paper elevation={elevation}>
                      {state.filteredOptions ? (
                         <List ref={listElement}>
                            {state.filteredOptions.map(entry => (
