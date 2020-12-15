@@ -29,6 +29,7 @@ export interface AutocompleteProps<T> extends Omit<HtmlDivProps, 'onChange'> {
    elevation?: number;
    options?: T[];
    selected: T | undefined;
+   noOptionsText?: string;
    onChange?: (selected: T | undefined) => void;
 
    getLabel: (entry: T) => string;
@@ -39,6 +40,7 @@ export interface AutocompleteProps<T> extends Omit<HtmlDivProps, 'onChange'> {
 }
 
 class State<T> {
+   options?: T[];
    selected: T | undefined;
    filter: string | false = false;
    getLabel: (entry: T) => string;
@@ -49,10 +51,15 @@ class State<T> {
    constructor(private props: AutocompleteProps<T>) {
       makeAutoObservable(this);
 
+      this.options = props.options;
       this.selected = props.selected;
       this.getLabel = props.getLabel;
       this.hasMatch = props.hasMatch ||
          ((entry, filter) => defaultMatcher(this.getLabel(entry),filter));
+   }
+
+   setOptions(options?: T[]) {
+      this.options = options;
    }
 
    setSelected(entry: T | undefined) {
@@ -72,7 +79,7 @@ class State<T> {
    }
 
    get filteredOptions() {
-      let filteredOptions = this.props.options;
+      let filteredOptions = this.options;
       if(filteredOptions && this.filter) {
          let filter = this.filter;
          filteredOptions = filteredOptions.filter(p => this.hasMatch(p, filter));
@@ -176,6 +183,7 @@ export function typedAutocomplete<T>() {
          required,
          fullwidth,
          elevation = 8,
+         noOptionsText = "-",
          onChange,
          getLabel,
          getKey = getLabel,
@@ -184,6 +192,7 @@ export function typedAutocomplete<T>() {
          
          ...divProps
       } = props;
+      state.setOptions(options);
       return (
          <div {...divProps}>
             <TextField {...textProps}
@@ -208,7 +217,7 @@ export function typedAutocomplete<T>() {
                container={document.body}
                >
                   <Paper elevation={elevation}>
-                     {state.filteredOptions ? (
+                     {state.filteredOptions && state.options && state.options.length > 0 ? (
                         <List ref={listElement}>
                            {state.filteredOptions.map(entry => (
                               <ListItem 
@@ -224,7 +233,9 @@ export function typedAutocomplete<T>() {
                            ))}
                         </List>
                      ) : (
-                        <Typography>No elements!</Typography>
+                        <List>
+                           <ListItem>{noOptionsText}</ListItem>
+                        </List>
                      )}
                   </Paper>
                </Popper>
