@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { observer } from 'mobx-react';
-import { List, ListItem, makeStyles, Paper, Popper, TextField, TextFieldProps, Typography } from '@material-ui/core';
+import { List, ListItem, makeStyles, Paper, Popper, TextField, TextFieldProps } from '@material-ui/core';
 import { makeAutoObservable, runInAction } from 'mobx';
 
 type HtmlDivProps = React.DetailedHTMLProps<
