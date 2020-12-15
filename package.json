@@ -26,7 +26,8 @@
     "compile": "tsc --build ./src/package/tsconfig.json",
     "clean": "rimraf package/",
     "publish:prepare": "npm run clean && npm run compile && clear-package-json package.json > package/package.json && cp .npmignore package",
-    "publish:try": "npm run publish:prepare && npm publish package --dry-run"
+    "publish:try": "npm run publish:prepare && npm publish package --dry-run",
+    "publish:push": "npm run publish:prepare && npm publish package"
   },
   "eslintConfig": {
     "extends": [
