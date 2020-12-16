@@ -3,6 +3,7 @@ import './App.css';
 import { observer } from 'mobx-react';
 import { Button, createMuiTheme, CssBaseline, ThemeProvider, useMediaQuery } from '@material-ui/core';
 import AutoCompleteTest from './package/autocomplete/test';
+import AuthCodeTest from './package/authcode/test';
 
 interface ThemeProps {
 
@@ -45,8 +46,12 @@ function App() {
   return (
     <Theme>
       {hash !== '#autocomplete' || <AutoCompleteTest/>}
+      {hash !== '#authcode' || <AuthCodeTest/>}
       {!hash ? (
-        <Button onClick={() => goto('#autocomplete')}>Autocomplete</Button>
+        <React.Fragment>
+          <Button onClick={() => goto('#autocomplete')}>Autocomplete</Button>
+          <Button onClick={() => goto('#authcode')}>AuthCode</Button>
+        </React.Fragment>
       ): (
         <Button onClick={() => goto('')} style={{position:'absolute', top: 8, left: 8 }}> &lt; Back</Button>
       )}
