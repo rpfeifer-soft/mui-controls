@@ -14,9 +14,6 @@ const useStyles = makeStyles(() => ({
       zIndex: 9999,
       maxHeight: '27em',
       overflowY: 'auto'
-   },
-   focused: {
-      fontWeight: 'bold'
    }
 }));
 
@@ -26,7 +23,6 @@ export interface AutocompleteProps<T> extends Omit<HtmlDivProps, 'onChange'> {
    autoFocus?: boolean;
    required?: boolean;
    fullwidth?: boolean;
-   elevation?: number;
    options?: T[];
    selected: T | undefined;
    noOptionsText?: string;
@@ -182,7 +178,6 @@ export function typedAutocomplete<T>() {
          autoFocus,
          required,
          fullwidth,
-         elevation = 8,
          noOptionsText = "-",
          onChange,
          getLabel,
@@ -216,7 +211,7 @@ export function typedAutocomplete<T>() {
                className={styles.popper}
                container={document.body}
                >
-                  <Paper elevation={elevation}>
+                  <Paper variant="outlined">
                      {state.filteredOptions && state.options && state.options.length > 0 ? (
                         <List ref={listElement}>
                            {state.filteredOptions.map(entry => (

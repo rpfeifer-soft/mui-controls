@@ -18,7 +18,8 @@ const useStyles = makeStyles(() => ({
    container: {
       display: 'grid',
       gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr 1fr',
-      gap: 8,
+      gap: '8px',
+      gridGap: '8px',
       fontSize: '1.4rem'
    }, 
    item: {
