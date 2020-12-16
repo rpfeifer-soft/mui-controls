@@ -61,7 +61,6 @@ const AutoCompleteTest = observer(({children, ...props}: React.PropsWithChildren
                      label="Autocomplete of strings"
                      autoFocus
                      fullwidth
-                     elevation={state.elevation}
                      variant={state.variant}
                      options={state.options}
                      selected={state.value}
