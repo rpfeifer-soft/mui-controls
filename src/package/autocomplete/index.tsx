@@ -3,7 +3,6 @@
 import * as React from 'react';
 import { observer } from 'mobx-react';
 import { List, ListItem, makeStyles, Paper, Popper, TextField, TextFieldProps } from '@material-ui/core';
-import { makeAutoObservable, runInAction } from 'mobx';
 
 type HtmlDivProps = React.DetailedHTMLProps<
    React.HtmlHTMLAttributes<HTMLDivElement>, HTMLDivElement
@@ -35,131 +34,6 @@ export interface AutocompleteProps<T> extends Omit<HtmlDivProps, 'onChange'> {
    textProps?: Omit<TextFieldProps, 'value' | 'onChange' | 'label' | 'autoFocus' | 'fullwidth' | 'required' | 'variant'>;
 }
 
-class State<T> {
-   options?: T[];
-   selected: T | undefined;
-   filter: string | false = false;
-   getLabel: (entry: T) => string;
-   hasMatch: (entry: T, filter: string) => boolean;
-   focusedEntry: T | false = false;
-   closed = false;
-
-   constructor(private props: AutocompleteProps<T>) {
-      makeAutoObservable(this);
-
-      this.options = props.options;
-      this.selected = props.selected;
-      this.getLabel = props.getLabel;
-      this.hasMatch = props.hasMatch ||
-         ((entry, filter) => defaultMatcher(this.getLabel(entry),filter));
-   }
-
-   setOptions(options?: T[]) {
-      this.options = options;
-   }
-
-   setSelected(entry: T | undefined) {
-      this.selected = entry;
-      this.filter = false;
-      this.focusedEntry = false;
-      this.closed = false;
-      if(this.props.onChange) {
-         this.props.onChange(this.selected);
-      }
-   }
-
-   setFilter(filter: string | false) {
-      this.filter = filter;
-      this.focusedEntry = false;
-      this.closed = false;
-   }
-
-   get filteredOptions() {
-      let filteredOptions = this.options;
-      if(filteredOptions && this.filter) {
-         let filter = this.filter;
-         filteredOptions = filteredOptions.filter(p => this.hasMatch(p, filter));
-         // eslint-disable-next-line
-         if(!filteredOptions.find(p => p == this.focusedEntry)) {
-            // focus not existing
-            this.focusedEntry = false;
-         }
-      }
-      return filteredOptions;
-   }
-
-   handleBlur() {
-      this.filter = false;
-      this.focusedEntry = false;
-      this.closed = false;
-   }
-
-   handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>, listElement: HTMLUListElement | null) {
-      switch(event.key) {
-         case 'Escape':
-            this.handleBlur();
-            break;
-
-         case 'Backspace':
-            if(!this.filter && this.selected) {
-               event.stopPropagation();
-
-               this.setSelected(undefined);
-            }
-            break;
-
-         case 'Enter':
-            if(this.focusedEntry !== false) {
-               event.preventDefault();
-               // Update the selection
-               this.setSelected(this.focusedEntry);
-            } else if(this.filteredOptions && this.filter) {
-               let entry = this.filteredOptions.find(p => this.getLabel(p) === this.filter);
-               if(!entry && this.filteredOptions.length === 1) {
-                  entry = this.filteredOptions[0];
-               }
-               if(entry) {
-                  // Select now
-                  this.setSelected(entry);
-               }
-            }
-            break;
-
-         case 'ArrowUp':
-         case 'ArrowDown':
-            event.preventDefault();
-            runInAction(() => {
-               if(this.closed && event.key === 'ArrowDown') {
-                  this.closed = false;
-               }
-               if(!this.filteredOptions || this.filteredOptions.length === 0) {
-                  return;
-               }
-               let index = -1;
-               if(this.focusedEntry === false) {
-                  index = 0;
-               } else {
-                  index = this.filteredOptions.findIndex(p => p === this.focusedEntry);
-                  index = index !== -1 ? index + (event.key === "ArrowDown" ? 1 : -1) : index;
-               }
-               if(index >= 0 && index < this.filteredOptions.length) {
-                  this.focusedEntry = this.filteredOptions[index];
-                  // Try to scroll into view
-                  if(listElement && listElement.children[index]) {
-                     listElement.children[index].scrollIntoView({
-                        block: 'nearest'
-                     });
-                  }
-               } else if(index === -1 && this.focusedEntry) {
-                  this.closed = true;
-                  this.focusedEntry = false;
-               }
-            });
-            break;
-      }
-   }
-}
-
 function defaultMatcher(value: string, filter: string) {
    return value.toLocaleLowerCase().includes(filter.toLocaleLowerCase());
 }
@@ -167,14 +41,15 @@ function defaultMatcher(value: string, filter: string) {
 export function typedAutocomplete<T>() {
    return observer(({children, ...props}: React.PropsWithChildren<AutocompleteProps<T>>) => {
       const styles = useStyles(props);
-      const [state] = React.useState(new State<T>(props)); 
       const textAnchor = React.useRef<HTMLInputElement>(null);
       const listElement = React.useRef<HTMLUListElement>(null);
+      const blurTimer = React.useRef<any>();
+
       const {
          label,
          options,
          variant,
-         selected,
+         selected: initSelected,
          autoFocus,
          required,
          fullwidth,
@@ -187,7 +62,123 @@ export function typedAutocomplete<T>() {
          
          ...divProps
       } = props;
-      state.setOptions(options);
+
+      // State values
+      const [selected, setSelected] = React.useState<T | undefined>(initSelected);
+      const [filter, setFilter] = React.useState<string | false>(false);
+      const [focusedEntry, setFocusedEntry] = React.useState<T | false>(false);
+      const [closed, setClosed] = React.useState(false);
+
+      if(blurTimer.current && initSelected) {
+         clearTimeout(blurTimer.current);
+         blurTimer.current = undefined;
+      }
+      // Init after selection change from outside
+      if(selected !== initSelected) {
+         setSelected(initSelected);
+         setFilter(false);
+         setFocusedEntry(false);
+         setClosed(false);
+      };
+
+      // Memoized values
+      const filteredOptions = React.useMemo(() => {
+         let filteredOptions = options;
+         if(filteredOptions && filter) {
+            let currentFilter = filter;
+            let currentHasMatch = hasMatch || ((p, q) => defaultMatcher(getLabel(p), q));
+            filteredOptions = filteredOptions.filter(p => currentHasMatch(p, currentFilter));
+         }
+         return filteredOptions;
+      }, [filter, hasMatch, getLabel, options]);
+
+      // Handlers
+      const changeSelected = (selected: T | undefined) => {
+         setSelected(selected);
+         setFilter(false);
+         setFocusedEntry(false);
+         setClosed(false);
+         if(onChange) {
+            onChange(selected);
+         }
+      };
+      const changeFilter = (filter: string | false) => {
+         setFilter(filter);
+         setFocusedEntry(false);
+         setClosed(false);
+      };
+      const handleBlur = () => {
+         blurTimer.current = setTimeout(() => {
+            setFilter(false);
+            setFocusedEntry(false);
+            setClosed(false);
+         }, 250);
+      };
+      const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>, listElement: HTMLUListElement | null) => {
+         switch(event.key) {
+            case 'Escape':
+               setFilter(false);
+               setFocusedEntry(false);
+               setClosed(false);
+               break;
+   
+            case 'Backspace':
+               if(!filter && selected) {
+                  event.stopPropagation();
+   
+                  changeSelected(undefined);
+               }
+               break;
+   
+            case 'Enter':
+               if(focusedEntry !== false) {
+                  event.preventDefault();
+                  // Update the selection
+                  changeSelected(focusedEntry);
+               } else if(filteredOptions && filter) {
+                  let entry = filteredOptions.find(p => getLabel(p) === filter);
+                  if(!entry && filteredOptions.length === 1) {
+                     entry = filteredOptions[0];
+                  }
+                  if(entry) {
+                     // Select now
+                     changeSelected(entry);
+                  }
+               }
+               break;
+   
+            case 'ArrowUp':
+            case 'ArrowDown':
+               event.preventDefault();
+               if(closed && event.key === 'ArrowDown') {
+                  setClosed(false);
+               }
+               if(!filteredOptions || filteredOptions.length === 0) {
+                  return;
+               }
+               let index = -1;
+               if(focusedEntry === false) {
+                  index = 0;
+               } else {
+                  index = filteredOptions.findIndex(p => p === focusedEntry);
+                  index = index !== -1 ? index + (event.key === "ArrowDown" ? 1 : -1) : index;
+               }
+               if(index >= 0 && index < filteredOptions.length) {
+                  setFocusedEntry(filteredOptions[index]);
+                  // Try to scroll into view
+                  if(listElement && listElement.children[index]) {
+                     listElement.children[index].scrollIntoView({
+                        block: 'nearest'
+                     });
+                  }
+               } else if(index === -1 && focusedEntry) {
+                  setClosed(true);
+                  setFocusedEntry(false);
+               }
+               break;
+         }
+      };
+
       return (
          <div {...divProps}>
             <TextField {...textProps}
@@ -197,30 +188,30 @@ export function typedAutocomplete<T>() {
                autoFocus={autoFocus}
                required={required}
                fullWidth={fullwidth}
-               value={state.filter !== false 
-                  ? state.filter 
-                  : (state.selected ? getLabel(state.selected) : '')}
-               onChange={(event) => state.setFilter(event.target.value)}
-               onKeyDown={(event) => state.handleKeyDown(event, listElement.current)}
-               onBlur={() => state.handleBlur()}
+               value={filter !== false 
+                  ? filter 
+                  : (selected ? getLabel(selected) : '')}
+               onChange={(event) => changeFilter(event.target.value)}
+               onKeyDown={(event) => handleKeyDown(event, listElement.current)}
+               onBlur={handleBlur}
                />
             <Popper
-               open={!!state.filter && !!textAnchor.current && !state.closed}
+               open={!!filter && !!textAnchor.current && !closed}
                anchorEl={textAnchor.current}
                placement="bottom-start"
                className={styles.popper}
                container={document.body}
                >
                   <Paper variant="outlined">
-                     {state.filteredOptions && state.options && state.options.length > 0 ? (
+                     {filteredOptions && options && options.length > 0 ? (
                         <List ref={listElement}>
-                           {state.filteredOptions.map(entry => (
+                           {filteredOptions.map(entry => (
                               <ListItem 
                                  button 
                                  className="autocomplete-item"
                                  autoFocus={false}
-                                 selected={entry === state.focusedEntry}
-                                 onClick={() => state.setSelected(entry)}
+                                 selected={entry === focusedEntry}
+                                 onClick={() => changeSelected(entry)}
                                  key={getKey(entry)}
                               >
                                  {getLabel(entry)}

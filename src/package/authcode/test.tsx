@@ -17,7 +17,6 @@ class TestState {
    value: string = '';
    message: string | false = false;
    interval: NodeJS.Timeout;
-   elevation?: number;
 
    constructor() {
       makeAutoObservable(this);
@@ -40,10 +39,6 @@ class TestState {
    clearMessage() {
       this.message = false;
    }
-
-   setElevation(elevation?: number) {
-      this.elevation = elevation;
-   }
 }
 
 const AuthCodeTest = observer(({children, ...props}: React.PropsWithChildren<AuthCodeTestProps>) => {
@@ -53,7 +48,6 @@ const AuthCodeTest = observer(({children, ...props}: React.PropsWithChildren<Aut
          <AuthCode
                autoFocus
                value={state.value}
-               elevation={state.elevation}
                onChange={(value) => state.setValue(value)}
                onSubmit={(value) => state.setMessage(`Submitted ${value}!`)}
             />
@@ -61,13 +55,8 @@ const AuthCodeTest = observer(({children, ...props}: React.PropsWithChildren<Aut
          Value: '{state.value}'
          <hr/>
          <ButtonGroup>
-            <Button disabled={state.elevation === undefined} onClick={() => state.setElevation()}>-</Button>
-            <Button disabled={state.elevation === 1} onClick={() => state.setElevation(1)}>1</Button>
-            <Button disabled={state.elevation === 2} onClick={() => state.setElevation(2)}>2</Button>
-            <Button disabled={state.elevation === 3} onClick={() => state.setElevation(3)}>3</Button>
-            <Button disabled={state.elevation === 4} onClick={() => state.setElevation(4)}>4</Button>
-            <Button disabled={state.elevation === 8} onClick={() => state.setElevation(8)}>8</Button>
-            <Button disabled={state.elevation === 16} onClick={() => state.setElevation(16)}>16</Button>
+            <Button disabled={!state.value} onClick={() => state.setValue('')}>-</Button>
+            <Button disabled={state.value === '123456'} onClick={() => state.setValue('123456')}>123456</Button>
          </ButtonGroup>
          <Snackbar
             anchorOrigin={{

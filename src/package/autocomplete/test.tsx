@@ -64,6 +64,7 @@ const AutoCompleteTest = observer(({children, ...props}: React.PropsWithChildren
                      variant={state.variant}
                      options={state.options}
                      selected={state.value}
+                     noOptionsText="Keine Werte!"
                      onChange={(value) => state.setValue(value || '')}
                      getLabel={(entry) => entry}
                   />
@@ -88,6 +89,7 @@ const AutoCompleteTest = observer(({children, ...props}: React.PropsWithChildren
                variant={state.variant}
                options={state.options}
                selected={state.value}
+               noOptionsText="Keine Werte!"
                onChange={(value) => state.setValue(value || '')}
                getLabel={(entry) => entry}
             />
@@ -112,6 +114,14 @@ const AutoCompleteTest = observer(({children, ...props}: React.PropsWithChildren
             <Button
                onClick={() => state.setInDialog(true)}
                variant={state.inDialog ? "contained" : undefined}>Dialog</Button>
+         </ButtonGroup>
+         <ButtonGroup style={{marginLeft: 8}}>
+            <Button
+               onClick={() => state.setValue("René")}
+               variant={state.value === 'René' ? "contained" : undefined}>René</Button>
+            <Button
+               onClick={() => state.setValue('')}
+               variant={!state.value ? "contained" : undefined}>Clear</Button>
          </ButtonGroup>
       </div>
    );
