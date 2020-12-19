@@ -5,6 +5,7 @@ import { observer } from 'mobx-react';
 import { makeAutoObservable } from 'mobx';
 import AuthCode from '.';
 import { Button, ButtonGroup, Snackbar } from '@material-ui/core';
+import InputRef from '../InputRef';
 
 type HtmlDivProps = React.DetailedHTMLProps<
    React.HtmlHTMLAttributes<HTMLDivElement>, HTMLDivElement
@@ -17,6 +18,7 @@ class TestState {
    value: string = '';
    message: string | false = false;
    interval: NodeJS.Timeout;
+   inputRef = new InputRef();
 
    constructor() {
       makeAutoObservable(this);
@@ -48,6 +50,7 @@ const AuthCodeTest = observer(({children, ...props}: React.PropsWithChildren<Aut
          <AuthCode
                autoFocus
                value={state.value}
+               inputRef={state.inputRef}
                onChange={(value) => state.setValue(value)}
                onSubmit={(value) => state.setMessage(`Submitted ${value}!`)}
             />
@@ -57,6 +60,12 @@ const AuthCodeTest = observer(({children, ...props}: React.PropsWithChildren<Aut
          <ButtonGroup>
             <Button disabled={!state.value} onClick={() => state.setValue('')}>-</Button>
             <Button disabled={state.value === '123456'} onClick={() => state.setValue('123456')}>123456</Button>
+         </ButtonGroup>
+         <ButtonGroup style={{marginLeft: 8}}>
+            <Button
+               onClick={() => state.inputRef.focusEnd()}>Focus</Button>
+            <Button
+               onClick={() => state.inputRef.focusAll()}>Select</Button>
          </ButtonGroup>
          <Snackbar
             anchorOrigin={{

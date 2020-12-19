@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { observer } from 'mobx-react';
 import { makeStyles, Paper, TextField } from '@material-ui/core';
+import InputRef from '../InputRef';
 
 type HtmlDivProps = React.DetailedHTMLProps<
    React.HtmlHTMLAttributes<HTMLDivElement>, HTMLDivElement
@@ -29,17 +30,18 @@ const useStyles = makeStyles(() => ({
 export interface AuthCodeProps extends Omit<HtmlDivProps, 'onChange' | 'onSubmit'> {
    autoFocus?: boolean;
    value: string;
+   inputRef?: InputRef;
    onChange?: (value: string) => void;
    onSubmit?: (value: string) => void;
 }
 
 const AuthCode = observer(({children, ...props}: React.PropsWithChildren<AuthCodeProps>) => {
    const styles = useStyles(props);
-   const focusElement = React.useRef<HTMLInputElement>(null);
    
    const {
       autoFocus,
       value: initValue,
+      inputRef = new InputRef(),
       onChange,
       onSubmit,
       
@@ -73,25 +75,22 @@ const AuthCode = observer(({children, ...props}: React.PropsWithChildren<AuthCod
             break;
       }
    }
-   const focus = () => {
-      console.log(focusElement.current);
-      if(focusElement.current) {
-         focusElement.current.setSelectionRange(value.length, value.length);
-         focusElement.current.focus();
+   const mountInput = (input: HTMLInputElement) => {
+      if(inputRef) {
+         inputRef.set(input);
       }
    }
-
    return (
       <div {...divProps}>
          <TextField 
-            inputRef={focusElement}
+            inputRef={mountInput}
             autoFocus={autoFocus}
             className={styles.input}
             value={value}
             onChange={(event) => changeValue(event.target.value)}
             onKeyDown={handleKeyDown}
             />
-         <div className={styles.container} onClick={focus}>
+         <div className={styles.container} onClick={() => inputRef.focusEnd()}>
             {[0,1,2,3,4,5].map(index => (
                <div key={index}>
                   <Paper className={styles.item} variant="outlined">

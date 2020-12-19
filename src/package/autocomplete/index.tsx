@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { observer } from 'mobx-react';
 import { List, ListItem, makeStyles, Paper, Popper, TextField, TextFieldProps } from '@material-ui/core';
+import InputRef from '../InputRef';
 
 type HtmlDivProps = React.DetailedHTMLProps<
    React.HtmlHTMLAttributes<HTMLDivElement>, HTMLDivElement
@@ -25,6 +26,8 @@ export interface AutocompleteProps<T> extends Omit<HtmlDivProps, 'onChange'> {
    options?: T[];
    selected: T | undefined;
    noOptionsText?: string;
+   inputRef?: InputRef;
+   
    onChange?: (selected: T | undefined) => void;
 
    getLabel: (entry: T) => string;
@@ -54,6 +57,7 @@ export function typedAutocomplete<T>() {
          required,
          fullwidth,
          noOptionsText = "-",
+         inputRef,
          onChange,
          getLabel,
          getKey = getLabel,
@@ -93,6 +97,11 @@ export function typedAutocomplete<T>() {
       }, [filter, hasMatch, getLabel, options]);
 
       // Handlers
+      const mountInput = (input: HTMLInputElement) => {
+         if(inputRef) {
+            inputRef.set(input);
+         }
+      }
       const changeSelected = (selected: T | undefined) => {
          setSelected(selected);
          setFilter(false);
@@ -183,9 +192,9 @@ export function typedAutocomplete<T>() {
          <div {...divProps}>
             <TextField {...textProps}
                ref={textAnchor}
+               inputRef={mountInput}
                label={label}
                variant={variant}
-               autoFocus={autoFocus}
                required={required}
                fullWidth={fullwidth}
                value={filter !== false 

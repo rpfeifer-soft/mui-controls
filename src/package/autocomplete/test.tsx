@@ -5,6 +5,7 @@ import { observer } from 'mobx-react';
 import { makeAutoObservable } from 'mobx';
 import { Button, ButtonGroup, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@material-ui/core';
 import Autocomplete from '.';
+import InputRef from '../InputRef';
 
 type HtmlDivProps = React.DetailedHTMLProps<
    React.HtmlHTMLAttributes<HTMLDivElement>, HTMLDivElement
@@ -20,6 +21,7 @@ class TestState {
    variant: variantTypes = "standard";
    inDialog = false;
    options: string[] = [];
+   inputRef = new InputRef();
 
    constructor() {
       makeAutoObservable(this);
@@ -90,6 +92,7 @@ const AutoCompleteTest = observer(({children, ...props}: React.PropsWithChildren
                options={state.options}
                selected={state.value}
                noOptionsText="Keine Werte!"
+               inputRef={state.inputRef}
                onChange={(value) => state.setValue(value || '')}
                getLabel={(entry) => entry}
             />
@@ -122,6 +125,12 @@ const AutoCompleteTest = observer(({children, ...props}: React.PropsWithChildren
             <Button
                onClick={() => state.setValue('')}
                variant={!state.value ? "contained" : undefined}>Clear</Button>
+         </ButtonGroup>
+         <ButtonGroup style={{marginLeft: 8}}>
+            <Button
+               onClick={() => state.inputRef.focusEnd()}>Focus</Button>
+            <Button
+               onClick={() => state.inputRef.focusAll()}>Select</Button>
          </ButtonGroup>
       </div>
    );
