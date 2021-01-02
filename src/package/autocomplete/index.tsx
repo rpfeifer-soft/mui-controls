@@ -212,9 +212,9 @@ export function typedAutocomplete<T>() {
                container={document.body}
                >
                   <Paper variant="outlined">
-                     {filteredOptions && options && options.length > 0 ? (
-                        <List ref={listElement}>
-                           {filteredOptions.map(entry => (
+                     <List ref={listElement}>
+                        {filteredOptions && filteredOptions.length > 0 && options && options.length > 0 ? 
+                           filteredOptions.map(entry => (
                               <ListItem 
                                  button 
                                  className="autocomplete-item"
@@ -225,13 +225,10 @@ export function typedAutocomplete<T>() {
                               >
                                  {getLabel(entry)}
                               </ListItem>
-                           ))}
+                           )) : (
+                              <ListItem>{noOptionsText}</ListItem>
+                           )}
                         </List>
-                     ) : (
-                        <List>
-                           <ListItem>{noOptionsText}</ListItem>
-                        </List>
-                     )}
                   </Paper>
                </Popper>
          </div>
