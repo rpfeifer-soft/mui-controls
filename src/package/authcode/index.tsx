@@ -2,18 +2,21 @@
 
 import * as React from 'react';
 import { observer } from 'mobx-react';
-import { makeStyles, Paper, TextField } from '@material-ui/core';
+import { Input, makeStyles, Paper } from '@material-ui/core';
 import InputRef from '../InputRef';
 
 type HtmlDivProps = React.DetailedHTMLProps<
    React.HtmlHTMLAttributes<HTMLDivElement>, HTMLDivElement
 >;
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
    input: {
       position: 'absolute',
       opacity: 0,
-      left: -1000
+      left: -1000,
+      '&.Mui-focused + div .cursor': {
+         borderRight: '1px solid ' + theme.palette.primary.dark
+      }
    },
    container: {
       display: 'grid',
@@ -24,6 +27,9 @@ const useStyles = makeStyles(() => ({
    }, 
    item: {
       textAlign: 'center'
+   },
+   cursor: {
+      borderRight: '1px solid tranparent'
    }
 }));
 
@@ -65,7 +71,7 @@ const AuthCode = observer(({children, ...props}: React.PropsWithChildren<AuthCod
          onChange(newValue);
       }
    }
-   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       switch(event.key) {
          case 'Enter':
             if(value.length === 6 &&
@@ -82,19 +88,24 @@ const AuthCode = observer(({children, ...props}: React.PropsWithChildren<AuthCod
    }
    return (
       <div {...divProps}>
-         <TextField 
+         <Input 
             inputRef={mountInput}
+            type="number"
             autoFocus={autoFocus}
             className={styles.input}
             value={value}
             onChange={(event) => changeValue(event.target.value)}
-            onKeyDown={handleKeyDown}
+            onKeyDown={(event) => handleKeyDown(event)}
             />
          <div className={styles.container} onClick={() => inputRef.focusEnd()}>
             {[0,1,2,3,4,5].map(index => (
                <div key={index}>
                   <Paper className={styles.item} variant="outlined">
-                     {value.charAt(index) || (<span>&nbsp;</span>)}
+                     {value.charAt(index) || (
+                        value.length === index 
+                        ? <span className={`cursor ${styles.cursor}`}>&#8203;</span> 
+                        : <span>&nbsp;</span>
+                     )}
                   </Paper>
                </div>
             ))}

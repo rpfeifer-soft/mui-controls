@@ -14,9 +14,17 @@ class InputRef {
 
    set(input: HTMLInputElement) {
       this.dFocus = !input ? noOp : () => input.focus();
-      this.dSelect = !input 
+      this.dSelect = !input
          ? noOp 
-         : (start, end, direction) => input.setSelectionRange(start, end, direction);
+         : (start, end, direction) => {
+            if(input.type === 'number') {
+               input.type = 'text';
+               input.setSelectionRange(start, end, direction);
+               input.type = 'number';
+            } else {
+               input.setSelectionRange(start, end, direction);
+            }
+         }
       this.dValue = !input ? noValue : () => input.value;
    }
 

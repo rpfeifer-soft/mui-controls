@@ -20,20 +20,21 @@ export interface AlertTestProps extends HtmlDivProps {
 
 const AlertTest = observer(({children, ...props}: React.PropsWithChildren<AlertTestProps>) => {
    const styles = useStyles();
+   const icon = <div>x</div>;
    return (
       <div {...props}>
-         <Alert className={styles.alert} severity="success" closeIcon={<div/>}>Test</Alert>
-         <Alert className={styles.alert} severity="info" closeIcon={<div/>}>Test</Alert>
-         <Alert className={styles.alert} severity="warning" closeIcon={<div/>}>Test</Alert>
-         <Alert className={styles.alert} severity="error" closeIcon={<div/>}>Test</Alert>
-         <Alert className={styles.alert} variant="filled" severity="success" closeIcon={<div/>}>Test</Alert>
-         <Alert className={styles.alert} variant="filled" severity="info" closeIcon={<div/>}>Test</Alert>
-         <Alert className={styles.alert} variant="filled" severity="warning" closeIcon={<div/>}>Test</Alert>
-         <Alert className={styles.alert} variant="filled" severity="error" closeIcon={<div/>}>Test</Alert>
-         <Alert className={styles.alert} variant="outlined" severity="success" closeIcon={<div/>}>Test</Alert>
-         <Alert className={styles.alert} variant="outlined" severity="info" closeIcon={<div/>}>Test</Alert>
-         <Alert className={styles.alert} variant="outlined" severity="warning" closeIcon={<div/>}>Test</Alert>
-         <Alert className={styles.alert} variant="outlined" severity="error" closeIcon={<div/>}>Test</Alert>
+         <Alert className={styles.alert} severity="success" closeIcon={icon}>Test</Alert>
+         <Alert className={styles.alert} severity="info" closeIcon={icon}>Test</Alert>
+         <Alert className={styles.alert} severity="warning" closeIcon={icon}>Test</Alert>
+         <Alert className={styles.alert} severity="error" closeIcon={icon}>Test</Alert>
+         <Alert className={styles.alert} variant="filled" severity="success" closeIcon={icon}>Test</Alert>
+         <Alert className={styles.alert} variant="filled" severity="info" closeIcon={icon}>Test</Alert>
+         <Alert className={styles.alert} variant="filled" severity="warning" closeIcon={icon}>Test</Alert>
+         <Alert className={styles.alert} variant="filled" severity="error" closeIcon={icon}>Test</Alert>
+         <Alert className={styles.alert} variant="outlined" severity="success" closeIcon={icon}>Test</Alert>
+         <Alert className={styles.alert} variant="outlined" severity="info" closeIcon={icon}>Test</Alert>
+         <Alert className={styles.alert} variant="outlined" severity="warning" closeIcon={icon}>Test</Alert>
+         <Alert className={styles.alert} variant="outlined" severity="error" closeIcon={icon}>Test</Alert>
       </div>
    );
 });
