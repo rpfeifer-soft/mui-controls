@@ -73,11 +73,28 @@ const AuthCode = observer(({children, ...props}: React.PropsWithChildren<AuthCod
    }
    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       switch(event.key) {
+         case '0':
+         case '1':
+         case '2':
+         case '3':
+         case '4':
+         case '5':
+         case '6':
+         case '7':
+         case '8':
+         case '9':
+         case 'Backspace':
+            break;
+
          case 'Enter':
             if(value.length === 6 &&
                onSubmit) {
                onSubmit(value);
             }
+            break;
+
+         default:
+            event.preventDefault();
             break;
       }
    }
