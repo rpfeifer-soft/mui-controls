@@ -4,8 +4,7 @@ import * as React from "react";
 import { observer } from "mobx-react";
 import { Button, ButtonGroup, makeStyles } from "@material-ui/core";
 import clsx from "clsx";
-import DateTimeField from ".";
-import DateTimeInit from "./init";
+import DateTimeField, { DateTimeInit } from ".";
 import InputRef from "../InputRef";
 
 const useStyles = makeStyles(() => ({

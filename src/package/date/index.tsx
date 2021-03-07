@@ -15,6 +15,7 @@ import InputRef from "../InputRef";
 import { DateUtils } from "./init";
 import moment from "moment";
 import { MaterialUiPickersDate } from "@material-ui/pickers/typings/date";
+export { default as DateTimeInit } from "./init";
 
 const useStyles = makeStyles(() => ({
    container: {},
