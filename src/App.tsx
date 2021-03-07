@@ -7,6 +7,7 @@ import { Button, createMuiTheme, CssBaseline, ThemeProvider, useMediaQuery } fro
 import AutoCompleteTest from './package/autocomplete/test';
 import AuthCodeTest from './package/authcode/test';
 import AlertTest from './package/alert/test';
+import DateTimeFieldTest from './package/date/test';
 
 interface ThemeProps {
 
@@ -72,11 +73,13 @@ function App() {
       {hash !== '#autocomplete' || <AutoCompleteTest />}
       {hash !== '#authcode' || <AuthCodeTest />}
       {hash !== '#alert' || <AlertTest />}
+      {hash !== '#datetime' || <DateTimeFieldTest />}
       {!hash ? (
         <React.Fragment>
           <Button onClick={() => goto('#autocomplete')}>Autocomplete</Button>
           <Button onClick={() => goto('#authcode')}>AuthCode</Button>
           <Button onClick={() => goto('#alert')}>Alert</Button>
+          <Button onClick={() => goto('#datetime')}>DateTime</Button>
         </React.Fragment>
       ) : (
           <Button onClick={() => goto('')} style={{ position: 'absolute', top: 8, left: 8 }}> &lt; Back</Button>

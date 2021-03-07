@@ -1,40 +1,42 @@
 /** @format */
 
-import * as React from 'react';
-import { observer } from 'mobx-react';
-import { List, ListItem, makeStyles, Paper, Popper, TextField, TextFieldProps } from '@material-ui/core';
-import InputRef from '../InputRef';
+import * as React from "react";
+import { observer } from "mobx-react";
+import { List, ListItem, makeStyles, Paper, Popper, TextField, TextFieldProps } from "@material-ui/core";
+import InputRef from "../InputRef";
 
-type HtmlDivProps = React.DetailedHTMLProps<
-   React.HtmlHTMLAttributes<HTMLDivElement>, HTMLDivElement
->;
+type HtmlDivProps = React.DetailedHTMLProps<React.HtmlHTMLAttributes<HTMLDivElement>, HTMLDivElement>;
 
 const useStyles = makeStyles(() => ({
    popper: {
       zIndex: 9999,
-      maxHeight: '27em',
-      overflowY: 'auto'
-   }
+      maxHeight: "27em",
+      overflowY: "auto",
+   },
 }));
 
-export interface AutocompleteProps<T> extends Omit<HtmlDivProps, 'onChange'> {
+export interface AutocompleteProps<T> extends Omit<HtmlDivProps, "onChange"> {
    label?: string;
    variant?: "standard" | "outlined" | "filled";
    autoFocus?: boolean;
    required?: boolean;
    fullwidth?: boolean;
+   disabled?: boolean;
    options?: T[];
    selected: T | undefined;
    noOptionsText?: string;
    inputRef?: InputRef;
-   
+
    onChange?: (selected: T | undefined) => void;
 
    getLabel: (entry: T) => string;
    getKey?: (entry: T) => string;
    hasMatch?: (entry: T, filter: string) => boolean;
 
-   textProps?: Omit<TextFieldProps, 'value' | 'onChange' | 'label' | 'autoFocus' | 'fullwidth' | 'required' | 'variant'>;
+   textProps?: Omit<
+      TextFieldProps,
+      "value" | "onChange" | "label" | "autoFocus" | "fullwidth" | "disabled" | "required" | "variant"
+   >;
 }
 
 function defaultMatcher(value: string, filter: string) {
@@ -42,7 +44,7 @@ function defaultMatcher(value: string, filter: string) {
 }
 
 export function typedAutocomplete<T>() {
-   return observer(({children, ...props}: React.PropsWithChildren<AutocompleteProps<T>>) => {
+   return observer(({ children, ...props }: React.PropsWithChildren<AutocompleteProps<T>>) => {
       const styles = useStyles(props);
       const textAnchor = React.useRef<HTMLInputElement>(null);
       const listElement = React.useRef<HTMLUListElement>(null);
@@ -56,6 +58,7 @@ export function typedAutocomplete<T>() {
          autoFocus,
          required,
          fullwidth,
+         disabled,
          noOptionsText = "-",
          inputRef,
          onChange,
@@ -63,7 +66,7 @@ export function typedAutocomplete<T>() {
          getKey = getLabel,
          hasMatch,
          textProps,
-         
+
          ...divProps
       } = props;
 
@@ -73,41 +76,41 @@ export function typedAutocomplete<T>() {
       const [focusedEntry, setFocusedEntry] = React.useState<T | false>(false);
       const [closed, setClosed] = React.useState(false);
 
-      if(blurTimer.current && initSelected) {
+      if (blurTimer.current && initSelected) {
          clearTimeout(blurTimer.current);
          blurTimer.current = undefined;
       }
       // Init after selection change from outside
-      if(selected !== initSelected) {
+      if (selected !== initSelected) {
          setSelected(initSelected);
          setFilter(false);
          setFocusedEntry(false);
          setClosed(false);
-      };
+      }
 
       // Memoized values
       const filteredOptions = React.useMemo(() => {
          let filteredOptions = options;
-         if(filteredOptions && filter) {
+         if (filteredOptions && filter) {
             let currentFilter = filter;
             let currentHasMatch = hasMatch || ((p, q) => defaultMatcher(getLabel(p), q));
-            filteredOptions = filteredOptions.filter(p => currentHasMatch(p, currentFilter));
+            filteredOptions = filteredOptions.filter((p) => currentHasMatch(p, currentFilter));
          }
          return filteredOptions;
       }, [filter, hasMatch, getLabel, options]);
 
       // Handlers
       const mountInput = (input: HTMLInputElement) => {
-         if(inputRef) {
+         if (inputRef) {
             inputRef.set(input);
          }
-      }
+      };
       const changeSelected = (selected: T | undefined) => {
          setSelected(selected);
          setFilter(false);
          setFocusedEntry(false);
          setClosed(false);
-         if(onChange) {
+         if (onChange) {
             onChange(selected);
          }
       };
@@ -124,63 +127,63 @@ export function typedAutocomplete<T>() {
          }, 250);
       };
       const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>, listElement: HTMLUListElement | null) => {
-         switch(event.key) {
-            case 'Escape':
+         switch (event.key) {
+            case "Escape":
                setFilter(false);
                setFocusedEntry(false);
                setClosed(false);
                break;
-   
-            case 'Backspace':
-               if(!filter && selected) {
+
+            case "Backspace":
+               if (!filter && selected) {
                   event.stopPropagation();
-   
+
                   changeSelected(undefined);
                }
                break;
-   
-            case 'Enter':
-               if(focusedEntry !== false) {
+
+            case "Enter":
+               if (focusedEntry !== false) {
                   event.preventDefault();
                   // Update the selection
                   changeSelected(focusedEntry);
-               } else if(filteredOptions && filter) {
-                  let entry = filteredOptions.find(p => getLabel(p) === filter);
-                  if(!entry && filteredOptions.length === 1) {
+               } else if (filteredOptions && filter) {
+                  let entry = filteredOptions.find((p) => getLabel(p) === filter);
+                  if (!entry && filteredOptions.length === 1) {
                      entry = filteredOptions[0];
                   }
-                  if(entry) {
+                  if (entry) {
                      // Select now
                      changeSelected(entry);
                   }
                }
                break;
-   
-            case 'ArrowUp':
-            case 'ArrowDown':
+
+            case "ArrowUp":
+            case "ArrowDown":
                event.preventDefault();
-               if(closed && event.key === 'ArrowDown') {
+               if (closed && event.key === "ArrowDown") {
                   setClosed(false);
                }
-               if(!filteredOptions || filteredOptions.length === 0) {
+               if (!filteredOptions || filteredOptions.length === 0) {
                   return;
                }
                let index = -1;
-               if(focusedEntry === false) {
+               if (focusedEntry === false) {
                   index = 0;
                } else {
-                  index = filteredOptions.findIndex(p => p === focusedEntry);
+                  index = filteredOptions.findIndex((p) => p === focusedEntry);
                   index = index !== -1 ? index + (event.key === "ArrowDown" ? 1 : -1) : index;
                }
-               if(index >= 0 && index < filteredOptions.length) {
+               if (index >= 0 && index < filteredOptions.length) {
                   setFocusedEntry(filteredOptions[index]);
                   // Try to scroll into view
-                  if(listElement && listElement.children[index]) {
+                  if (listElement && listElement.children[index]) {
                      listElement.children[index].scrollIntoView({
-                        block: 'nearest'
+                        block: "nearest",
                      });
                   }
-               } else if(index === -1 && focusedEntry) {
+               } else if (index === -1 && focusedEntry) {
                   setClosed(true);
                   setFocusedEntry(false);
                }
@@ -190,47 +193,48 @@ export function typedAutocomplete<T>() {
 
       return (
          <div {...divProps}>
-            <TextField {...textProps}
+            <TextField
+               {...textProps}
                ref={textAnchor}
                inputRef={mountInput}
                label={label}
                variant={variant}
                required={required}
                fullWidth={fullwidth}
-               value={filter !== false 
-                  ? filter 
-                  : (selected ? getLabel(selected) : '')}
+               disabled={disabled}
+               value={filter !== false ? filter : selected ? getLabel(selected) : ""}
                onChange={(event) => changeFilter(event.target.value)}
                onKeyDown={(event) => handleKeyDown(event, listElement.current)}
                onBlur={handleBlur}
-               />
+            />
             <Popper
                open={!!filter && !!textAnchor.current && !closed}
                anchorEl={textAnchor.current}
                placement="bottom-start"
                className={styles.popper}
                container={document.body}
-               >
-                  <Paper variant="outlined">
-                     <List ref={listElement}>
-                        {filteredOptions && filteredOptions.length > 0 && options && options.length > 0 ? 
-                           filteredOptions.map(entry => (
-                              <ListItem 
-                                 button 
-                                 className="autocomplete-item"
-                                 autoFocus={false}
-                                 selected={entry === focusedEntry}
-                                 onClick={() => changeSelected(entry)}
-                                 key={getKey(entry)}
-                              >
-                                 {getLabel(entry)}
-                              </ListItem>
-                           )) : (
-                              <ListItem>{noOptionsText}</ListItem>
-                           )}
-                        </List>
-                  </Paper>
-               </Popper>
+            >
+               <Paper variant="outlined">
+                  <List ref={listElement}>
+                     {filteredOptions && filteredOptions.length > 0 && options && options.length > 0 ? (
+                        filteredOptions.map((entry) => (
+                           <ListItem
+                              button
+                              className="autocomplete-item"
+                              autoFocus={false}
+                              selected={entry === focusedEntry}
+                              onClick={() => changeSelected(entry)}
+                              key={getKey(entry)}
+                           >
+                              {getLabel(entry)}
+                           </ListItem>
+                        ))
+                     ) : (
+                        <ListItem>{noOptionsText}</ListItem>
+                     )}
+                  </List>
+               </Paper>
+            </Popper>
          </div>
       );
    });

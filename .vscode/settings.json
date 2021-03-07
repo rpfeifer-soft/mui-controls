@@ -16,5 +16,8 @@ Happy linting! 💖
    "editor.formatOnSave": true,
    "editor.tabSize": 3,
    "prettier.printWidth": 120,
-   "prettier.tabWidth": 3
+   "prettier.tabWidth": 3,
+   "[typescriptreact]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+   }
 }
