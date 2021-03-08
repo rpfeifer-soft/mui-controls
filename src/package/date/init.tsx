@@ -2,8 +2,8 @@
 
 import * as React from "react";
 import { observer } from "mobx-react";
-import { MuiPickersUtilsProvider } from "@material-ui/pickers";
-import MomentUtils from "@date-io/moment";
+import { LocalizationProvider } from "@material-ui/lab";
+import MomentUtils from "@material-ui/lab/AdapterMoment";
 import moment from "moment";
 import "moment/locale/de";
 
@@ -51,9 +51,9 @@ const DateTimeInit = observer((props: DateTimeInitProps) => {
 
    // The markup
    return (
-      <MuiPickersUtilsProvider libInstance={moment} utils={DateUtils} locale={locale}>
+      <LocalizationProvider dateLibInstance={moment} dateAdapter={DateUtils} locale={locale}>
          {children}
-      </MuiPickersUtilsProvider>
+      </LocalizationProvider>
    );
 });
 

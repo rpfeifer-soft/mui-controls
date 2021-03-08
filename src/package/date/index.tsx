@@ -2,19 +2,18 @@
 
 import * as React from "react";
 import { observer } from "mobx-react";
-import { makeStyles } from "@material-ui/core";
+import { makeStyles, TextField, TextFieldProps } from "@material-ui/core";
 import clsx from "clsx";
 import {
    DatePicker,
    DateTimePicker,
-   KeyboardDatePicker,
-   KeyboardDateTimePicker,
-   MuiPickersContext,
-} from "@material-ui/pickers";
+   DesktopDatePicker,
+   DesktopDateTimePicker,
+   MuiPickersAdapterContext,
+} from "@material-ui/lab";
 import InputRef from "../InputRef";
 import { DateUtils } from "./init";
 import moment from "moment";
-import { MaterialUiPickersDate } from "@material-ui/pickers/typings/date";
 export { default as DateTimeInit } from "./init";
 
 const useStyles = makeStyles(() => ({
@@ -41,7 +40,7 @@ export interface DateTimeFieldProps
 const DateTimeField = observer((props: DateTimeFieldProps) => {
    // The styles
    const styles = useStyles();
-   const context = React.useContext(MuiPickersContext);
+   const context = React.useContext(MuiPickersAdapterContext);
 
    // The props
    const {
@@ -126,8 +125,9 @@ const DateTimeField = observer((props: DateTimeFieldProps) => {
 
    const commonProps = {
       value: current,
+      renderInput: (params: TextFieldProps) => <TextField {...params} />,
       format,
-      onAccept: (date?: MaterialUiPickersDate) => {
+      onAccept: (date?: any) => {
          onChange(date?.toDate());
       },
       clearable,
@@ -151,26 +151,25 @@ const DateTimeField = observer((props: DateTimeFieldProps) => {
             <DateTimePicker
                ampm={false}
                minutesStep={timeSteps}
-               focused={false}
                onChange={(date) => setCurrent(date?.toDate() || null)}
                {...commonProps}
             />
          );
       } else {
          control = (
-            <KeyboardDateTimePicker
+            <DesktopDateTimePicker
                ampm={false}
                minutesStep={timeSteps}
-               inputProps={{
+               InputProps={{
                   ref: mountInput,
                   onKeyDown: (event) => handleKeyDown(event),
+                  onBlur: () => {
+                     onEndInput(true);
+                  },
                }}
                onChange={(date, text) => {
                   setCurrent(date?.toDate() || null);
                   setInputText(text);
-               }}
-               onBlur={() => {
-                  onEndInput(true);
                }}
                {...commonProps}
             />
@@ -178,23 +177,21 @@ const DateTimeField = observer((props: DateTimeFieldProps) => {
       }
    } else {
       if (mobile) {
-         control = (
-            <DatePicker focused={false} onChange={(date) => setCurrent(date?.toDate() || null)} {...commonProps} />
-         );
+         control = <DatePicker onChange={(date) => setCurrent(date?.toDate() || null)} {...commonProps} />;
       } else {
          control = (
-            <KeyboardDatePicker
-               inputProps={{
+            <DesktopDatePicker
+               InputProps={{
                   ref: mountInput,
                   onKeyDown: (event) => handleKeyDown(event),
+                  onBlur: () => {
+                     onEndInput(true);
+                  },
                }}
                orientation={desktop ? "landscape" : "portrait"}
                onChange={(date, text) => {
                   setCurrent(date?.toDate() || null);
                   setInputText(text);
-               }}
-               onBlur={() => {
-                  onEndInput(true);
                }}
                {...commonProps}
             />

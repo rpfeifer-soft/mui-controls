@@ -1,91 +1,39 @@
-/** @format */
+import React from "react";
+import Theme from "./Theme";
+import Choice from "./Choice";
+import { Box, Paper } from "@material-ui/core";
 
-import React, { useEffect } from 'react';
-import './App.css';
-import { observer } from 'mobx-react';
-import { Button, createMuiTheme, CssBaseline, ThemeProvider, useMediaQuery } from '@material-ui/core';
-import AutoCompleteTest from './package/autocomplete/test';
-import AuthCodeTest from './package/authcode/test';
-import AlertTest from './package/alert/test';
-import DateTimeFieldTest from './package/date/test';
+const choices = ["Alert", "AuthCode", "AutoComplete", "DateTime"] as const;
 
-interface ThemeProps {
+interface AppProps {}
 
-}
+const App = (props: AppProps) => {
+   const [type, Type] = Choice.useChoice(choices, window.location.hash.substr(1));
 
-const Theme = observer(({ children }: React.PropsWithChildren<ThemeProps>) => {
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-  const [darkMode, setDarkMode] = React.useState(localStorage.getItem('dark') === 'true');
-  useEffect(() => {
-    if (localStorage.getItem('dark') === null) {
-      setDarkMode(prefersDarkMode)
-    }
-  }, [prefersDarkMode]);
-  const paletteType = darkMode ? 'dark' : 'light';
-  const theme = React.useMemo(
-    () =>
-      createMuiTheme({
-        palette: {
-          type: paletteType,
-          primary: {
-            main: '#90caf9'
-          },
-          secondary: {
-            main: '#f48fb1'
-          }
-        }
-      }),
-    [paletteType]
-  );
-  const toggleDark = () => {
-    setDarkMode(!darkMode);
-    localStorage.setItem('dark', darkMode ? 'false' : 'true');
-  }
-  return (
-    <ThemeProvider theme={theme}>
-      <React.Fragment>
-        <CssBaseline />
-        <div style={{ border: '1px solid #888', padding: 8 }}>
-          <Button
-            onClick={() => toggleDark()}
-            style={{
-              position: 'absolute',
-              right: 0,
-              top: 0
+   React.useEffect(() => {
+      window.location.hash = type ? type : "";
+   }, [type]);
+
+   return (
+      <Theme>
+         <Box
+            sx={{
+               padding: 2,
+               marginTop: 5,
+               borderTop: "1px solid #888",
             }}
-          >{darkMode ? 'Dark' : 'Light'}
-          </Button>
-          {children}
-        </div>
-      </React.Fragment>
-    </ThemeProvider>
-  )
-});
-
-function App() {
-  const hash = window.location.hash;
-  const goto = (hash: string) => {
-    window.location.hash = hash;
-    window.location.reload();
-  }
-  return (
-    <Theme>
-      {hash !== '#autocomplete' || <AutoCompleteTest />}
-      {hash !== '#authcode' || <AuthCodeTest />}
-      {hash !== '#alert' || <AlertTest />}
-      {hash !== '#datetime' || <DateTimeFieldTest />}
-      {!hash ? (
-        <React.Fragment>
-          <Button onClick={() => goto('#autocomplete')}>Autocomplete</Button>
-          <Button onClick={() => goto('#authcode')}>AuthCode</Button>
-          <Button onClick={() => goto('#alert')}>Alert</Button>
-          <Button onClick={() => goto('#datetime')}>DateTime</Button>
-        </React.Fragment>
-      ) : (
-          <Button onClick={() => goto('')} style={{ position: 'absolute', top: 8, left: 8 }}> &lt; Back</Button>
-        )}
-    </Theme>
-  );
-}
+         >
+            <Type />
+            <hr />
+            <Paper sx={{ padding: 2 }}>
+               {type === "Alert" && "1."}
+               {type === "AuthCode" && "2."}
+               {type === "AutoComplete" && "3."}
+               {type === "DateTime" && "4."}
+            </Paper>
+         </Box>
+      </Theme>
+   );
+};
 
 export default App;
