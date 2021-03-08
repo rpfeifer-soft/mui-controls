@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Button, createMuiTheme, CssBaseline, StylesProvider, ThemeProvider, useMediaQuery } from "@material-ui/core";
 import { absolute } from "./types";
+import { css } from "@emotion/css";
 
 interface ThemeProps {
    children: React.ReactNode;
@@ -36,6 +37,10 @@ const Theme = (props: ThemeProps) => {
       [paletteType]
    );
 
+   const gotoHome = () => {
+      window.location.hash = "";
+      window.location.reload();
+   };
    const toggleDark = () => {
       setDarkMode(!darkMode);
       localStorage.setItem("dark", darkMode ? "false" : "true");
@@ -44,7 +49,10 @@ const Theme = (props: ThemeProps) => {
       <StylesProvider injectFirst>
          <ThemeProvider theme={theme}>
             <CssBaseline />
-            <Button className={absolute} onClick={toggleDark}>
+            <Button className={absolute} onClick={gotoHome}>
+               Home
+            </Button>
+            <Button className={css(absolute, { left: "auto", right: 0 })} onClick={toggleDark}>
                {darkMode ? "Dark" : "Light"}
             </Button>
             {children}

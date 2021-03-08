@@ -24,13 +24,17 @@ const App = (props: AppProps) => {
             }}
          >
             <Type />
-            <hr />
-            <Paper sx={{ padding: 2 }}>
-               {type === "Alert" && "1."}
-               {type === "AuthCode" && "2."}
-               {type === "AutoComplete" && "3."}
-               {type === "DateTime" && "4."}
-            </Paper>
+            {type && (
+               <React.Fragment>
+                  <hr />
+                  <Paper sx={{ padding: 2 }}>
+                     {type === "Alert" && "1."}
+                     {type === "AuthCode" && "2."}
+                     {type === "AutoComplete" && "3."}
+                     {type === "DateTime" && "4."}
+                  </Paper>
+               </React.Fragment>
+            )}
          </Box>
       </Theme>
    );
