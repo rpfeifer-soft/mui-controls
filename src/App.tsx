@@ -1,14 +1,14 @@
 import React from "react";
 import Theme from "./Theme";
-import Choice from "./Choice";
 import { Box, Paper } from "@material-ui/core";
+import useChoice from "./useChoice";
 
 const choices = ["Alert", "AuthCode", "AutoComplete", "DateTime"] as const;
 
 interface AppProps {}
 
 const App = (props: AppProps) => {
-   const [type, Type] = Choice.useChoice(choices, window.location.hash.substr(1));
+   const [type, Type] = useChoice(choices, window.location.hash.substr(1));
 
    React.useEffect(() => {
       window.location.hash = type ? type : "";
