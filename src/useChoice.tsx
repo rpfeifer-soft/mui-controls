@@ -14,13 +14,13 @@ function useChoice<T extends string>(choices: ReadonlyArray<T>, active?: T | fal
    const render = (props: ChoiceProps) => {
       // The markup
       return (
-         <OptionGroup size="small">
+         <OptionGroup>
             {all.map((choice, index) => (
                <OptionButton
                   key={index}
+                  {...props}
                   onClick={() => setCurrent(choice)}
                   variant={current === choice ? "contained" : "outlined"}
-                  {...props}
                >
                   {choice}
                </OptionButton>

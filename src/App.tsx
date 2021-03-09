@@ -2,6 +2,7 @@ import React from "react";
 import Theme from "./Theme";
 import { Box, Paper } from "@material-ui/core";
 import useChoice from "./useChoice";
+import TestAlert from "./tests/TestAlert";
 
 const choices = ["Alert", "AuthCode", "AutoComplete", "DateTime"] as const;
 
@@ -28,7 +29,7 @@ const App = (props: AppProps) => {
                <React.Fragment>
                   <hr />
                   <Paper sx={{ padding: 2 }}>
-                     {type === "Alert" && "1."}
+                     {type === "Alert" && <TestAlert />}
                      {type === "AuthCode" && "2."}
                      {type === "AutoComplete" && "3."}
                      {type === "DateTime" && "4."}
