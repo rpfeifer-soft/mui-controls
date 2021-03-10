@@ -1,9 +1,9 @@
 import React from "react";
 import Theme from "./Theme";
 import { Box, Paper } from "@material-ui/core";
-import useChoice from "./hooks/useChoice";
-import TestAlert from "./tests/TestAlert";
-import AuthCodeTest from "./package/authcode/test";
+import AuthCodeTest from "../package/authcode/test";
+import { useChoice } from "../hooks";
+import { TestAlert } from "../tests";
 
 const choices = ["Alert", "AuthCode", "AutoComplete", "DateTime"] as const;
 
@@ -22,7 +22,7 @@ const App = (props: AppProps) => {
             sx={{
                padding: 2,
                marginTop: 5,
-               borderTop: "1px solid #888",
+               borderTop: "1px solid rgba(128,128,128,0.3)",
             }}
          >
             <Type />

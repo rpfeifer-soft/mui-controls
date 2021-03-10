@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Button, createMuiTheme, CssBaseline, StylesProvider, ThemeProvider, useMediaQuery } from "@material-ui/core";
-import { absolute } from "./styles";
+import { absolute } from "../styles";
 import { css } from "@emotion/css";
 
 interface ThemeProps {
