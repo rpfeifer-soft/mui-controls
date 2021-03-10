@@ -49,11 +49,15 @@ const Theme = (props: ThemeProps) => {
       <StylesProvider injectFirst>
          <ThemeProvider theme={theme}>
             <CssBaseline />
-            <Button className={absolute} onClick={gotoHome}>
+            <Button variant="outlined" className={css(absolute, { margin: 2 })} onClick={gotoHome}>
                Home
             </Button>
-            <Button className={css(absolute, { left: "auto", right: 0 })} onClick={toggleDark}>
-               {darkMode ? "Dark" : "Light"}
+            <Button
+               variant="outlined"
+               className={css(absolute, { margin: 2, left: "auto", right: 0 })}
+               onClick={toggleDark}
+            >
+               {!darkMode ? "Dark" : "Light"}
             </Button>
             {children}
          </ThemeProvider>
