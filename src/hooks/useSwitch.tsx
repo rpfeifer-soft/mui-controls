@@ -8,9 +8,8 @@ export interface SwitchProps extends Omit<ButtonProps, "variant" | "onClick"> {
    maySwitch?: (next: boolean) => boolean;
 }
 
-function useSwitch(name: string, active?: boolean): [boolean, React.FC<SwitchProps>] {
-   const [current, setCurrent] = React.useState(active || false);
-   const render = (props: SwitchProps) => {
+function createRender(name: string, current: boolean, setCurrent: (next: boolean) => void) {
+   return (props: SwitchProps) => {
       // The props
       const { maySwitch, ...btnProps } = props;
       // The functions
@@ -27,7 +26,12 @@ function useSwitch(name: string, active?: boolean): [boolean, React.FC<SwitchPro
          </OptionButton>
       );
    };
-   return [current, render];
+}
+
+function useSwitch(name: string, active?: boolean): [boolean, React.FC<SwitchProps>] {
+   const [current, setCurrent] = React.useState(active || false);
+
+   return [current, React.useMemo(() => createRender(name, current, setCurrent), [name, current, setCurrent])];
 }
 
 export default useSwitch;

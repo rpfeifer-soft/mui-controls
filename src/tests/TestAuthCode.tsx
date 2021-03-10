@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { BoxProps, Box, Paper } from "@material-ui/core";
 import { AuthCode } from "../package";
-import { useActions } from "../hooks";
+import { useActions, useMessage } from "../hooks";
 import InputRef from "../package/InputRef";
 
 export interface TestAuthCodeProps extends BoxProps {}
@@ -14,11 +14,20 @@ const TestAuthCode = (props: TestAuthCodeProps) => {
    const [value, setValue] = useState("");
    const Values = useActions("Values", ["", "123456"] as const);
    const States = useActions("States", ["Focus", "Select"] as const);
+   const [showMessage, Message] = useMessage();
 
    // The markup
    return (
       <Box {...props}>
-         <AuthCode autoFocus value={value} inputRef={ctrl} onChange={setValue} />
+         <AuthCode
+            autoFocus
+            value={value}
+            inputRef={ctrl}
+            onChange={setValue}
+            onSubmit={(value) => {
+               showMessage(`You submitted the value: '${value}'`);
+            }}
+         />
          <hr />
          <Paper
             sx={{
@@ -38,7 +47,7 @@ const TestAuthCode = (props: TestAuthCodeProps) => {
             onChosen={(what) => {
                switch (what) {
                   case "Focus":
-                     ctrl.focus();
+                     ctrl.focusEnd();
                      break;
                   case "Select":
                      ctrl.focusAll();
@@ -46,6 +55,7 @@ const TestAuthCode = (props: TestAuthCodeProps) => {
                }
             }}
          />
+         <Message />
       </Box>
    );
 };

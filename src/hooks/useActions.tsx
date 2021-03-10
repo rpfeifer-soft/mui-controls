@@ -8,9 +8,8 @@ export interface ActionsProps<T extends string> extends Omit<ButtonProps, "varia
    onChosen: (action: T) => void;
 }
 
-function useActions<T extends string>(title: string, actions: ReadonlyArray<T>): React.FC<ActionsProps<T>> {
-   const [all] = React.useState(actions);
-   const Render = (props: ActionsProps<T>) => {
+function createRender<T extends string>(title: string, all: readonly T[]) {
+   return (props: ActionsProps<T>) => {
       // The props
       const { onChosen, ...btnProps } = props;
       // The markup
@@ -24,7 +23,12 @@ function useActions<T extends string>(title: string, actions: ReadonlyArray<T>):
          </OptionGroup>
       );
    };
-   return Render;
+}
+
+function useActions<T extends string>(title: string, actions: ReadonlyArray<T>): React.FC<ActionsProps<T>> {
+   const [all] = React.useState(actions);
+
+   return React.useMemo(() => createRender(title, all), [title, all]);
 }
 
 export default useActions;

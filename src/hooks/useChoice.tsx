@@ -8,20 +8,13 @@ export interface ChoiceProps<T extends string> extends Omit<ButtonProps, "varian
    mayChoose?: (choice: T) => boolean;
 }
 
-function useChoice<T extends string>(
+function createRender<T extends string>(
    title: string,
-   choices: ReadonlyArray<T>,
-   active: false
-): [T | false, React.FC<ChoiceProps<T>>];
-function useChoice<T extends string>(
-   title: string,
-   choices: ReadonlyArray<T>,
-   active?: T
-): [T, React.FC<ChoiceProps<T>>];
-function useChoice<T extends string>(title: string, choices: ReadonlyArray<T>, active?: T | false) {
-   const [all] = React.useState(choices);
-   const [current, setCurrent] = React.useState(active);
-   const render = (props: ChoiceProps<T>) => {
+   all: readonly T[],
+   current: T | false | undefined,
+   setCurrent: (next: T) => void
+) {
+   return (props: ChoiceProps<T>) => {
       // The props
       const { mayChoose, ...btnProps } = props;
       // The functions
@@ -47,7 +40,26 @@ function useChoice<T extends string>(title: string, choices: ReadonlyArray<T>, a
          </OptionGroup>
       );
    };
-   return [current, render];
+}
+
+function useChoice<T extends string>(
+   title: string,
+   choices: ReadonlyArray<T>,
+   active: false
+): [T | false, React.FC<ChoiceProps<T>>];
+function useChoice<T extends string>(
+   title: string,
+   choices: ReadonlyArray<T>,
+   active?: T
+): [T, React.FC<ChoiceProps<T>>];
+function useChoice<T extends string>(title: string, choices: ReadonlyArray<T>, active?: T | false) {
+   const [all] = React.useState(choices);
+   const [current, setCurrent] = React.useState(active);
+
+   return [
+      current,
+      React.useMemo(() => createRender(title, all, current, setCurrent), [title, all, current, setCurrent]),
+   ];
 }
 
 export default useChoice;

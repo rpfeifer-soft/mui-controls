@@ -7,16 +7,8 @@ export interface MessageProps extends Omit<SnackbarProps, "open" | "message"> {
    durationInMS?: number;
 }
 
-function useMessage(): [(message: string) => void, React.FC<MessageProps>] {
-   const [current, setCurrent] = React.useState("");
-   const [changeNo, setChangeNo] = React.useState(0);
-
-   const showMessage = (message: string) => {
-      setCurrent(message);
-      setChangeNo(changeNo + 1);
-   };
-
-   const Render = (props: MessageProps) => {
+function createRender(current: string, changeNo: number, setCurrent: (value: string) => void) {
+   return (props: MessageProps) => {
       // The props
       const { durationInMS = 5000, ...snackProps } = props;
 
@@ -36,7 +28,21 @@ function useMessage(): [(message: string) => void, React.FC<MessageProps>] {
       // The markup
       return <Snackbar {...snackProps} open={Boolean(message)} message={message} />;
    };
-   return [showMessage, Render];
+}
+
+function useMessage(): [(message: string) => void, React.FC<MessageProps>] {
+   const [current, setCurrent] = React.useState("");
+   const [changeNo, setChangeNo] = React.useState(0);
+
+   const showMessage = (message: string) => {
+      setCurrent(message);
+      setChangeNo(changeNo + 1);
+   };
+
+   return [
+      showMessage,
+      React.useMemo(() => createRender(current, changeNo, setCurrent), [current, changeNo, setCurrent]),
+   ];
 }
 
 export default useMessage;
