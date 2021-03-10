@@ -3,7 +3,7 @@ import Theme from "./Theme";
 import { Box, Paper } from "@material-ui/core";
 import AuthCodeTest from "../package/authcode/test";
 import { useChoice } from "../hooks";
-import { TestAlert } from "../tests";
+import { TestAlert, TestAuthCode } from "../tests";
 
 const choices = ["Alert", "AuthCode", "AutoComplete", "DateTime"] as const;
 
@@ -31,8 +31,8 @@ const App = (props: AppProps) => {
                   <hr />
                   <Paper sx={{ padding: 2 }}>
                      {type === "Alert" && <TestAlert />}
-                     {type === "AuthCode" && <AuthCodeTest />}
-                     {type === "AutoComplete" && "3."}
+                     {type === "AuthCode" && <TestAuthCode />}
+                     {type === "AutoComplete" && <AuthCodeTest />}
                      {type === "DateTime" && "4."}
                   </Paper>
                </React.Fragment>
