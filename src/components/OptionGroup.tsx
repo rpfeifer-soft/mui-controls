@@ -10,16 +10,17 @@ const OptionGroup = (props: ButtonGroupProps) => {
          className={css({
             display: "inline-block",
             position: "relative",
+            marginTop: 16,
             marginRight: 8,
-            marginBottom: 8,
+            marginBottom: 4,
          })}
       >
          <ButtonGroup
             size="small"
             sx={{
                "& .MuiButton-root": {
-                  borderBottomLeftRadius: 0,
-                  borderBottomRightRadius: 0,
+                  borderTopLeftRadius: 0,
+                  borderTopRightRadius: 0,
                },
             }}
             {...groupProps}
@@ -28,16 +29,17 @@ const OptionGroup = (props: ButtonGroupProps) => {
          </ButtonGroup>
          <div
             className={css(absolute, {
-               top: "100%",
-               marginTop: -1,
+               bottom: "100%",
+               top: "auto",
+               marginBottom: -1,
                right: 0,
                fontSize: "0.5rem",
                textAlign: "center",
-               background: `linear-gradient(${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+               background: `linear-gradient(${theme.palette.primary.dark}, ${theme.palette.primary.main})`,
                color: theme.palette.primary.light,
-               textShadow: "0px 1px 2px " + theme.palette.background.default,
-               borderBottomLeftRadius: 6,
-               borderBottomRightRadius: 6,
+               textShadow: "0px -1px 2px " + theme.palette.background.default,
+               borderTopLeftRadius: 6,
+               borderTopRightRadius: 6,
             })}
          >
             {title}

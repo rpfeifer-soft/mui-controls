@@ -27,10 +27,8 @@ function useMessage(): [(message: string) => void, React.FC<MessageProps>] {
          if (!message) {
             return;
          }
-         console.log("Set timeout", new Date().getTime() / 1000);
          const timeout = setTimeout(() => {
             setCurrent("");
-            console.log("Timeout done", new Date().getTime() / 1000);
          }, durationInMS);
          return () => clearTimeout(timeout);
       }, [change, message, durationInMS]);
