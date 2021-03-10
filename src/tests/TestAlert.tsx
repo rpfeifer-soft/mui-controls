@@ -3,9 +3,8 @@
 import * as React from "react";
 import Alert from "../package/alert";
 import { AlertTitle, Box, BoxProps } from "@material-ui/core";
-import useChoice from "../useChoice";
-import useSwitch from "../useSwitch";
-import { OptionGroup } from "../types";
+import { OptionGroup } from "../components";
+import { useChoice, useSwitch } from "../hooks";
 
 export interface TestAlertProps extends BoxProps {}
 

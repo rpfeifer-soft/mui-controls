@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { ButtonProps } from "@material-ui/core";
-import { OptionButton, OptionGroup } from "./types";
+import { OptionButton, OptionGroup } from "../components";
 
 export interface ChoiceProps extends Omit<ButtonProps, "variant" | "onClick"> {}
 
