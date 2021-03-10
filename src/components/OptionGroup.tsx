@@ -14,17 +14,30 @@ const OptionGroup = (props: ButtonGroupProps) => {
             marginBottom: 8,
          })}
       >
-         <ButtonGroup size="small" {...groupProps}>
+         <ButtonGroup
+            size="small"
+            sx={{
+               "& .MuiButton-root": {
+                  borderBottomLeftRadius: 0,
+                  borderBottomRightRadius: 0,
+               },
+            }}
+            {...groupProps}
+         >
             {children}
          </ButtonGroup>
          <div
             className={css(absolute, {
                top: "100%",
+               marginTop: -1,
                right: 0,
                fontSize: "0.5rem",
                textAlign: "center",
-               color: theme.palette.secondary.main,
-               opacity: 0.5,
+               background: `linear-gradient(${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+               color: theme.palette.primary.light,
+               textShadow: "0px 1px 2px " + theme.palette.background.default,
+               borderBottomLeftRadius: 6,
+               borderBottomRightRadius: 6,
             })}
          >
             {title}
