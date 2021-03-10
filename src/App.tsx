@@ -10,7 +10,7 @@ const choices = ["Alert", "AuthCode", "AutoComplete", "DateTime"] as const;
 interface AppProps {}
 
 const App = (props: AppProps) => {
-   const [type, Type] = useChoice(choices, window.location.hash.substr(1));
+   const [type, Type] = useChoice("Type", choices, window.location.hash.substr(1));
 
    React.useEffect(() => {
       window.location.hash = type ? type : "";
