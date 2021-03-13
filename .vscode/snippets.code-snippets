@@ -78,5 +78,37 @@
          "export default $1;"
       ],
       "description": "Init a component with styles and properties."
+   },
+   "New react box component": {
+      "prefix": "newboxcomp",
+      "body": [
+         "/** @format */",
+         "",
+         "import * as React from 'react';",
+         "import * as Mui from \"@material-ui/core\";",
+         "",
+         "export interface $1Props extends Mui.BoxProps {",
+         "}",
+         "",
+         "const $1 = (props: $1Props) => {",
+         "   // The state",
+         "",
+         "   // The props",
+         "   const {",
+         "      ...boxProps",
+         "   } = props;",
+         "",
+         "   // The functions",
+         "",
+         "   // The markup",
+         "   return (",
+         "      <Mui.Box {...boxProps}>",
+         "      </Mui.Box>",
+         "   );",
+         "};",
+         "",
+         "export default $1;"
+      ],
+      "description": "Init a component with styles and properties."
    }
 }
