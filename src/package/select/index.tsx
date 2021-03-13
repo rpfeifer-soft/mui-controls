@@ -6,6 +6,9 @@ import InputRef from "../InputRef";
 
 function noChange<T>(value: T | null) {}
 function noOpen() {}
+function noGroup<T>(value: T) {
+   return "";
+}
 
 // Trick the linter
 const memoize = React.useMemo;
@@ -38,15 +41,16 @@ export interface SelectProps<T> extends Omit<Mui.BoxProps, "onChange"> {
    options: T[];
 
    label?: string;
-   value?: T;
+   value?: T | null;
    variant?: Mui.TextFieldProps["variant"];
    disabled?: boolean;
    loading?: boolean;
    autoFocus?: boolean;
    selectRef?: React.MutableRefObject<SelectRef>;
 
-   onChange: (value: T | null) => void;
-   onOpen: () => void;
+   onChange?: (value: T | null) => void;
+   onOpen?: () => void;
+   groupBy?: (value: T) => string;
 }
 
 function Select<T>(props: SelectProps<T>) {
@@ -62,6 +66,7 @@ function Select<T>(props: SelectProps<T>) {
       selectRef: propsSelectRef,
       onChange = noChange,
       onOpen = noOpen,
+      groupBy = noGroup,
       ...boxProps
    } = props;
 
@@ -92,6 +97,7 @@ function Select<T>(props: SelectProps<T>) {
             fullWidth
             value={value}
             options={options}
+            groupBy={groupBy}
             loading={loading}
             disabled={disabled}
             onChange={(event, value) => onChange(value)}

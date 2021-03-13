@@ -125,6 +125,7 @@ const TestSelect = (props: TestSelectProps) => {
    const [label, Label] = useChoice("Label", ["", "Select"] as const);
    const [disabled, Disabled] = useSwitch("Disabled");
    const [async, Async] = useSwitch("Async");
+   const [grouped, Grouped] = useSwitch("Grouped");
    const [value, setValue] = React.useState<Option | null>(null);
    const [variant, Variant] = useChoice("Variant", ["standard", "outlined", "filled"] as const);
    const [options, setOptions] = React.useState<Option[]>([]);
@@ -165,6 +166,7 @@ const TestSelect = (props: TestSelectProps) => {
                showMessage(JSON.stringify(value));
             }}
             onOpen={onOpen}
+            groupBy={grouped ? (value) => value.id : undefined}
          />
          <hr />
          <Mui.Paper
@@ -180,6 +182,7 @@ const TestSelect = (props: TestSelectProps) => {
          <OptionGroup title="Options">
             <Disabled />
             <Async />
+            <Grouped />
          </OptionGroup>
          <Actions
             onChosen={(chosen) => {
