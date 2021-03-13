@@ -36,8 +36,8 @@ const OptionGroup = (props: ButtonGroupProps) => {
                fontSize: "0.5rem",
                textAlign: "center",
                background: `linear-gradient(${theme.palette.primary.dark}, ${theme.palette.primary.main})`,
-               color: theme.palette.primary.light,
-               textShadow: "0px -1px 2px " + theme.palette.background.default,
+               color: theme.palette.getContrastText(theme.palette.primary.main),
+               textShadow: "1px 1px 2px " + theme.palette.background.default,
                borderTopLeftRadius: 6,
                borderTopRightRadius: 6,
             })}

@@ -1,7 +1,7 @@
 /** @format */
 
 import * as React from "react";
-import { Box, BoxProps, Input, Paper, useTheme } from "@material-ui/core";
+import { alpha, Box, BoxProps, Input, Paper, useTheme } from "@material-ui/core";
 import InputRef from "../InputRef";
 import { css } from "@emotion/css";
 import clsx from "clsx";
@@ -141,6 +141,7 @@ const AuthCode = (props: AuthCodeProps) => {
                },
                "&.Mui-focused + .box .selected.digit": {
                   borderColor: theme.palette.primary.main,
+                  backgroundColor: alpha(theme.palette.primary.light, 0.1),
                },
                "&.Mui-focused + .box .last.digit::after": {
                   content: '"_"',

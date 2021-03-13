@@ -27,14 +27,14 @@ const Theme = (props: ThemeProps) => {
             palette: {
                mode: paletteType,
                primary: {
-                  main: "#90caf9",
+                  main: darkMode ? "#90caf9" : "#2d0476",
                },
                secondary: {
-                  main: "#f48fb1",
+                  main: darkMode ? "#f48fb1" : "#197e81",
                },
             },
          }),
-      [paletteType]
+      [darkMode, paletteType]
    );
 
    const gotoHome = () => {
