@@ -1,8 +1,9 @@
 import * as React from "react";
 import * as Mui from "@material-ui/core";
 import Theme from "./Theme";
-import { useChoice } from "../hooks";
+import { useChoice, useSwitch } from "../hooks";
 import { TestAlert, TestAuthCode, TestSelect } from "../tests";
+import OptionGroup from "./OptionGroup";
 
 const choices = ["Alert", "AuthCode", "Select", "DateTime"] as const;
 
@@ -10,10 +11,23 @@ interface AppProps {}
 
 const App = (props: AppProps) => {
    const [type, Type] = useChoice("Type", choices, window.location.hash.substr(1));
+   const [dialog, Dialog] = useSwitch("Dialog");
 
    React.useEffect(() => {
       window.location.hash = type ? type : "";
    }, [type]);
+
+   const test = type && (
+      <React.Fragment>
+         {!dialog && <hr />}
+         <Mui.Paper elevation={5} sx={{ padding: 2 }}>
+            {type === "Alert" && <TestAlert />}
+            {type === "AuthCode" && <TestAuthCode />}
+            {type === "Select" && <TestSelect />}
+            {type === "DateTime" && "4."}
+         </Mui.Paper>
+      </React.Fragment>
+   );
 
    return (
       <Theme>
@@ -25,16 +39,19 @@ const App = (props: AppProps) => {
             }}
          >
             <Type />
-            {type && (
-               <React.Fragment>
-                  <hr />
-                  <Mui.Paper sx={{ padding: 2 }}>
-                     {type === "Alert" && <TestAlert />}
-                     {type === "AuthCode" && <TestAuthCode />}
-                     {type === "Select" && <TestSelect />}
-                     {type === "DateTime" && "4."}
-                  </Mui.Paper>
-               </React.Fragment>
+            <OptionGroup title="Options">
+               <Dialog />
+            </OptionGroup>
+            {dialog ? (
+               <Mui.Dialog open>
+                  <Mui.DialogTitle>Dialog</Mui.DialogTitle>
+                  <Mui.DialogContent>{test}</Mui.DialogContent>
+                  <Mui.DialogActions>
+                     <Dialog />
+                  </Mui.DialogActions>
+               </Mui.Dialog>
+            ) : (
+               test
             )}
          </Mui.Box>
       </Theme>
