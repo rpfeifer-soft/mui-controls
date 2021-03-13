@@ -1,10 +1,10 @@
 /** @format */
 
 import * as React from "react";
-import { ButtonProps } from "@material-ui/core";
+import * as Mui from "@material-ui/core";
 import { OptionButton } from "../components";
 
-export interface SwitchProps extends Omit<ButtonProps, "variant" | "onClick"> {
+export interface SwitchProps extends Omit<Mui.ButtonProps, "variant" | "onClick"> {
    maySwitch?: (next: boolean) => boolean;
 }
 

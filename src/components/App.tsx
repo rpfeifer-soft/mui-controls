@@ -1,6 +1,6 @@
-import React from "react";
+import * as React from "react";
+import * as Mui from "@material-ui/core";
 import Theme from "./Theme";
-import { Box, Paper } from "@material-ui/core";
 import { useChoice } from "../hooks";
 import { TestAlert, TestAuthCode } from "../tests";
 
@@ -17,7 +17,7 @@ const App = (props: AppProps) => {
 
    return (
       <Theme>
-         <Box
+         <Mui.Box
             sx={{
                padding: 2,
                marginTop: 5,
@@ -28,15 +28,15 @@ const App = (props: AppProps) => {
             {type && (
                <React.Fragment>
                   <hr />
-                  <Paper sx={{ padding: 2 }}>
+                  <Mui.Paper sx={{ padding: 2 }}>
                      {type === "Alert" && <TestAlert />}
                      {type === "AuthCode" && <TestAuthCode />}
                      {type === "AutoComplete" && "3."}
                      {type === "DateTime" && "4."}
-                  </Paper>
+                  </Mui.Paper>
                </React.Fragment>
             )}
-         </Box>
+         </Mui.Box>
       </Theme>
    );
 };

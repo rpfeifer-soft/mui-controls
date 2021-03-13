@@ -1,12 +1,12 @@
 /** @format */
 
+import * as Mui from "@material-ui/core";
 import Alert from "../package/alert";
-import { Box, BoxProps } from "@material-ui/core";
 import { OptionGroup } from "../components";
 import { useChoice, useSwitch } from "../hooks";
 import useMessage from "../hooks/useMessage";
 
-export interface TestAlertProps extends BoxProps {}
+export interface TestAlertProps extends Mui.BoxProps {}
 
 const TestAlert = (props: TestAlertProps) => {
    // The state
@@ -23,7 +23,7 @@ const TestAlert = (props: TestAlertProps) => {
 
    // The markup
    return (
-      <Box {...props}>
+      <Mui.Box {...props}>
          <Alert
             variant={variant}
             severity={severity}
@@ -47,7 +47,7 @@ const TestAlert = (props: TestAlertProps) => {
             <Close />
          </OptionGroup>
          <Message />
-      </Box>
+      </Mui.Box>
    );
 };
 

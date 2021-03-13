@@ -1,10 +1,10 @@
 /** @format */
 
 import * as React from "react";
-import { ButtonProps } from "@material-ui/core";
+import * as Mui from "@material-ui/core";
 import { OptionButton, OptionGroup } from "../components";
 
-export interface ChoiceProps<T extends string> extends Omit<ButtonProps, "variant" | "onClick"> {
+export interface ChoiceProps<T extends string> extends Omit<Mui.ButtonProps, "variant" | "onClick"> {
    mayChoose?: (choice: T) => boolean;
 }
 

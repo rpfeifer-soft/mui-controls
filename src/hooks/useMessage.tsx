@@ -1,9 +1,9 @@
 /** @format */
 
 import * as React from "react";
-import { Snackbar, SnackbarProps } from "@material-ui/core";
+import * as Mui from "@material-ui/core";
 
-export interface MessageProps extends Omit<SnackbarProps, "open" | "message"> {
+export interface MessageProps extends Omit<Mui.SnackbarProps, "open" | "message"> {
    durationInMS?: number;
 }
 
@@ -26,7 +26,7 @@ function createRender(current: string, changeNo: number, setCurrent: (value: str
       }, [change, message, durationInMS]);
 
       // The markup
-      return <Snackbar {...snackProps} open={Boolean(message)} message={message} />;
+      return <Mui.Snackbar {...snackProps} open={Boolean(message)} message={message} />;
    };
 }
 

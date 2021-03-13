@@ -41,7 +41,20 @@
       "extends": [
          "react-app",
          "react-app/jest"
-      ]
+      ],
+      "rules": {
+         "no-restricted-syntax": [
+            "error",
+            {
+               "selector": "ImportDeclaration[source.value='react'] > :matches(ImportSpecifier, ImportDefaultSpecifier)",
+               "message": "Please use `import * as React from 'react'` instead."
+            },
+            {
+               "selector": "ImportDeclaration[source.value='@material-ui/core'] > :matches(ImportSpecifier, ImportDefaultSpecifier)",
+               "message": "Please use `import * as React from 'react'` instead."
+            }
+         ]
+      }
    },
    "browserslist": {
       "production": [

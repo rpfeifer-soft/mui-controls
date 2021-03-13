@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Button, createMuiTheme, CssBaseline, StylesProvider, ThemeProvider, useMediaQuery } from "@material-ui/core";
+import * as Mui from "@material-ui/core";
 import { absolute } from "../styles";
 import { css } from "@emotion/css";
 
@@ -8,7 +8,7 @@ interface ThemeProps {
 }
 
 const Theme = (props: ThemeProps) => {
-   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
+   const prefersDarkMode = Mui.useMediaQuery("(prefers-color-scheme: dark)");
    const [darkMode, setDarkMode] = React.useState(localStorage.getItem("dark") === "true");
 
    React.useEffect(() => {
@@ -23,7 +23,7 @@ const Theme = (props: ThemeProps) => {
    const paletteType = darkMode ? "dark" : "light";
    const theme = React.useMemo(
       () =>
-         createMuiTheme({
+         Mui.createMuiTheme({
             palette: {
                mode: paletteType,
                primary: {
@@ -46,22 +46,22 @@ const Theme = (props: ThemeProps) => {
       localStorage.setItem("dark", darkMode ? "false" : "true");
    };
    return (
-      <StylesProvider injectFirst>
-         <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <Button variant="outlined" className={css(absolute, { margin: 2 })} onClick={gotoHome}>
+      <Mui.StylesProvider injectFirst>
+         <Mui.ThemeProvider theme={theme}>
+            <Mui.CssBaseline />
+            <Mui.Button variant="outlined" className={css(absolute, { margin: 2 })} onClick={gotoHome}>
                Home
-            </Button>
-            <Button
+            </Mui.Button>
+            <Mui.Button
                variant="outlined"
                className={css(absolute, { margin: 2, left: "auto", right: 0 })}
                onClick={toggleDark}
             >
                {!darkMode ? "Dark" : "Light"}
-            </Button>
+            </Mui.Button>
             {children}
-         </ThemeProvider>
-      </StylesProvider>
+         </Mui.ThemeProvider>
+      </Mui.StylesProvider>
    );
 };
 

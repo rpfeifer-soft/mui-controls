@@ -1,13 +1,13 @@
 /** @format */
 
 import * as React from "react";
+import * as Mui from "@material-ui/core";
 import { observer } from "mobx-react";
-import { List, ListItem, makeStyles, Paper, Popper, TextField, TextFieldProps } from "@material-ui/core";
 import InputRef from "../InputRef";
 
 type HtmlDivProps = React.DetailedHTMLProps<React.HtmlHTMLAttributes<HTMLDivElement>, HTMLDivElement>;
 
-const useStyles = makeStyles(() => ({
+const useStyles = Mui.makeStyles(() => ({
    popper: {
       zIndex: 9999,
       maxHeight: "27em",
@@ -34,7 +34,7 @@ export interface AutocompleteProps<T> extends Omit<HtmlDivProps, "onChange"> {
    hasMatch?: (entry: T, filter: string) => boolean;
 
    textProps?: Omit<
-      TextFieldProps,
+      Mui.TextFieldProps,
       "value" | "onChange" | "label" | "autoFocus" | "fullwidth" | "disabled" | "required" | "variant"
    >;
 }
@@ -193,7 +193,7 @@ export function typedAutocomplete<T>() {
 
       return (
          <div {...divProps}>
-            <TextField
+            <Mui.TextField
                {...textProps}
                ref={textAnchor}
                inputRef={mountInput}
@@ -207,18 +207,18 @@ export function typedAutocomplete<T>() {
                onKeyDown={(event) => handleKeyDown(event, listElement.current)}
                onBlur={handleBlur}
             />
-            <Popper
+            <Mui.Popper
                open={!!filter && !!textAnchor.current && !closed}
                anchorEl={textAnchor.current}
                placement="bottom-start"
                className={styles.popper}
                container={document.body}
             >
-               <Paper variant="outlined">
-                  <List ref={listElement}>
+               <Mui.Paper variant="outlined">
+                  <Mui.List ref={listElement}>
                      {filteredOptions && filteredOptions.length > 0 && options && options.length > 0 ? (
                         filteredOptions.map((entry) => (
-                           <ListItem
+                           <Mui.ListItem
                               button
                               className="autocomplete-item"
                               autoFocus={false}
@@ -227,14 +227,14 @@ export function typedAutocomplete<T>() {
                               key={getKey(entry)}
                            >
                               {getLabel(entry)}
-                           </ListItem>
+                           </Mui.ListItem>
                         ))
                      ) : (
-                        <ListItem>{noOptionsText}</ListItem>
+                        <Mui.ListItem>{noOptionsText}</Mui.ListItem>
                      )}
-                  </List>
-               </Paper>
-            </Popper>
+                  </Mui.List>
+               </Mui.Paper>
+            </Mui.Popper>
          </div>
       );
    });

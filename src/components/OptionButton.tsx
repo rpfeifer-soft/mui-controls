@@ -1,6 +1,6 @@
-import { Button, styled } from "@material-ui/core";
+import * as Mui from "@material-ui/core";
 
-const OptionButton = styled(Button)({
+const OptionButton = Mui.styled(Mui.Button)({
    textTransform: "capitalize",
 });
 

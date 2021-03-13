@@ -1,9 +1,9 @@
+import * as Mui from "@material-ui/core";
 import { css } from "@emotion/css";
 import { absolute } from "../styles";
-import { ButtonGroup, ButtonGroupProps, useTheme } from "@material-ui/core";
 
-const OptionGroup = (props: ButtonGroupProps) => {
-   const theme = useTheme();
+const OptionGroup = (props: Mui.ButtonGroupProps) => {
+   const theme = Mui.useTheme();
    const { title, children, ...groupProps } = props;
    return (
       <div
@@ -15,7 +15,7 @@ const OptionGroup = (props: ButtonGroupProps) => {
             marginBottom: 4,
          })}
       >
-         <ButtonGroup
+         <Mui.ButtonGroup
             size="small"
             sx={{
                "& .MuiButton-root": {
@@ -26,7 +26,7 @@ const OptionGroup = (props: ButtonGroupProps) => {
             {...groupProps}
          >
             {children}
-         </ButtonGroup>
+         </Mui.ButtonGroup>
          <div
             className={css(absolute, {
                bottom: "100%",

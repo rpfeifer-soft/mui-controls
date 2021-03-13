@@ -1,8 +1,8 @@
 /** @format */
 
 import * as React from "react";
+import * as Mui from "@material-ui/core";
 import { observer } from "mobx-react";
-import { makeStyles, TextField, TextFieldProps } from "@material-ui/core";
 import clsx from "clsx";
 import {
    DatePicker,
@@ -16,7 +16,7 @@ import { DateUtils } from "./init";
 import moment from "moment";
 export { default as DateTimeInit } from "./init";
 
-const useStyles = makeStyles(() => ({
+const useStyles = Mui.makeStyles(() => ({
    container: {},
    control: {},
 }));
@@ -125,7 +125,7 @@ const DateTimeField = observer((props: DateTimeFieldProps) => {
 
    const commonProps = {
       value: current,
-      renderInput: (params: TextFieldProps) => <TextField {...params} />,
+      renderInput: (params: Mui.TextFieldProps) => <Mui.TextField {...params} />,
       format,
       onAccept: (date?: any) => {
          onChange(date?.toDate());

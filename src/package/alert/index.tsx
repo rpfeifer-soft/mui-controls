@@ -1,10 +1,10 @@
 /** @format */
 
 import * as React from "react";
-import * as MUI from "@material-ui/core";
+import * as Mui from "@material-ui/core";
 
-export interface AlertProps extends Pick<MUI.AlertProps, "variant" | "severity" | "onClose" | "children"> {
-   alertTitle?: MUI.AlertTitleProps | string | false;
+export interface AlertProps extends Pick<Mui.AlertProps, "variant" | "severity" | "onClose" | "children"> {
+   alertTitle?: Mui.AlertTitleProps | string | false;
 }
 
 const Alert = (props: AlertProps) => {
@@ -14,10 +14,10 @@ const Alert = (props: AlertProps) => {
    const titleProps = typeof alertTitle === "string" ? { children: alertTitle } : alertTitle;
    // The markup
    return (
-      <MUI.Alert {...alertProps}>
-         {alertTitle && <MUI.AlertTitle {...titleProps} />}
+      <Mui.Alert {...alertProps}>
+         {alertTitle && <Mui.AlertTitle {...titleProps} />}
          {children}
-      </MUI.Alert>
+      </Mui.Alert>
    );
 };
 

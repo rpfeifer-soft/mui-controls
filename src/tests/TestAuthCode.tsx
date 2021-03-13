@@ -1,11 +1,11 @@
 /** @format */
 
 import * as React from "react";
-import { BoxProps, Box, Paper } from "@material-ui/core";
+import * as Mui from "@material-ui/core";
 import { AuthCode, useAuthCodeRef } from "../package";
 import { useActions, useMessage } from "../hooks";
 
-export interface TestAuthCodeProps extends BoxProps {}
+export interface TestAuthCodeProps extends Mui.BoxProps {}
 
 const TestAuthCode = (props: TestAuthCodeProps) => {
    // The state
@@ -17,7 +17,7 @@ const TestAuthCode = (props: TestAuthCodeProps) => {
 
    // The markup
    return (
-      <Box {...props}>
+      <Mui.Box {...props}>
          <AuthCode
             autoFocus
             value={value}
@@ -28,14 +28,14 @@ const TestAuthCode = (props: TestAuthCodeProps) => {
             }}
          />
          <hr />
-         <Paper
+         <Mui.Paper
             sx={{
                padding: 1,
             }}
             variant="outlined"
          >
             value: '{value}'
-         </Paper>
+         </Mui.Paper>
          <Values
             onChosen={(what) => {
                setValue(what);
@@ -55,7 +55,7 @@ const TestAuthCode = (props: TestAuthCodeProps) => {
             }}
          />
          <Message />
-      </Box>
+      </Mui.Box>
    );
 };
 

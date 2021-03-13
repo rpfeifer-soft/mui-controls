@@ -1,9 +1,9 @@
 /** @format */
 
 import * as React from "react";
-import { alpha, Box, BoxProps, Input, Paper, useTheme } from "@material-ui/core";
-import InputRef from "../InputRef";
+import * as Mui from "@material-ui/core";
 import { css } from "@emotion/css";
+import InputRef from "../InputRef";
 import clsx from "clsx";
 
 type DSetSelected = (selected: boolean) => void;
@@ -43,7 +43,7 @@ class AuthCodeRef {
 
 export const useAuthCodeRef = () => React.useRef(new AuthCodeRef());
 
-export interface AuthCodeProps extends Omit<BoxProps, "onChange" | "onSubmit"> {
+export interface AuthCodeProps extends Omit<Mui.BoxProps, "onChange" | "onSubmit"> {
    value: string;
 
    autoFocus?: boolean;
@@ -68,7 +68,7 @@ const AuthCode = (props: AuthCodeProps) => {
    const toValue = (text: string) => text.replace(/\D/g, "").slice(0, 6);
 
    // The state
-   const theme = useTheme();
+   const theme = Mui.useTheme();
    const [value, setValue] = React.useState(toValue(propsValue));
    const [selected, setSelected] = React.useState(false);
    const authCodeRef = useAuthCodeRef();
@@ -130,7 +130,7 @@ const AuthCode = (props: AuthCodeProps) => {
 
    // The markup
    return (
-      <Box
+      <Mui.Box
          {...boxProps}
          className={css({
             "&:focus-within .digit": {
@@ -138,7 +138,7 @@ const AuthCode = (props: AuthCodeProps) => {
             },
             "&:focus-within .selected.digit": {
                borderColor: theme.palette.primary.main,
-               backgroundColor: alpha(theme.palette.primary.light, 0.1),
+               backgroundColor: Mui.alpha(theme.palette.primary.light, 0.1),
             },
             "&:focus-within .last.digit::after": {
                content: '"_"',
@@ -147,7 +147,7 @@ const AuthCode = (props: AuthCodeProps) => {
             },
          })}
       >
-         <Input
+         <Mui.Input
             inputRef={handleAuthCodeRef}
             type="tel"
             autoFocus={autoFocus}
@@ -160,7 +160,7 @@ const AuthCode = (props: AuthCodeProps) => {
                left: -1000,
             })}
          />
-         <Box
+         <Mui.Box
             onClick={() => authCodeRef.current.focus()}
             className="box"
             sx={{
@@ -172,8 +172,8 @@ const AuthCode = (props: AuthCodeProps) => {
             }}
          >
             {[0, 1, 2, 3, 4, 5].map((index) => (
-               <Box key={index}>
-                  <Paper
+               <Mui.Box key={index}>
+                  <Mui.Paper
                      variant="outlined"
                      className={clsx("digit", {
                         last: value.length === index,
@@ -183,11 +183,11 @@ const AuthCode = (props: AuthCodeProps) => {
                   >
                      {value.charAt(index) ||
                         (value.length === index ? <span className={`cursor`}>&#8203;</span> : <span>&nbsp;</span>)}
-                  </Paper>
-               </Box>
+                  </Mui.Paper>
+               </Mui.Box>
             ))}
-         </Box>
-      </Box>
+         </Mui.Box>
+      </Mui.Box>
    );
 };
 
