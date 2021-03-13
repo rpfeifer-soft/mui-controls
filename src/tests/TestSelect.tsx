@@ -11,7 +11,7 @@ interface Option {
    id: string;
 }
 
-const options: Option[] = [
+const allOptions: Option[] = [
    { label: "Almuth", id: "A" },
    { label: "Anastasia", id: "A" },
    { label: "André", id: "A" },
@@ -124,29 +124,47 @@ const TestSelect = (props: TestSelectProps) => {
    const [showMessage, Message] = useMessage();
    const [label, Label] = useChoice("Label", ["", "Select"] as const);
    const [disabled, Disabled] = useSwitch("Disabled");
+   const [async, Async] = useSwitch("Async");
    const [value, setValue] = React.useState<Option | null>(null);
    const [variant, Variant] = useChoice("Variant", ["standard", "outlined", "filled"] as const);
-   const Actions = useActions("Actions", ["", "René", "Anna", "Yvonne", "Focus", "Select"] as const);
+   const [options, setOptions] = React.useState<Option[]>([]);
+   const [loading, setLoading] = React.useState(false);
+   const Actions = useActions("Actions", ["", "René", "Yvonne", "Focus", "Select"] as const);
+
+   React.useEffect(() => {
+      setOptions(async ? [] : allOptions);
+   }, [async]);
 
    // The props
    const { ...boxProps } = props;
 
    // The functions
+   const onOpen = () => {
+      if (options.length === 0) {
+         setLoading(true);
+         setTimeout(() => {
+            setOptions(allOptions);
+         }, 2000);
+      }
+   };
 
    // The markup
    return (
       <Mui.Box {...boxProps}>
          <Select
+            autoFocus
             label={label}
             value={value}
             variant={variant}
             disabled={disabled}
             options={options}
+            loading={loading}
             selectRef={selectRef}
             onChange={(value) => {
                setValue(value);
                showMessage(JSON.stringify(value));
             }}
+            onOpen={onOpen}
          />
          <hr />
          <Mui.Paper
@@ -161,6 +179,7 @@ const TestSelect = (props: TestSelectProps) => {
          <Variant />
          <OptionGroup title="Options">
             <Disabled />
+            <Async />
          </OptionGroup>
          <Actions
             onChosen={(chosen) => {

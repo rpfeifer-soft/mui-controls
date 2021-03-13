@@ -5,6 +5,7 @@ import * as Mui from "@material-ui/core";
 import InputRef from "../InputRef";
 
 function noChange<T>(value: T | null) {}
+function noOpen() {}
 
 // Trick the linter
 const memoize = React.useMemo;
@@ -34,13 +35,18 @@ class SelectRef {
 export const useSelectRef = () => React.useRef(new SelectRef());
 
 export interface SelectProps<T> extends Omit<Mui.BoxProps, "onChange"> {
+   options: T[];
+
    label?: string;
    value?: T;
    variant?: Mui.TextFieldProps["variant"];
-   options: T[];
-   onChange: (value: T | null) => void;
    disabled?: boolean;
+   loading?: boolean;
+   autoFocus?: boolean;
    selectRef?: React.MutableRefObject<SelectRef>;
+
+   onChange: (value: T | null) => void;
+   onOpen: () => void;
 }
 
 function Select<T>(props: SelectProps<T>) {
@@ -50,9 +56,12 @@ function Select<T>(props: SelectProps<T>) {
       value,
       variant,
       options,
-      onChange = noChange,
       disabled = false,
+      loading = false,
+      autoFocus = false,
       selectRef: propsSelectRef,
+      onChange = noChange,
+      onOpen = noOpen,
       ...boxProps
    } = props;
 
@@ -70,13 +79,23 @@ function Select<T>(props: SelectProps<T>) {
       <Mui.Box {...boxProps}>
          <Mui.Autocomplete
             renderInput={(params) => {
-               return <Mui.TextField inputRef={handleSelectRef} {...params} label={label} variant={variant} />;
+               return (
+                  <Mui.TextField
+                     inputRef={handleSelectRef}
+                     {...params}
+                     autoFocus={autoFocus}
+                     label={label}
+                     variant={variant}
+                  />
+               );
             }}
             fullWidth
             value={value}
             options={options}
+            loading={loading}
             disabled={disabled}
             onChange={(event, value) => onChange(value)}
+            onOpen={() => onOpen()}
          />
       </Mui.Box>
    );
