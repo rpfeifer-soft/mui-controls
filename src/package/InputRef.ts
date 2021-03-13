@@ -1,6 +1,6 @@
 /** @format */
 
-const noOp = () => {};
+const noOp = () => { };
 const noValue = () => '';
 
 type DFocus = () => void;
@@ -15,9 +15,9 @@ class InputRef {
    set(input: HTMLInputElement) {
       this.dFocus = !input ? noOp : () => input.focus();
       this.dSelect = !input
-         ? noOp 
+         ? noOp
          : (start, end, direction) => {
-            if(input.type === 'number') {
+            if (input.type === 'number') {
                input.type = 'text';
                input.setSelectionRange(start, end, direction);
                input.type = 'number';
@@ -33,7 +33,7 @@ class InputRef {
    }
 
    focus(start?: number, end?: number, direction?: "forward" | "backward" | "none") {
-      if(start !== undefined && end !== undefined) {
+      if (start !== undefined && end !== undefined) {
          this.dSelect(start, end, direction);
       }
       this.dFocus();
@@ -49,7 +49,7 @@ class InputRef {
       this.dSelect(length, length);
       this.dFocus();
    }
-   
+
    focusAll() {
       const length = this.dValue().length;
       this.dSelect(0, length);

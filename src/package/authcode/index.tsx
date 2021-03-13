@@ -1,134 +1,183 @@
 /** @format */
 
-import * as React from 'react';
-import { observer } from 'mobx-react';
-import { Input, makeStyles, Paper } from '@material-ui/core';
-import InputRef from '../InputRef';
+import * as React from "react";
+import { Box, BoxProps, Input, Paper, useTheme } from "@material-ui/core";
+import InputRef from "../InputRef";
+import { css } from "@emotion/css";
+import clsx from "clsx";
 
-type HtmlDivProps = React.DetailedHTMLProps<
-   React.HtmlHTMLAttributes<HTMLDivElement>, HTMLDivElement
->;
+export class AuthCodeRef {
+   private inputRef: InputRef;
 
-const useStyles = makeStyles((theme) => ({
-   input: {
-      position: 'absolute',
-      opacity: 0,
-      left: -1000,
-      '&.Mui-focused + div .cursor': {
-         borderRight: '1px solid ' + theme.palette.primary.dark
-      }
-   },
-   container: {
-      display: 'grid',
-      gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr 1fr',
-      gap: '8px',
-      gridGap: '8px',
-      fontSize: '1.4rem'
-   }, 
-   item: {
-      textAlign: 'center'
-   },
-   cursor: {
-      borderRight: '1px solid tranparent'
+   onSelect?: (selected: boolean) => void;
+
+   constructor() {
+      this.inputRef = new InputRef();
    }
-}));
 
-export interface AuthCodeProps extends Omit<HtmlDivProps, 'onChange' | 'onSubmit'> {
+   set(input: HTMLInputElement) {
+      this.inputRef.set(input);
+   }
+
+   focus() {
+      this.inputRef.focusEnd();
+
+      if (this.onSelect) {
+         this.onSelect(false);
+      }
+   }
+
+   select() {
+      this.inputRef.focusAll();
+
+      if (this.onSelect) {
+         this.onSelect(true);
+      }
+   }
+}
+
+export interface AuthCodeProps extends Omit<BoxProps, "onChange" | "onSubmit"> {
    autoFocus?: boolean;
    value: string;
-   inputRef?: InputRef;
+   authCodeRef?: AuthCodeRef;
    onChange?: (value: string) => void;
    onSubmit?: (value: string) => void;
 }
 
-const AuthCode = observer(({children, ...props}: React.PropsWithChildren<AuthCodeProps>) => {
-   const styles = useStyles(props);
-   
-   const {
-      autoFocus,
-      value: initValue,
-      inputRef = new InputRef(),
-      onChange,
-      onSubmit,
-      
-      ...divProps
-   } = props;
+const AuthCode = (props: AuthCodeProps) => {
+   // The props
+   const { autoFocus, value: initValue, authCodeRef: initAuthCodeRef, onChange, onSubmit, ...boxProps } = props;
 
-   // State values
-   const [value, setValue] = React.useState(initValue);
+   // Work with real values
+   const toValue = (text: string) => text.replace(/\D/g, "").slice(0, 6);
 
-   // Init after selection change from outside
-   if(value !== initValue) {
-      setValue(initValue);
-   }
+   // The state
+   const [authCodeRef, setAuthCodeRef] = React.useState(initAuthCodeRef || new AuthCodeRef());
+   const [value, setValue] = React.useState(toValue(initValue));
+   const [selected, setSelected] = React.useState(false);
+   const theme = useTheme();
 
-   // Handlers
-   const changeValue = (value: string) => {
-      const newValue = value.replace(/\D/g, '').slice(0, 6);
+   // The hooks
+   React.useEffect(() => {
+      const newValue = toValue(initValue);
+      // Update the state
       setValue(newValue);
-
-      if(onChange) {
+      // Notify the parent (on wrong format)
+      if (initValue !== newValue && onChange) {
          onChange(newValue);
       }
-   }
+   }, [initValue, onChange]);
+
+   React.useEffect(() => {
+      if (initAuthCodeRef) {
+         setAuthCodeRef(initAuthCodeRef);
+         // We have to be notified, if the selection changes from outside
+         initAuthCodeRef.onSelect = (selected) => setSelected(selected);
+      }
+   }, [initAuthCodeRef]);
+
+   // The functions
+   const changeValue = (value: string) => {
+      const newValue = toValue(value);
+      setValue(newValue);
+
+      if (onChange) {
+         onChange(newValue);
+      }
+   };
    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      switch(event.key) {
-         case '0':
-         case '1':
-         case '2':
-         case '3':
-         case '4':
-         case '5':
-         case '6':
-         case '7':
-         case '8':
-         case '9':
-         case 'Backspace':
+      switch (event.key) {
+         case "0":
+         case "1":
+         case "2":
+         case "3":
+         case "4":
+         case "5":
+         case "6":
+         case "7":
+         case "8":
+         case "9":
+            changeValue((selected ? "" : value) + event.key);
+            setSelected(false);
             break;
 
-         case 'Enter':
-            if(value.length === 6 &&
-               onSubmit) {
+         case "Backspace":
+            changeValue(selected ? "" : value.substring(0, value.length - 1));
+            setSelected(false);
+            break;
+
+         case "Enter":
+            if (value.length === 6 && onSubmit) {
                onSubmit(value);
             }
             break;
-
-         default:
-            event.preventDefault();
-            break;
       }
-   }
+      if (event.key !== "Tab") {
+         event.preventDefault();
+      }
+   };
    const mountInput = (input: HTMLInputElement) => {
-      if(inputRef) {
-         inputRef.set(input);
+      if (authCodeRef) {
+         authCodeRef.set(input);
       }
-   }
+   };
+
+   // The markup
    return (
-      <div {...divProps}>
-         <Input 
+      <Box {...boxProps}>
+         <Input
             inputRef={mountInput}
-            type="number"
+            type="tel"
             autoFocus={autoFocus}
-            className={styles.input}
             value={value}
             onChange={(event) => changeValue(event.target.value)}
             onKeyDown={(event) => handleKeyDown(event)}
-            />
-         <div className={styles.container} onClick={() => inputRef.focusEnd()}>
-            {[0,1,2,3,4,5].map(index => (
-               <div key={index}>
-                  <Paper className={styles.item} variant="outlined">
-                     {value.charAt(index) || (
-                        value.length === index 
-                        ? <span className={`cursor ${styles.cursor}`}>&#8203;</span> 
-                        : <span>&nbsp;</span>
-                     )}
+            className={css({
+               position: "absolute",
+               opacity: 0,
+               left: -1000,
+               "&.Mui-focused + .box .digit": {
+                  color: theme.palette.primary.main,
+               },
+               "&.Mui-focused + .box .selected.digit": {
+                  borderColor: theme.palette.primary.main,
+               },
+               "&.Mui-focused + .box .last.digit::after": {
+                  content: '"_"',
+                  display: "inline-block",
+                  color: theme.palette.primary.main,
+               },
+            })}
+         />
+         <Box
+            onClick={() => authCodeRef.focus()}
+            className="box"
+            sx={{
+               display: "grid",
+               gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr 1fr",
+               gap: "8px",
+               gridGap: "8px",
+               fontSize: "1.4rem",
+            }}
+         >
+            {[0, 1, 2, 3, 4, 5].map((index) => (
+               <Box key={index}>
+                  <Paper
+                     variant="outlined"
+                     className={clsx("digit", {
+                        last: value.length === index,
+                        selected: value.length === index || (selected && index < value.length),
+                     })}
+                     sx={{ textAlign: "center", boxShadow: "0 0 1px #888 inset" }}
+                  >
+                     {value.charAt(index) ||
+                        (value.length === index ? <span className={`cursor`}>&#8203;</span> : <span>&nbsp;</span>)}
                   </Paper>
-               </div>
+               </Box>
             ))}
-         </div>
-      </div>
+         </Box>
+      </Box>
    );
-});
+};
 
 export default AuthCode;
