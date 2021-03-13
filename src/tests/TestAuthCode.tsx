@@ -1,16 +1,16 @@
 /** @format */
 
-import { useState } from "react";
+import * as React from "react";
 import { BoxProps, Box, Paper } from "@material-ui/core";
-import { AuthCode, AuthCodeRef } from "../package";
+import { AuthCode, useAuthCodeRef } from "../package";
 import { useActions, useMessage } from "../hooks";
 
 export interface TestAuthCodeProps extends BoxProps {}
 
 const TestAuthCode = (props: TestAuthCodeProps) => {
    // The state
-   const [ctrl] = useState(new AuthCodeRef());
-   const [value, setValue] = useState("");
+   const authCodeRef = useAuthCodeRef();
+   const [value, setValue] = React.useState("");
    const Values = useActions("Values", ["", "123456", "2bcd34"] as const);
    const States = useActions("States", ["Focus", "Select"] as const);
    const [showMessage, Message] = useMessage();
@@ -21,7 +21,7 @@ const TestAuthCode = (props: TestAuthCodeProps) => {
          <AuthCode
             autoFocus
             value={value}
-            authCodeRef={ctrl}
+            authCodeRef={authCodeRef}
             onChange={setValue}
             onSubmit={(value) => {
                showMessage(`You submitted the value: '${value}'`);
@@ -39,17 +39,17 @@ const TestAuthCode = (props: TestAuthCodeProps) => {
          <Values
             onChosen={(what) => {
                setValue(what);
-               ctrl.focus();
+               authCodeRef.current.focus();
             }}
          />
          <States
             onChosen={(what) => {
                switch (what) {
                   case "Focus":
-                     ctrl.focus();
+                     authCodeRef.current.focus();
                      break;
                   case "Select":
-                     ctrl.select();
+                     authCodeRef.current.select();
                      break;
                }
             }}

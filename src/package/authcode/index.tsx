@@ -6,84 +6,95 @@ import InputRef from "../InputRef";
 import { css } from "@emotion/css";
 import clsx from "clsx";
 
-export class AuthCodeRef {
-   private inputRef: InputRef;
+type DSetSelected = (selected: boolean) => void;
 
-   onSelect?: (selected: boolean) => void;
+// Trick the linter
+const memoize = React.useMemo;
+const noOp = (value: string) => {};
 
-   constructor() {
-      this.inputRef = new InputRef();
-   }
+class AuthCodeRef {
+   // The input control class
+   private inputRef: InputRef = new InputRef();
 
-   set(input: HTMLInputElement) {
-      this.inputRef.set(input);
-   }
+   // Allow to set the selected state
+   private setSelected: DSetSelected = (selected: boolean) => {};
 
    focus() {
       this.inputRef.focusEnd();
-
-      if (this.onSelect) {
-         this.onSelect(false);
-      }
+      this.setSelected(false);
    }
 
    select() {
       this.inputRef.focusAll();
-
-      if (this.onSelect) {
-         this.onSelect(true);
-      }
+      this.setSelected(true);
    }
+
+   useHandler = (setSelected: DSetSelected) => {
+      return memoize(() => {
+         // Support selection
+         this.setSelected = setSelected;
+         // Register the input element
+         return (input: HTMLInputElement) => {
+            this.inputRef.set(input);
+         };
+      }, [setSelected]);
+   };
 }
 
+export const useAuthCodeRef = () => React.useRef(new AuthCodeRef());
+
 export interface AuthCodeProps extends Omit<BoxProps, "onChange" | "onSubmit"> {
-   autoFocus?: boolean;
    value: string;
-   authCodeRef?: AuthCodeRef;
+
+   autoFocus?: boolean;
+   authCodeRef?: React.MutableRefObject<AuthCodeRef>;
+
    onChange?: (value: string) => void;
    onSubmit?: (value: string) => void;
 }
 
 const AuthCode = (props: AuthCodeProps) => {
    // The props
-   const { autoFocus, value: initValue, authCodeRef: initAuthCodeRef, onChange, onSubmit, ...boxProps } = props;
+   const {
+      autoFocus = false,
+      value: propsValue,
+      authCodeRef: propsAuthCodeRef,
+      onChange = noOp,
+      onSubmit = noOp,
+      ...boxProps
+   } = props;
 
    // Work with real values
    const toValue = (text: string) => text.replace(/\D/g, "").slice(0, 6);
 
    // The state
-   const [authCodeRef, setAuthCodeRef] = React.useState(initAuthCodeRef || new AuthCodeRef());
-   const [value, setValue] = React.useState(toValue(initValue));
-   const [selected, setSelected] = React.useState(false);
    const theme = useTheme();
+   const [value, setValue] = React.useState(toValue(propsValue));
+   const [selected, setSelected] = React.useState(false);
+   const authCodeRef = useAuthCodeRef();
+   const handleAuthCodeRef = authCodeRef.current.useHandler(setSelected);
+
+   // Allow the caller to use the authcode functions
+   if (propsAuthCodeRef) {
+      propsAuthCodeRef.current = authCodeRef.current;
+   }
 
    // The hooks
    React.useEffect(() => {
-      const newValue = toValue(initValue);
+      const newValue = toValue(propsValue);
       // Update the state
       setValue(newValue);
       // Notify the parent (on wrong format)
-      if (initValue !== newValue && onChange) {
+      if (propsValue !== newValue) {
          onChange(newValue);
       }
-   }, [initValue, onChange]);
-
-   React.useEffect(() => {
-      if (initAuthCodeRef) {
-         setAuthCodeRef(initAuthCodeRef);
-         // We have to be notified, if the selection changes from outside
-         initAuthCodeRef.onSelect = (selected) => setSelected(selected);
-      }
-   }, [initAuthCodeRef]);
+   }, [propsValue, onChange]);
 
    // The functions
    const changeValue = (value: string) => {
       const newValue = toValue(value);
       setValue(newValue);
-
-      if (onChange) {
-         onChange(newValue);
-      }
+      onChange(newValue);
    };
    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       switch (event.key) {
@@ -107,7 +118,7 @@ const AuthCode = (props: AuthCodeProps) => {
             break;
 
          case "Enter":
-            if (value.length === 6 && onSubmit) {
+            if (value.length === 6) {
                onSubmit(value);
             }
             break;
@@ -116,17 +127,28 @@ const AuthCode = (props: AuthCodeProps) => {
          event.preventDefault();
       }
    };
-   const mountInput = (input: HTMLInputElement) => {
-      if (authCodeRef) {
-         authCodeRef.set(input);
-      }
-   };
 
    // The markup
    return (
-      <Box {...boxProps}>
+      <Box
+         {...boxProps}
+         className={css({
+            "&:focus-within .digit": {
+               color: theme.palette.primary.main,
+            },
+            "&:focus-within .selected.digit": {
+               borderColor: theme.palette.primary.main,
+               backgroundColor: alpha(theme.palette.primary.light, 0.1),
+            },
+            "&:focus-within .last.digit::after": {
+               content: '"_"',
+               display: "inline-block",
+               color: theme.palette.primary.main,
+            },
+         })}
+      >
          <Input
-            inputRef={mountInput}
+            inputRef={handleAuthCodeRef}
             type="tel"
             autoFocus={autoFocus}
             value={value}
@@ -136,22 +158,10 @@ const AuthCode = (props: AuthCodeProps) => {
                position: "absolute",
                opacity: 0,
                left: -1000,
-               "&.Mui-focused + .box .digit": {
-                  color: theme.palette.primary.main,
-               },
-               "&.Mui-focused + .box .selected.digit": {
-                  borderColor: theme.palette.primary.main,
-                  backgroundColor: alpha(theme.palette.primary.light, 0.1),
-               },
-               "&.Mui-focused + .box .last.digit::after": {
-                  content: '"_"',
-                  display: "inline-block",
-                  color: theme.palette.primary.main,
-               },
             })}
          />
          <Box
-            onClick={() => authCodeRef.focus()}
+            onClick={() => authCodeRef.current.focus()}
             className="box"
             sx={{
                display: "grid",
