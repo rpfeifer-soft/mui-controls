@@ -15,6 +15,7 @@ const TestDate = (props: TestDateProps) => {
    const [showMessage, Message] = useMessage();
    const [label, Label] = useChoice("Label", ["", "Date"] as const);
    const [disabled, Disabled] = useSwitch("Disabled");
+   const [readOnly, ReadOnly] = useSwitch("ReadOnly");
    const [required, Required] = useSwitch("Required");
    const [mobile, Mobile] = useSwitch("Mobile");
    const [value, setValue] = React.useState<Date | null>(null);
@@ -36,6 +37,7 @@ const TestDate = (props: TestDateProps) => {
                label={label}
                variant={variant}
                disabled={disabled}
+               readOnly={readOnly}
                required={required}
                mobile={mobile}
                timeSteps={Number(timeSteps)}
@@ -59,6 +61,7 @@ const TestDate = (props: TestDateProps) => {
          <Label />
          <OptionGroup title="Options">
             <Disabled />
+            <ReadOnly />
             <Required
                maySwitch={(on) => {
                   if (on && !value) {

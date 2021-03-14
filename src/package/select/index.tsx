@@ -57,7 +57,7 @@ function Select<T>(props: SelectProps<T>) {
    // The props
    const {
       label,
-      value,
+      value = null,
       variant,
       options,
       disabled = false,

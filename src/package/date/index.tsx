@@ -312,6 +312,7 @@ export interface DateProps {
    label?: string;
    variant?: "outlined" | "filled" | "standard";
    disabled?: boolean;
+   readOnly?: boolean;
    mobile?: boolean;
    timeSteps?: number;
    dateRef?: React.MutableRefObject<DateRef>;
@@ -334,6 +335,7 @@ const Date = (props: DateProps) => {
       label,
       variant,
       disabled = false,
+      readOnly = false,
       mobile = false,
       timeSteps = 0,
       dateRef: propsDateRef,
@@ -447,24 +449,34 @@ const Date = (props: DateProps) => {
                inputRef={handleDateRef}
                InputProps={{
                   ...params.InputProps,
+                  endAdornment: !readOnly && params.InputProps ? params.InputProps.endAdornment : undefined,
                   onKeyDown: (event) => {
-                     onKeyDown(event);
-                     if (params.InputProps?.onKeyDown && !event.isDefaultPrevented()) {
-                        params.InputProps?.onKeyDown(event);
+                     if (!readOnly) {
+                        onKeyDown(event);
+                        if (params.InputProps?.onKeyDown && !event.isDefaultPrevented()) {
+                           params.InputProps?.onKeyDown(event);
+                        }
                      }
                   },
                   onBlur: (event) => {
                      if (params.InputProps?.onBlur) {
                         params.InputProps?.onBlur(event);
                      }
-                     const change = onEndInput(true);
-                     if (change) {
-                        change();
+                     if (!readOnly) {
+                        const change = onEndInput(true);
+                        if (change) {
+                           change();
+                        }
                      }
                   },
+                  readOnly: mobile || params.InputProps?.readOnly,
                }}
-               inputProps={{ ...params.inputProps }}
-               placeholder={params.placeholder}
+               inputProps={{
+                  ...params.inputProps,
+                  placeholder: !disabled && !readOnly && params.inputProps ? params.inputProps.placeholder : undefined,
+                  value: mobile && !value ? "-" : params.inputProps?.value,
+               }}
+               disabled={disabled}
                label={params.label}
                helperText=""
                variant={variant}
@@ -472,13 +484,55 @@ const Date = (props: DateProps) => {
             />
          );
       };
-   }, [variant, onKeyDown, onEndInput, dateRef, handleDateRef]);
+   }, [variant, onKeyDown, onEndInput, dateRef, mobile, value, disabled, readOnly, handleDateRef]);
 
    // The functions
+   const fixes = {
+      className: css({
+         "& .MuiPickersToolbar-root": {
+            display: "none",
+         },
+         "& .MuiPickersCalendar-root": {
+            minHeight: 240,
+         },
+         "& .MuiTabs-indicator": {
+            width: "50% !important",
+         },
+         "& .MuiPickersDay-dayOutsideMonth": {
+            color: Mui.alpha("#FFF", 0.2),
+         },
+         "& .MuiPickersCalendar-weekDayLabel::after": {
+            display: "inline-block",
+         },
+         "& .MuiPickersCalendar-weekDayLabel:nth-child(1)::after": {
+            content: `"${weekDays[0][1]}"`,
+         },
+         "& .MuiPickersCalendar-weekDayLabel:nth-child(2)::after": {
+            content: `"${weekDays[1][1]}"`,
+         },
+         "& .MuiPickersCalendar-weekDayLabel:nth-child(3)::after": {
+            content: `"${weekDays[2][1]}"`,
+         },
+         "& .MuiPickersCalendar-weekDayLabel:nth-child(4)::after": {
+            content: `"${weekDays[3][1]}"`,
+         },
+         "& .MuiPickersCalendar-weekDayLabel:nth-child(5)::after": {
+            content: `"${weekDays[4][1]}"`,
+         },
+         "& .MuiPickersCalendar-weekDayLabel:nth-child(6)::after": {
+            content: `"${weekDays[5][1]}"`,
+         },
+         "& .MuiPickersCalendar-weekDayLabel:nth-child(7)::after": {
+            content: `"${weekDays[6][1]}"`,
+         },
+      }),
+   };
+
    const commonProps = {
       label,
       value,
       disabled,
+      readOnly,
       format,
       mask: format.replace(/[DMYHm]/g, "_"),
       renderInput,
@@ -493,43 +547,6 @@ const Date = (props: DateProps) => {
       clearText: dateUtils?.clearText,
       todayText: dateUtils?.todayText,
       showDaysOutsideCurrentMonth: true,
-      PopperProps: {
-         className: css({
-            "& .MuiPickersCalendar-root": {
-               minHeight: 240,
-            },
-            "& .MuiTabs-indicator": {
-               width: "50% !important",
-            },
-            "& .MuiPickersDay-dayOutsideMonth": {
-               color: Mui.alpha("#FFF", 0.2),
-            },
-            "& .MuiPickersCalendar-weekDayLabel::after": {
-               display: "inline-block",
-            },
-            "& .MuiPickersCalendar-weekDayLabel:nth-child(1)::after": {
-               content: `"${weekDays[0][1]}"`,
-            },
-            "& .MuiPickersCalendar-weekDayLabel:nth-child(2)::after": {
-               content: `"${weekDays[1][1]}"`,
-            },
-            "& .MuiPickersCalendar-weekDayLabel:nth-child(3)::after": {
-               content: `"${weekDays[2][1]}"`,
-            },
-            "& .MuiPickersCalendar-weekDayLabel:nth-child(4)::after": {
-               content: `"${weekDays[3][1]}"`,
-            },
-            "& .MuiPickersCalendar-weekDayLabel:nth-child(5)::after": {
-               content: `"${weekDays[4][1]}"`,
-            },
-            "& .MuiPickersCalendar-weekDayLabel:nth-child(6)::after": {
-               content: `"${weekDays[5][1]}"`,
-            },
-            "& .MuiPickersCalendar-weekDayLabel:nth-child(7)::after": {
-               content: `"${weekDays[6][1]}"`,
-            },
-         }),
-      },
    };
 
    // The markup
@@ -538,6 +555,8 @@ const Date = (props: DateProps) => {
          {mobile && Boolean(timeSteps) && (
             <MuiLab.MobileDateTimePicker
                {...commonProps}
+               DialogProps={fixes}
+               showToolbar={true}
                showTodayButton
                minutesStep={timeSteps}
                clearable={!required}
@@ -547,13 +566,17 @@ const Date = (props: DateProps) => {
          {mobile && !timeSteps && (
             <MuiLab.MobileDatePicker
                {...commonProps}
+               DialogProps={fixes}
+               showToolbar={false}
                showTodayButton
                clearable={!required}
                okText={dateUtils?.okText}
             />
          )}
-         {!mobile && Boolean(timeSteps) && <MuiLab.DesktopDateTimePicker {...commonProps} minutesStep={timeSteps} />}
-         {!mobile && !timeSteps && <MuiLab.DesktopDatePicker {...commonProps} />}
+         {!mobile && Boolean(timeSteps) && (
+            <MuiLab.DesktopDateTimePicker {...commonProps} PopperProps={fixes} minutesStep={timeSteps} />
+         )}
+         {!mobile && !timeSteps && <MuiLab.DesktopDatePicker {...commonProps} PopperProps={fixes} />}
       </Mui.Box>
    );
 };
