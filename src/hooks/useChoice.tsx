@@ -58,7 +58,12 @@ function useChoice<T extends string>(title: string, choices: ReadonlyArray<T>, a
 
    return [
       current,
-      React.useMemo(() => createRender(title, all, current, setCurrent), [title, all, current, setCurrent]),
+      React.useMemo(() => createRender(title, all, current, (next) => setCurrent(next)), [
+         title,
+         all,
+         current,
+         setCurrent,
+      ]),
    ];
 }
 

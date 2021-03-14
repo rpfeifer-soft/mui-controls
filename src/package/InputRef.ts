@@ -8,11 +8,13 @@ type DSelect = (start: number, end: number, direction?: "forward" | "backward" |
 type DValue = () => string;
 
 class InputRef {
+   private dBlur: DFocus = noOp;
    private dFocus: DFocus = noOp;
    private dSelect: DSelect = noOp;
    private dValue: DValue = noValue;
 
    set(input: HTMLInputElement) {
+      this.dBlur = !input ? noOp : () => input.blur();
       this.dFocus = !input ? noOp : () => input.focus();
       this.dSelect = !input
          ? noOp
@@ -37,6 +39,10 @@ class InputRef {
          this.dSelect(start, end, direction);
       }
       this.dFocus();
+   }
+
+   blur() {
+      this.dBlur();
    }
 
    focusStart() {

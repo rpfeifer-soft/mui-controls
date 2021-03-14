@@ -7,6 +7,7 @@ import { default as MomentUtils } from "@date-io/moment";
 import moment from "moment";
 import "moment/locale/de";
 import InputRef from "../InputRef";
+import { css } from "@emotion/css";
 
 export class DateUtils extends MomentUtils {
    constructor(
@@ -60,6 +61,11 @@ const memoize = React.useMemo;
 class DateRef {
    // The input control class
    private inputRef: InputRef = new InputRef();
+   private otherRef?: React.Ref<any>;
+
+   blur() {
+      this.inputRef.blur();
+   }
 
    focus() {
       this.inputRef.focusEnd();
@@ -69,13 +75,17 @@ class DateRef {
       this.inputRef.focusAll();
    }
 
+   set forkedRef(otherRef: React.Ref<any> | undefined) {
+      this.otherRef = otherRef;
+   }
+
    useHandler = () => {
       return memoize(() => {
          // Register the input element
-         return (inputRef?: React.Ref<any>) => (input: HTMLInputElement) => {
+         return (input: HTMLInputElement) => {
             this.inputRef.set(input);
-            if (typeof inputRef === "function") {
-               inputRef(input);
+            if (typeof this.otherRef === "function") {
+               this.otherRef(input);
             }
          };
       }, []);
@@ -294,44 +304,64 @@ export default DateTimeField;
 
 const noChange = (value: Date | null) => {};
 
-export interface DateProps extends Omit<Mui.BoxProps, "onChange"> {
-   label?: string;
+export interface DateProps {
+   required?: boolean;
    value: Date | null;
    onChange?: (value: Date | null) => void;
 
+   label?: string;
    variant?: "outlined" | "filled" | "standard";
    disabled?: boolean;
-   clearable?: boolean;
-   desktop?: boolean;
    mobile?: boolean;
    timeSteps?: number;
    dateRef?: React.MutableRefObject<DateRef>;
+   boxProps?: Mui.BoxProps;
+}
+
+function momentInTime(date: moment.Moment | null) {
+   return date ? date.toDate().getTime() : 0;
+}
+function dateInTime(date: Date | null) {
+   return date ? date.getTime() : 0;
 }
 
 const Date = (props: DateProps) => {
    // The props
    const {
-      label,
-      value: initValue = null,
+      required,
+      value: initValue,
       onChange = noChange,
+      label,
       variant,
       disabled = false,
-      clearable = false,
-      desktop = false,
       mobile = false,
       timeSteps = 0,
       dateRef: propsDateRef,
-      ...boxProps
+      boxProps,
    } = props;
+
+   // Validation
+   if (required && !initValue) {
+      throw new TypeError("Value not specified");
+   }
 
    // The state
    const context = React.useContext(MuiLab.MuiPickersAdapterContext);
    const dateUtils = context instanceof DateUtils ? context : undefined;
-   const [value, setValue] = React.useState<moment.Moment | null>(moment(initValue));
+   const [value, setValue] = React.useState<moment.Moment | null>(initValue ? moment(initValue) : null);
    const [inputText, setInputText] = React.useState<string | null | undefined>();
 
    const dateRef = useDateRef();
    const handleDateRef = dateRef.current.useHandler();
+
+   // Common props
+   let format = "";
+   let weekDays = context?.getWeekdays() || [];
+   if (context && context.moment) {
+      format = timeSteps
+         ? context.moment.localeData().longDateFormat("L") + " " + context.moment.localeData().longDateFormat("LT")
+         : context.moment.localeData().longDateFormat("L");
+   }
 
    React.useEffect(() => {
       setValue(initValue ? moment(initValue) : null);
@@ -342,51 +372,116 @@ const Date = (props: DateProps) => {
       propsDateRef.current = dateRef.current;
    }
 
-   // The functions
-   const onEndInput = (makeValid: boolean) => {
-      if (value && value.isValid()) {
-         return onChange(value.toDate());
-      } else if (clearable && !inputText) {
-         return onChange(null);
-      }
-      if (makeValid) {
-         setValue(initValue ? moment(initValue) : null);
-      }
-   };
+   const onEndInput = React.useMemo(
+      () => (makeValid: boolean) => {
+         const changeValue = (date: Date | null) => {
+            if (dateInTime(date) !== dateInTime(initValue)) {
+               return () => onChange(date);
+            } else if (momentInTime(value) !== dateInTime(initValue)) {
+               return () => setValue(initValue ? moment(initValue) : null);
+            }
+            return false;
+         };
+         if (value && value.isValid()) {
+            return changeValue(value.toDate());
+         } else if (!required && !inputText) {
+            return changeValue(null);
+         }
+         if (makeValid) {
+            return changeValue(initValue);
+         }
+         return false;
+      },
+      [value, onChange, required, inputText, initValue]
+   );
 
-   // Common props
-   let format = "";
-   if (context && context.moment) {
-      format = timeSteps
-         ? context.moment.localeData().longDateFormat("L") + " " + context.moment.localeData().longDateFormat("LT")
-         : context.moment.localeData().longDateFormat("L");
-   }
-   const commonProps = {
-      value,
-      label,
-      disabled,
-      format,
-      mask: format.replace(/[DMY]/g, "_"),
-      renderInput: (params: Mui.TextFieldProps) => {
+   const onKeyDown = React.useMemo(
+      () => (event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+         switch (event.key) {
+            case "Enter":
+            case "Escape":
+               const change = onEndInput(event.key === "Escape");
+               if (change) {
+                  dateRef.current.blur();
+                  change();
+                  setTimeout(() => dateRef.current.focus(), 0);
+               }
+               break;
+
+            case "ArrowUp":
+            case "ArrowDown":
+            case "PageUp":
+            case "PageDown":
+               const step =
+                  event.key === "ArrowUp"
+                     ? +1
+                     : event.key === "ArrowDown"
+                     ? -1
+                     : event.key === "PageUp"
+                     ? +7
+                     : event.key === "PageDown"
+                     ? -7
+                     : 0;
+               if (value && value.isValid()) {
+                  // Add or subtract
+                  dateRef.current.blur();
+                  onChange(value.add(step, "day").toDate());
+                  setTimeout(() => dateRef.current.focus(), 0);
+               } else {
+                  dateRef.current.blur();
+                  onChange(moment().add(step, "day").toDate());
+                  setTimeout(() => dateRef.current.focus(), 0);
+               }
+               break;
+         }
+      },
+      [onChange, onEndInput, value, dateRef]
+   );
+
+   const renderInput = React.useMemo(() => {
+      return (params: Mui.TextFieldProps) => {
+         // We have to allow the control to reregister
+         dateRef.current.forkedRef = params.inputRef;
          return (
             <Mui.TextField
-               {...params}
+               inputRef={handleDateRef}
                InputProps={{
                   ...params.InputProps,
-                  onBlur: (event) => {
-                     if (params.onBlur) {
-                        params.onBlur(event);
+                  onKeyDown: (event) => {
+                     onKeyDown(event);
+                     if (params.InputProps?.onKeyDown && !event.isDefaultPrevented()) {
+                        params.InputProps?.onKeyDown(event);
                      }
-                     onEndInput(true);
+                  },
+                  onBlur: (event) => {
+                     if (params.InputProps?.onBlur) {
+                        params.InputProps?.onBlur(event);
+                     }
+                     const change = onEndInput(true);
+                     if (change) {
+                        change();
+                     }
                   },
                }}
-               inputRef={handleDateRef(params.inputRef)}
+               inputProps={{ ...params.inputProps }}
+               placeholder={params.placeholder}
+               label={params.label}
                helperText=""
                variant={variant}
                fullWidth
             />
          );
-      },
+      };
+   }, [variant, onKeyDown, onEndInput, dateRef, handleDateRef]);
+
+   // The functions
+   const commonProps = {
+      label,
+      value,
+      disabled,
+      format,
+      mask: format.replace(/[DMYHm]/g, "_"),
+      renderInput,
       onChange: (date: moment.Moment | null, text: string | undefined) => {
          setValue(date);
          setInputText(text);
@@ -398,6 +493,43 @@ const Date = (props: DateProps) => {
       clearText: dateUtils?.clearText,
       todayText: dateUtils?.todayText,
       showDaysOutsideCurrentMonth: true,
+      PopperProps: {
+         className: css({
+            "& .MuiPickersCalendar-root": {
+               minHeight: 240,
+            },
+            "& .MuiTabs-indicator": {
+               width: "50% !important",
+            },
+            "& .MuiPickersDay-dayOutsideMonth": {
+               color: Mui.alpha("#FFF", 0.2),
+            },
+            "& .MuiPickersCalendar-weekDayLabel::after": {
+               display: "inline-block",
+            },
+            "& .MuiPickersCalendar-weekDayLabel:nth-child(1)::after": {
+               content: `"${weekDays[0][1]}"`,
+            },
+            "& .MuiPickersCalendar-weekDayLabel:nth-child(2)::after": {
+               content: `"${weekDays[1][1]}"`,
+            },
+            "& .MuiPickersCalendar-weekDayLabel:nth-child(3)::after": {
+               content: `"${weekDays[2][1]}"`,
+            },
+            "& .MuiPickersCalendar-weekDayLabel:nth-child(4)::after": {
+               content: `"${weekDays[3][1]}"`,
+            },
+            "& .MuiPickersCalendar-weekDayLabel:nth-child(5)::after": {
+               content: `"${weekDays[4][1]}"`,
+            },
+            "& .MuiPickersCalendar-weekDayLabel:nth-child(6)::after": {
+               content: `"${weekDays[5][1]}"`,
+            },
+            "& .MuiPickersCalendar-weekDayLabel:nth-child(7)::after": {
+               content: `"${weekDays[6][1]}"`,
+            },
+         }),
+      },
    };
 
    // The markup
@@ -407,7 +539,8 @@ const Date = (props: DateProps) => {
             <MuiLab.MobileDateTimePicker
                {...commonProps}
                showTodayButton
-               clearable={clearable}
+               minutesStep={timeSteps}
+               clearable={!required}
                okText={dateUtils?.okText}
             />
          )}
@@ -415,16 +548,12 @@ const Date = (props: DateProps) => {
             <MuiLab.MobileDatePicker
                {...commonProps}
                showTodayButton
-               clearable={clearable}
+               clearable={!required}
                okText={dateUtils?.okText}
             />
          )}
-         {!mobile && Boolean(timeSteps) && (
-            <MuiLab.DesktopDateTimePicker {...commonProps} orientation={desktop ? "landscape" : "portrait"} />
-         )}
-         {!mobile && !timeSteps && (
-            <MuiLab.DesktopDatePicker {...commonProps} orientation={desktop ? "landscape" : "portrait"} />
-         )}
+         {!mobile && Boolean(timeSteps) && <MuiLab.DesktopDateTimePicker {...commonProps} minutesStep={timeSteps} />}
+         {!mobile && !timeSteps && <MuiLab.DesktopDatePicker {...commonProps} />}
       </Mui.Box>
    );
 };
