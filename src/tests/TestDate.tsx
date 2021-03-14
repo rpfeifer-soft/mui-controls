@@ -31,7 +31,7 @@ const TestDate = (props: TestDateProps) => {
    // The markup
    return (
       <Mui.Box {...boxProps}>
-         <DateInit locale="de">
+         <DateInit locale="de" okText="OKAY">
             <Date
                value={value}
                label={label}
