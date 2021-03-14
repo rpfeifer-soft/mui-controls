@@ -31,7 +31,7 @@
       "eject": "react-scripts eject",
       "compile": "tsc --build ./src/package/tsconfig.json",
       "clean": "rimraf package/",
-      "publish:prepare": "npm run clean && npm run compile && clear-package-json package.json > package/package.json && cp .npmignore package",
+      "publish:prepare": "npm run clean && npm run compile && clear-package-json package.json | sed 's/dependencies/peerDependencies/' > package/package.json && cp .npmignore package",
       "publish:try": "npm run publish:prepare && npm publish package --dry-run",
       "publish:patch": "npm version patch && npm run publish:prepare && npm publish package",
       "publish:minor": "npm version minor && npm run publish:prepare && npm publish package",
