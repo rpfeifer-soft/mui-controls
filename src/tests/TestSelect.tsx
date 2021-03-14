@@ -124,6 +124,8 @@ const TestSelect = (props: TestSelectProps) => {
    const [showMessage, Message] = useMessage();
    const [label, Label] = useChoice("Label", ["", "Select"] as const);
    const [disabled, Disabled] = useSwitch("Disabled");
+   const [readOnly, ReadOnly] = useSwitch("ReadOnly");
+   const [required, Required] = useSwitch("Required");
    const [async, Async] = useSwitch("Async");
    const [grouped, Grouped] = useSwitch("Grouped");
    const [value, setValue] = React.useState<Option | null>(null);
@@ -158,6 +160,8 @@ const TestSelect = (props: TestSelectProps) => {
             value={value}
             variant={variant}
             disabled={disabled}
+            readOnly={readOnly}
+            required={required}
             options={options}
             loading={loading}
             selectRef={selectRef}
@@ -181,6 +185,8 @@ const TestSelect = (props: TestSelectProps) => {
          <Variant />
          <OptionGroup title="Options">
             <Disabled />
+            <ReadOnly />
+            <Required />
             <Async />
             <Grouped />
          </OptionGroup>
