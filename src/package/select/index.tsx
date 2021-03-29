@@ -47,11 +47,13 @@ export interface SelectProps<T extends Option> extends Omit<Mui.BoxProps, "onCha
    label?: string;
    value?: T | null;
    variant?: Mui.TextFieldProps["variant"];
+   onInputChange?: Mui.TextFieldProps["onChange"];
    disabled?: boolean;
    readOnly?: boolean;
    required?: boolean;
    loading?: boolean;
    autoFocus?: boolean;
+   noFilter?: boolean;
    selectRef?: React.MutableRefObject<SelectRef>;
 
    onChange?: (value: T | null) => void;
@@ -65,12 +67,14 @@ function Select<T extends Option>(props: SelectProps<T>) {
       label,
       value = null,
       variant,
+      onInputChange,
       options,
       disabled = false,
       readOnly = false,
       required = false,
       loading = false,
       autoFocus = false,
+      noFilter = false,
       selectRef: propsSelectRef,
       onChange = noChange,
       onOpen = noOpen,
@@ -98,13 +102,14 @@ function Select<T extends Option>(props: SelectProps<T>) {
                   endAdornment: !readOnly && params.InputProps ? params.InputProps.endAdornment : undefined,
                   readOnly,
                }}
+               onChange={onInputChange}
                autoFocus={autoFocus}
                label={label}
                variant={variant}
             />
          );
       };
-   }, [autoFocus, handleSelectRef, label, readOnly, variant]);
+   }, [autoFocus, handleSelectRef, label, readOnly, variant, onInputChange]);
 
    // The markup
    return (
@@ -114,6 +119,7 @@ function Select<T extends Option>(props: SelectProps<T>) {
             fullWidth
             value={value}
             options={options}
+            filterOptions={noFilter ? (option) => options : undefined}
             getOptionLabel={(option) => option.label}
             getOptionSelected={(option, value) => option.label === value.label}
             groupBy={groupBy}

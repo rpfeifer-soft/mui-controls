@@ -4,8 +4,9 @@ import Theme from "./Theme";
 import { useChoice, useSwitch } from "../hooks";
 import { TestAlert, TestAuthCode, TestDate, TestSelect } from "../tests";
 import OptionGroup from "./OptionGroup";
+import TestAddress from "../tests/TestAddress";
 
-const choices = ["Alert", "AuthCode", "DateTime", "Select"] as const;
+const choices = ["Address", "Alert", "AuthCode", "DateTime", "Select"] as const;
 
 interface AppProps {}
 
@@ -21,6 +22,7 @@ const App = (props: AppProps) => {
       <React.Fragment>
          {!dialog && <hr />}
          <Mui.Paper elevation={5} sx={{ padding: 2 }}>
+            {type === "Address" && <TestAddress />}
             {type === "Alert" && <TestAlert />}
             {type === "AuthCode" && <TestAuthCode />}
             {type === "Select" && <TestSelect />}
