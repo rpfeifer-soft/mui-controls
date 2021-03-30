@@ -3,6 +3,7 @@
 import * as React from "react";
 import * as Mui from "@material-ui/core";
 import InputRef from "../InputRef";
+import { ICtrl } from "../types";
 
 function noChange<T>(value: T | null) {}
 function noOpen() {}
@@ -41,22 +42,15 @@ export interface Option {
 
 export const useSelectRef = () => React.useRef(new SelectRef());
 
-export interface SelectProps<T extends Option> extends Omit<Mui.BoxProps, "onChange"> {
+export interface SelectProps<T extends Option> extends ICtrl<T>, Omit<Mui.BoxProps, "onChange"> {
    options: T[];
 
-   label?: string;
-   value?: T | null;
    variant?: Mui.TextFieldProps["variant"];
    onInputChange?: Mui.TextFieldProps["onChange"];
-   disabled?: boolean;
-   readOnly?: boolean;
-   required?: boolean;
    loading?: boolean;
-   autoFocus?: boolean;
    noFilter?: boolean;
    selectRef?: React.MutableRefObject<SelectRef>;
 
-   onChange?: (value: T | null) => void;
    onOpen?: () => void;
    groupBy?: (value: T) => string;
 }
@@ -64,21 +58,24 @@ export interface SelectProps<T extends Option> extends Omit<Mui.BoxProps, "onCha
 function Select<T extends Option>(props: SelectProps<T>) {
    // The props
    const {
+      // ICtrl
       label,
       value = null,
-      variant,
-      onInputChange,
-      options,
       disabled = false,
       readOnly = false,
       required = false,
-      loading = false,
       autoFocus = false,
+      onChange = noChange,
+      // Select
+      options,
+      variant,
+      onInputChange,
+      loading = false,
       noFilter = false,
       selectRef: propsSelectRef,
-      onChange = noChange,
       onOpen = noOpen,
       groupBy = noGroup,
+      // Box
       ...boxProps
    } = props;
 

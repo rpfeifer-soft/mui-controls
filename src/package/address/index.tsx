@@ -2,9 +2,10 @@
 
 import * as React from "react";
 import * as Mui from "@material-ui/core";
+import { ICtrl } from "../types";
 
 export interface IAddress {
-   label: string;
+   description: string;
    lat?: number;
    lon?: number;
 }
@@ -56,18 +57,18 @@ async function searchAddress(searchFor: string, lat?: number, lon?: number): Pro
       const addresses = json.features.map((feature: any) => {
          const [longitude, latitude] =
             feature.geometry && feature.geometry.coordinates ? feature.geometry.coordinates : [];
-         let label = searchFor;
+         let description = searchFor;
          const { type, name, country, county, postcode, city, street, housenumber } = feature.properties;
          console.log(type, feature.properties);
          switch (type) {
             case "city":
-               label = county ? `${name}, ${county}, ${country}` : `${name}, ${country}`;
+               description = county ? `${name}, ${county}, ${country}` : `${name}, ${country}`;
                break;
             case "locality":
-               label = city ? `${name}, ${city}, ${country}` : `${name}, ${country}`;
+               description = city ? `${name}, ${city}, ${country}` : `${name}, ${country}`;
                break;
             case "street":
-               label = housenumber
+               description = housenumber
                   ? `${name} ${housenumber}, ${postcode} ${city}, ${country}`
                   : `${name}, ${postcode} ${city}, ${country}`;
                break;
@@ -75,12 +76,12 @@ async function searchAddress(searchFor: string, lat?: number, lon?: number): Pro
                if (!housenumber) {
                   return null;
                }
-               label = `${street} ${housenumber}, ${postcode} ${city}, ${country}`;
+               description = `${street} ${housenumber}, ${postcode} ${city}, ${country}`;
                break;
          }
-         console.log(label);
+         console.log(description);
          const address: IAddress = {
-            label,
+            description,
             lat: latitude,
             lon: longitude,
          };
@@ -89,13 +90,13 @@ async function searchAddress(searchFor: string, lat?: number, lon?: number): Pro
       const valids = addresses.filter((address: IAddress | null) => Boolean(address)) as IAddress[];
       const uniques: IAddress[] = [];
       valids.forEach((valid) => {
-         if (!uniques.find((unique) => unique.label === valid.label)) {
+         if (!uniques.find((unique) => unique.description === valid.description)) {
             uniques.push(valid);
          }
       });
       return addRequest(searchUrl, uniques);
    }
-   return addRequest(searchUrl, searchFor ? [{ label: searchFor }] : []);
+   return addRequest(searchUrl, searchFor ? [{ description: searchFor }] : []);
 }
 
 interface IState {
@@ -111,29 +112,47 @@ function setOptions(state: IState, options: IAddress[]) {
    let selected = state.selected;
    if (selected >= 0) {
       // Check for valid selection
-      if (options.length <= selected || options[selected].label !== state.options[selected].label) {
+      if (options.length <= selected || options[selected].description !== state.options[selected].description) {
          selected = -1;
       }
    }
    return { ...state, options, loading: false, selected };
 }
 
-export interface AddressProps extends Omit<Mui.BoxProps, "onChange"> {
-   value: string;
+export interface AddressProps extends ICtrl<IAddress>, Omit<Mui.BoxProps, "onChange"> {
+   variant?: Mui.TextFieldProps["variant"];
+
    requestDelay?: number;
    lat?: number;
    lon?: number;
 
-   onChange?: (value: IAddress | null) => void;
+   noOptionsText?: string;
 }
 
 const Address = (props: AddressProps) => {
    // The props
-   const { value, onChange, requestDelay = 500, lat, lon, ...boxProps } = props;
+   const {
+      // ICtrl
+      label,
+      value,
+      onChange,
+      disabled,
+      readOnly,
+      required,
+      autoFocus,
+      // Address
+      variant,
+      requestDelay = 500,
+      lat,
+      lon,
+      noOptionsText = "-",
+      // Box
+      ...boxProps
+   } = props;
 
    // The state
    const [state, setState] = React.useState<IState>({
-      current: value,
+      current: value ? value.description : "",
       options: [],
       searchFor: "",
       loading: false,
@@ -172,15 +191,21 @@ const Address = (props: AddressProps) => {
    // The functions
    const onInputChange = React.useMemo(
       () => (event: React.ChangeEvent<HTMLInputElement>) => {
-         const value = event.target.value;
-         setState((state) => ({
-            ...state,
-            current: value,
-            searchFor: value,
-            open: value.length >= 4,
-         }));
+         const newValue = event.target.value;
+         setState((state) => {
+            if (value && !newValue && !required) {
+               // This must change the newValue
+               setTimeout(() => onChange(null));
+            }
+            return {
+               ...state,
+               current: newValue,
+               searchFor: newValue,
+               open: newValue.length >= 4,
+            };
+         });
       },
-      []
+      [required, onChange, value]
    );
 
    const onInputKeyDown = React.useMemo(
@@ -207,7 +232,7 @@ const Address = (props: AddressProps) => {
                         ...state,
                         selected: -1,
                         open: false,
-                        current: option.label,
+                        current: option.description,
                      };
                   }
                   break;
@@ -233,7 +258,7 @@ const Address = (props: AddressProps) => {
                      return {
                         ...state,
                         open: true,
-                        selected: state.options.findIndex((option) => option.label === state.current),
+                        selected: state.options.findIndex((option) => option.description === state.current),
                      };
                   }
                   break;
@@ -250,7 +275,7 @@ const Address = (props: AddressProps) => {
          setState((state) => ({
             ...state,
             open: false,
-            current: value,
+            current: value ? value.description : "",
          }));
       },
       [value]
@@ -260,6 +285,14 @@ const Address = (props: AddressProps) => {
    return (
       <Mui.Box {...boxProps} sx={{ position: "relative" }}>
          <Mui.TextField
+            label={label}
+            required={required}
+            disabled={disabled}
+            variant={variant}
+            InputProps={{
+               readOnly,
+            }}
+            autoFocus={autoFocus}
             value={state.current}
             onChange={onInputChange}
             onKeyDown={onInputKeyDown}
@@ -267,17 +300,19 @@ const Address = (props: AddressProps) => {
             fullWidth
          />
          {state.open && (
-            <Mui.Paper sx={{ padding: 2, position: "absolute", left: 0, right: 0 }}>
+            <Mui.Paper sx={{ padding: 2, position: "absolute", left: 0, right: 0, zIndex: 9999 }}>
                {state.loading && <Mui.LinearProgress />}
+               {!state.loading && !state.options.length && noOptionsText}
                {!state.loading &&
+                  Boolean(state.options.length) &&
                   state.options.map((option, index) => (
                      <Mui.Box
                         sx={{
                            color: index === state.selected ? "#F00" : undefined,
                         }}
-                        key={option.label}
+                        key={option.description}
                      >
-                        {option.label}
+                        {option.description}
                      </Mui.Box>
                   ))}
             </Mui.Paper>
