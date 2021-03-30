@@ -119,6 +119,8 @@ function setOptions(state: IState, options: IAddress[]) {
    return { ...state, options, loading: false, selected };
 }
 
+const ArrowDropDown = Mui.createSvgIcon(<path d="M7 10l5 5 5-5z"></path>, "ArrowDropDown");
+
 export interface AddressProps extends ICtrl<IAddress>, Omit<Mui.BoxProps, "onChange"> {
    variant?: Mui.TextFieldProps["variant"];
 
@@ -189,16 +191,33 @@ const Address = (props: AddressProps) => {
    }, [state.open, state.searchFor, requestDelay, lat, lon]);
 
    // The functions
+   const change = React.useMemo(
+      () => (newValue: IAddress | null) => {
+         // This must change the newValue
+         setTimeout(() => onChange(newValue), 0);
+         setState((state) => ({
+            ...state,
+            selected: -1,
+            current: newValue ? newValue.description : "",
+            open: false,
+         }));
+      },
+      [onChange]
+   );
+
    const onInputChange = React.useMemo(
       () => (event: React.ChangeEvent<HTMLInputElement>) => {
          const newValue = event.target.value;
          setState((state) => {
+            let options = state.options;
             if (value && !newValue && !required) {
                // This must change the newValue
-               setTimeout(() => onChange(null));
+               setTimeout(() => onChange(null), 0);
+               options = [];
             }
             return {
                ...state,
+               options,
                current: newValue,
                searchFor: newValue,
                open: newValue.length >= 4,
@@ -272,6 +291,17 @@ const Address = (props: AddressProps) => {
    const onInputBlur = React.useMemo(
       () => (event: React.FocusEvent<HTMLInputElement>) => {
          // Leave the current value
+         const clickedItem = event.relatedTarget;
+         alert(clickedItem);
+         if (clickedItem && clickedItem instanceof HTMLElement && clickedItem.classList.contains("dropdown")) {
+            // Do not change the state
+            return;
+         }
+         if (clickedItem && clickedItem instanceof HTMLElement && clickedItem.classList.contains("option")) {
+            // Click to one of our childs - regain focus
+            setTimeout(() => event.target.focus(), 0);
+            return;
+         }
          setState((state) => ({
             ...state,
             open: false,
@@ -279,6 +309,16 @@ const Address = (props: AddressProps) => {
          }));
       },
       [value]
+   );
+
+   const onDropDown = React.useMemo(
+      () => (event: React.MouseEvent<HTMLElement>) => {
+         setState((state) => ({
+            ...state,
+            open: state.open ? false : state.options.length > 0,
+         }));
+      },
+      []
    );
 
    // The markup
@@ -291,6 +331,20 @@ const Address = (props: AddressProps) => {
             variant={variant}
             InputProps={{
                readOnly,
+               endAdornment: (
+                  <Mui.IconButton
+                     size="small"
+                     className="dropdown"
+                     disabled={!state.open && !state.options.length}
+                     sx={{
+                        transform: state.open ? "rotate(180deg)" : undefined,
+                        marginRight: -1,
+                     }}
+                     onClick={onDropDown}
+                  >
+                     <ArrowDropDown />
+                  </Mui.IconButton>
+               ),
             }}
             autoFocus={autoFocus}
             value={state.current}
@@ -300,21 +354,24 @@ const Address = (props: AddressProps) => {
             fullWidth
          />
          {state.open && (
-            <Mui.Paper sx={{ padding: 2, position: "absolute", left: 0, right: 0, zIndex: 9999 }}>
+            <Mui.Paper sx={{ position: "absolute", left: 0, right: 0, zIndex: 9999 }}>
                {state.loading && <Mui.LinearProgress />}
                {!state.loading && !state.options.length && noOptionsText}
-               {!state.loading &&
-                  Boolean(state.options.length) &&
-                  state.options.map((option, index) => (
-                     <Mui.Box
-                        sx={{
-                           color: index === state.selected ? "#F00" : undefined,
-                        }}
-                        key={option.description}
-                     >
-                        {option.description}
-                     </Mui.Box>
-                  ))}
+               {!state.loading && Boolean(state.options.length) && (
+                  <Mui.List>
+                     {state.options.map((option, index) => (
+                        <Mui.ListItem
+                           button
+                           className="option"
+                           selected={state.selected === index}
+                           onClick={() => change(option)}
+                           key={option.description}
+                        >
+                           {option.description}
+                        </Mui.ListItem>
+                     ))}
+                  </Mui.List>
+               )}
             </Mui.Paper>
          )}
       </Mui.Box>
