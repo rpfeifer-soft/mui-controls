@@ -73,10 +73,13 @@ async function searchAddress(searchFor: string, lat?: number, lon?: number): Pro
                   : `${name}, ${postcode} ${city}, ${country}`;
                break;
             case "house":
-               if (!housenumber) {
+               if (housenumber) {
+                  description = `${street} ${housenumber}, ${postcode} ${city}, ${country}`;
+               } else if (street) {
+                  description = `${name}, ${street}, ${postcode} ${city}, ${country}`;
+               } else {
                   return null;
                }
-               description = `${street} ${housenumber}, ${postcode} ${city}, ${country}`;
                break;
          }
          console.log(description);
