@@ -229,7 +229,6 @@ const Address = (props: AddressProps) => {
 
    const onInputKeyDown = React.useMemo(
       () => (event: React.KeyboardEvent<HTMLInputElement>) => {
-         console.log(event.key);
          setState((state) => {
             switch (event.key) {
                case "Escape":
@@ -292,7 +291,6 @@ const Address = (props: AddressProps) => {
       () => (event: React.FocusEvent<HTMLInputElement>) => {
          // Leave the current value
          const clickedItem = event.relatedTarget;
-         alert(clickedItem);
          if (clickedItem && clickedItem instanceof HTMLElement && clickedItem.classList.contains("dropdown")) {
             // Do not change the state
             return;
