@@ -33,6 +33,7 @@ const TestDate = (props: TestDateProps) => {
       <Mui.Box {...boxProps}>
          <DateInit locale="de" okText="OKAY">
             <Date
+               autoFocus
                value={value}
                label={label}
                variant={variant}

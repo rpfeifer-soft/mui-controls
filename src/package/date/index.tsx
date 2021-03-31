@@ -8,6 +8,7 @@ import moment from "moment";
 import "moment/locale/de";
 import InputRef from "../InputRef";
 import { css } from "@emotion/css";
+import { ICtrl } from "../types";
 
 export class DateUtils extends MomentUtils {
    constructor(
@@ -94,20 +95,13 @@ class DateRef {
 
 export const useDateRef = () => React.useRef(new DateRef());
 
-const noChange = (value: Date | null) => {};
+export interface DateProps extends ICtrl<Date> {
+   variant?: Mui.TextFieldProps["variant"];
 
-export interface DateProps {
-   required?: boolean;
-   value: Date | null;
-   onChange?: (value: Date | null) => void;
-
-   label?: string;
-   variant?: "outlined" | "filled" | "standard";
-   disabled?: boolean;
-   readOnly?: boolean;
    mobile?: boolean;
    timeSteps?: number;
    dateRef?: React.MutableRefObject<DateRef>;
+
    boxProps?: Mui.BoxProps;
 }
 
@@ -121,16 +115,20 @@ function dateInTime(date: Date | null) {
 const Date = (props: DateProps) => {
    // The props
    const {
-      required,
-      value: initValue,
-      onChange = noChange,
+      // ICtrl
       label,
+      value: initValue,
+      onChange,
+      disabled,
+      readOnly,
+      required,
+      autoFocus,
+      // Date
       variant,
-      disabled = false,
-      readOnly = false,
       mobile = false,
       timeSteps = 0,
       dateRef: propsDateRef,
+      // Box
       boxProps,
    } = props;
 
@@ -238,6 +236,7 @@ const Date = (props: DateProps) => {
          dateRef.current.forkedRef = params.inputRef;
          return (
             <Mui.TextField
+               autoFocus={autoFocus}
                inputRef={handleDateRef}
                InputProps={{
                   ...params.InputProps,
@@ -276,7 +275,7 @@ const Date = (props: DateProps) => {
             />
          );
       };
-   }, [variant, onKeyDown, onEndInput, dateRef, mobile, value, disabled, readOnly, handleDateRef]);
+   }, [variant, onKeyDown, onEndInput, dateRef, mobile, value, autoFocus, disabled, readOnly, handleDateRef]);
 
    // The functions
    const fixes = {
