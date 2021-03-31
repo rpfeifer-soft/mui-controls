@@ -35,28 +35,34 @@ class SelectRef {
    };
 }
 
-export interface Option {
+export interface IOption {
    label: string;
+}
+
+function getOptionLabel(option: IOption) {
+   return option.label;
 }
 
 export const useSelectRef = () => React.useRef(new SelectRef());
 
-export interface SelectProps<T extends Option> extends ICtrl<T> {
+export interface SelectProps<T extends IOption> extends ICtrl<T> {
    options: T[];
 
    variant?: Mui.TextFieldProps["variant"];
    onInputChange?: Mui.TextFieldProps["onChange"];
    loading?: boolean;
-   noFilter?: boolean;
    selectRef?: React.MutableRefObject<SelectRef>;
 
    onOpen?: () => void;
+   filterOptions?: (options: T[], inputValue: string) => T[];
    groupBy?: (value: T) => string;
+   getLabel?: (value: T) => string;
+   getSelected?: (option: T, value: T) => boolean;
 
    boxProps?: Mui.BoxProps;
 }
 
-function Select<T extends Option>(props: SelectProps<T>) {
+function Select<T extends IOption>(props: SelectProps<T>) {
    // The props
    const {
       // ICtrl
@@ -72,10 +78,12 @@ function Select<T extends Option>(props: SelectProps<T>) {
       variant,
       onInputChange,
       loading = false,
-      noFilter = false,
       selectRef: propsSelectRef,
       onOpen = noOpen,
+      filterOptions,
       groupBy = noGroup,
+      getLabel = getOptionLabel,
+      getSelected,
       // Box
       boxProps,
    } = props;
@@ -109,6 +117,11 @@ function Select<T extends Option>(props: SelectProps<T>) {
       };
    }, [autoFocus, handleSelectRef, label, readOnly, variant, onInputChange]);
 
+   const getOptionSelected = React.useMemo(
+      () => (getSelected ? getSelected : (option: T, value: T) => getLabel(option) === getLabel(value)),
+      [getLabel, getSelected]
+   );
+
    // The markup
    return (
       <Mui.Box {...boxProps}>
@@ -117,9 +130,9 @@ function Select<T extends Option>(props: SelectProps<T>) {
             fullWidth
             value={value}
             options={options}
-            filterOptions={noFilter ? (option) => options : undefined}
-            getOptionLabel={(option) => option.label}
-            getOptionSelected={(option, value) => option.label === value.label}
+            filterOptions={filterOptions ? (options, state) => filterOptions(options, state.inputValue) : undefined}
+            getOptionLabel={getLabel}
+            getOptionSelected={getOptionSelected}
             groupBy={groupBy}
             loading={loading}
             disabled={disabled}

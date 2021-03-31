@@ -128,6 +128,8 @@ const TestSelect = (props: TestSelectProps) => {
    const [required, Required] = useSwitch("Required");
    const [async, Async] = useSwitch("Async");
    const [grouped, Grouped] = useSwitch("Grouped");
+   const [ownLabels, OwnLabels] = useSwitch("OwnLabels");
+   const [ownFilter, OwnFilter] = useSwitch("OwnFilter");
    const [value, setValue] = React.useState<Option | null>(null);
    const [variant, Variant] = useChoice("Variant", ["standard", "outlined", "filled"] as const);
    const [options, setOptions] = React.useState<Option[]>([]);
@@ -163,6 +165,10 @@ const TestSelect = (props: TestSelectProps) => {
             readOnly={readOnly}
             required={required}
             options={options}
+            getLabel={ownLabels ? (option) => option.label.toUpperCase() : undefined}
+            filterOptions={
+               ownFilter ? (options, text) => options.filter((option) => option.label.includes(text)) : undefined
+            }
             loading={loading}
             selectRef={selectRef}
             onChange={(value) => {
@@ -188,7 +194,11 @@ const TestSelect = (props: TestSelectProps) => {
             <ReadOnly />
             <Required />
             <Async />
+         </OptionGroup>
+         <OptionGroup title="Own">
             <Grouped />
+            <OwnLabels />
+            <OwnFilter />
          </OptionGroup>
          <Actions
             onChosen={(chosen) => {
