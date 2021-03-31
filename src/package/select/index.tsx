@@ -3,9 +3,8 @@
 import * as React from "react";
 import * as Mui from "@material-ui/core";
 import InputRef from "../InputRef";
-import { ICtrl } from "../types";
+import { ICtrl, noChange } from "../types";
 
-function noChange<T>(value: T | null) {}
 function noOpen() {}
 function noGroup<T>(value: T) {
    return "";

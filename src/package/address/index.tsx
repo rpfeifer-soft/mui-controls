@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import * as Mui from "@material-ui/core";
-import { ICtrl } from "../types";
+import { ICtrl, noChange } from "../types";
 
 export interface IAddress {
    description: string;
@@ -140,7 +140,7 @@ const Address = (props: AddressProps) => {
       // ICtrl
       label,
       value,
-      onChange,
+      onChange = noChange,
       disabled,
       readOnly,
       required,

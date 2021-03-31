@@ -8,7 +8,7 @@ import moment from "moment";
 import "moment/locale/de";
 import InputRef from "../InputRef";
 import { css } from "@emotion/css";
-import { ICtrl } from "../types";
+import { ICtrl, noChange } from "../types";
 
 export class DateUtils extends MomentUtils {
    constructor(
@@ -118,7 +118,7 @@ const Date = (props: DateProps) => {
       // ICtrl
       label,
       value: initValue,
-      onChange,
+      onChange = noChange,
       disabled,
       readOnly,
       required,

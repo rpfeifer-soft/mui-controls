@@ -6,5 +6,7 @@ export interface ICtrl<T> {
    required?: boolean;
    autoFocus?: boolean;
 
-   onChange: (value: T | null) => void;
+   onChange?: (value: T | null) => void;
 }
+
+export function noChange<T>(value: T | null) { }
