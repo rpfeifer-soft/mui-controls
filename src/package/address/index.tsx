@@ -10,40 +10,49 @@ export interface IAddress {
    lon?: number;
 }
 
-// interface IRequestCache {
-//    [searchUrl: string]: IAddress[];
-// }
+const debugMode = false;
+const useLocalStorage = debugMode;
 
-// const requestCache: IRequestCache = {};
+interface IRequestCache {
+   [searchUrl: string]: IAddress[];
+}
+
+const requestCache: IRequestCache = {};
 
 function addRequest(searchUrl: string, result: IAddress[]): IAddress[] {
-   // requestCache[searchUrl] = result;
-   localStorage.setItem(searchUrl, JSON.stringify(result));
+   if (useLocalStorage) {
+      localStorage.setItem(searchUrl, JSON.stringify(result));
+   } else {
+      requestCache[searchUrl] = result;
+   }
    return result;
 }
 function getRequest(searchUrl: string): IAddress[] | undefined {
-   // return requestCache[searchUrl];
-   const json = localStorage.getItem(searchUrl);
-   return json ? JSON.parse(json) : undefined;
+   if (useLocalStorage) {
+      const json = localStorage.getItem(searchUrl);
+      return json ? JSON.parse(json) : undefined;
+   } else {
+      return requestCache[searchUrl];
+   }
 }
 
-function photonUrl(searchFor: string, lat?: number, lon?: number) {
+function photonUrl(searchFor: string, limit: number, lat?: number, lon?: number) {
    if (searchFor.length < 4) return "";
 
    const location = lat !== undefined && lon !== undefined ? `lat=${lat}&lon=${lon}&` : "";
-   return `https://photon.komoot.io/api?limit=3&${location}q=${encodeURIComponent(searchFor)}`;
+   return `https://photon.komoot.io/api?limit=${limit}&${location}q=${encodeURIComponent(searchFor)}`;
 }
 
-function cachedAddress(searchFor: string, lat?: number, lon?: number) {
-   const searchUrl = photonUrl(searchFor, lat, lon);
+function cachedAddress(searchFor: string, limit: number, lat?: number, lon?: number) {
+   const searchUrl = photonUrl(searchFor, limit, lat, lon);
    if (!searchUrl) {
       return [];
    }
    return getRequest(searchUrl);
 }
 
-async function searchAddress(searchFor: string, lat?: number, lon?: number): Promise<IAddress[]> {
-   const searchUrl = photonUrl(searchFor, lat, lon);
+async function searchAddress(searchFor: string, limit: number, lat?: number, lon?: number): Promise<IAddress[]> {
+   const searchUrl = photonUrl(searchFor, limit, lat, lon);
    if (!searchUrl) {
       return [];
    }
@@ -52,14 +61,19 @@ async function searchAddress(searchFor: string, lat?: number, lon?: number): Pro
    if (!response.ok) return [];
 
    const json = JSON.parse(await response.text());
-   console.log(json);
+   if (debugMode) {
+      console.log(json);
+   }
    if (json.type === "FeatureCollection" && Array.isArray(json.features) && json.features.length > 0) {
       const addresses = json.features.map((feature: any) => {
          const [longitude, latitude] =
             feature.geometry && feature.geometry.coordinates ? feature.geometry.coordinates : [];
          let description = searchFor;
          const { type, name, country, county, postcode, city, street, housenumber } = feature.properties;
-         console.log(type, feature.properties);
+
+         if (debugMode) {
+            console.log(type, feature.properties);
+         }
          switch (type) {
             case "city":
                description = county ? `${name}, ${county}, ${country}` : `${name}, ${country}`;
@@ -82,7 +96,9 @@ async function searchAddress(searchFor: string, lat?: number, lon?: number): Pro
                }
                break;
          }
-         console.log(description);
+         if (debugMode) {
+            console.log(description);
+         }
          const address: IAddress = {
             description,
             lat: latitude,
@@ -127,6 +143,7 @@ const ArrowDropDown = Mui.createSvgIcon(<path d="M7 10l5 5 5-5z"></path>, "Arrow
 export interface AddressProps extends ICtrl<IAddress> {
    variant?: Mui.TextFieldProps["variant"];
 
+   requestLimit?: number;
    requestDelay?: number;
    lat?: number;
    lon?: number;
@@ -149,6 +166,7 @@ const Address = (props: AddressProps) => {
       autoFocus,
       // Address
       variant,
+      requestLimit = 3,
       requestDelay = 500,
       lat,
       lon,
@@ -176,7 +194,7 @@ const Address = (props: AddressProps) => {
          // Only search when open or not cached
          return;
       }
-      const cachedAnswer = cachedAddress(state.searchFor, lat, lon);
+      const cachedAnswer = cachedAddress(state.searchFor, requestLimit, lat, lon);
       if (cachedAnswer) {
          setState((state) => setOptions(state, cachedAnswer));
          return;
@@ -185,7 +203,7 @@ const Address = (props: AddressProps) => {
 
       // Start the delay
       const timer = setTimeout(async () => {
-         const options = await searchAddress(state.searchFor, lat, lon);
+         const options = await searchAddress(state.searchFor, requestLimit, lat, lon);
          setState((state) => setOptions(state, options));
       }, requestDelay);
       // Return clean up function for delay
@@ -193,7 +211,7 @@ const Address = (props: AddressProps) => {
          clearTimeout(timerToClear);
          setState((state) => ({ ...state, loading: false }));
       })(timer);
-   }, [state.open, state.searchFor, requestDelay, lat, lon]);
+   }, [state.open, state.searchFor, requestDelay, requestLimit, lat, lon]);
 
    // The functions
    const change = React.useMemo(

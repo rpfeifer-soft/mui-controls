@@ -19,6 +19,7 @@ const TestAddress = (props: TestAddressProps) => {
    const [variant, Variant] = useChoice("Variant", ["standard", "outlined", "filled"] as const);
    const [noOptionsText, NoOptionsText] = useChoice("NoOptionsText", ["", "nicht gefunden"] as const);
    const Values = useActions("Init", ["", "Alte Ziegelei 2, 76316 Malsch"] as const);
+   const [limit, Limit] = useChoice("Limit", ["", "5", "10"] as const);
 
    // The props
    const { ...boxProps } = props;
@@ -39,6 +40,7 @@ const TestAddress = (props: TestAddressProps) => {
             readOnly={readOnly}
             required={required}
             variant={variant}
+            requestLimit={limit ? Number(limit) : undefined}
             lat={local ? 48.87 : undefined}
             lon={local ? 8.34 : undefined}
             onChange={onChange}
@@ -62,6 +64,7 @@ const TestAddress = (props: TestAddressProps) => {
             <Local />
          </OptionGroup>
          <NoOptionsText />
+         <Limit />
          <Values
             onChosen={(description) => {
                if (description) {
