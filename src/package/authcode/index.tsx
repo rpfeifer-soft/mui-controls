@@ -5,6 +5,7 @@ import * as Mui from "@material-ui/core";
 import { css } from "@emotion/css";
 import InputRef from "../InputRef";
 import clsx from "clsx";
+import { ICtrl, noChange } from "../types";
 
 type DSetSelected = (selected: boolean) => void;
 
@@ -43,29 +44,31 @@ class AuthCodeRef {
 
 export const useAuthCodeRef = () => React.useRef(new AuthCodeRef());
 
-export interface AuthCodeProps extends Omit<Mui.BoxProps, "onChange" | "onSubmit"> {
-   value: string;
-
-   autoFocus?: boolean;
+export interface AuthCodeProps extends Omit<ICtrl<string>, "label" | "readOnly" | "required"> {
    authCodeRef?: React.MutableRefObject<AuthCodeRef>;
 
-   onChange?: (value: string) => void;
    onSubmit?: (value: string) => void;
+
+   boxProps?: Mui.BoxProps;
 }
 
 const AuthCode = (props: AuthCodeProps) => {
    // The props
    const {
-      autoFocus = false,
+      // ICtrl
       value: propsValue,
+      disabled = false,
+      autoFocus = false,
+      onChange = noChange,
+      // AuthCode
       authCodeRef: propsAuthCodeRef,
-      onChange = noOp,
       onSubmit = noOp,
-      ...boxProps
+      // Box
+      boxProps,
    } = props;
 
    // Work with real values
-   const toValue = (text: string) => text.replace(/\D/g, "").slice(0, 6);
+   const toValue = (text: string | null) => (text ? text.replace(/\D/g, "").slice(0, 6) : "");
 
    // The state
    const theme = Mui.useTheme();
@@ -97,6 +100,10 @@ const AuthCode = (props: AuthCodeProps) => {
       onChange(newValue);
    };
    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      if (disabled) {
+         event.preventDefault();
+         return;
+      }
       switch (event.key) {
          case "0":
          case "1":
@@ -128,25 +135,31 @@ const AuthCode = (props: AuthCodeProps) => {
       }
    };
 
+   // Styles
+   const focusCss = !disabled
+      ? css({
+           "&:focus-within .digit": {
+              color: theme.palette.primary.main,
+           },
+           "&:focus-within .selected.digit": {
+              borderColor: theme.palette.primary.main,
+              backgroundColor: Mui.alpha(theme.palette.primary.light, 0.1),
+           },
+           "&:focus-within .last.digit::after": {
+              content: '"_"',
+              display: "inline-block",
+              color: theme.palette.primary.main,
+           },
+        })
+      : css({
+           "& .digit": {
+              color: theme.palette.grey["500"],
+           },
+        });
+
    // The markup
    return (
-      <Mui.Box
-         {...boxProps}
-         className={css({
-            "&:focus-within .digit": {
-               color: theme.palette.primary.main,
-            },
-            "&:focus-within .selected.digit": {
-               borderColor: theme.palette.primary.main,
-               backgroundColor: Mui.alpha(theme.palette.primary.light, 0.1),
-            },
-            "&:focus-within .last.digit::after": {
-               content: '"_"',
-               display: "inline-block",
-               color: theme.palette.primary.main,
-            },
-         })}
-      >
+      <Mui.Box {...boxProps} className={focusCss}>
          <Mui.Input
             inputRef={handleAuthCodeRef}
             type="tel"

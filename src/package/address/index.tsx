@@ -124,7 +124,7 @@ function setOptions(state: IState, options: IAddress[]) {
 
 const ArrowDropDown = Mui.createSvgIcon(<path d="M7 10l5 5 5-5z"></path>, "ArrowDropDown");
 
-export interface AddressProps extends ICtrl<IAddress>, Omit<Mui.BoxProps, "onChange"> {
+export interface AddressProps extends ICtrl<IAddress> {
    variant?: Mui.TextFieldProps["variant"];
 
    requestDelay?: number;
@@ -132,6 +132,8 @@ export interface AddressProps extends ICtrl<IAddress>, Omit<Mui.BoxProps, "onCha
    lon?: number;
 
    noOptionsText?: string;
+
+   boxProps?: Mui.BoxProps;
 }
 
 const Address = (props: AddressProps) => {
@@ -152,7 +154,7 @@ const Address = (props: AddressProps) => {
       lon,
       noOptionsText = "-",
       // Box
-      ...boxProps
+      boxProps,
    } = props;
 
    // The state

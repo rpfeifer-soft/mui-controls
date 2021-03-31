@@ -3,7 +3,7 @@
 import * as React from "react";
 import * as Mui from "@material-ui/core";
 import Address, { IAddress } from "../package/address";
-import { useChoice, useSwitch } from "../hooks";
+import { useActions, useChoice, useSwitch } from "../hooks";
 import { OptionGroup } from "../components";
 
 export interface TestAddressProps extends Mui.BoxProps {}
@@ -18,7 +18,7 @@ const TestAddress = (props: TestAddressProps) => {
    const [local, Local] = useSwitch("Local");
    const [variant, Variant] = useChoice("Variant", ["standard", "outlined", "filled"] as const);
    const [noOptionsText, NoOptionsText] = useChoice("NoOptionsText", ["", "nicht gefunden"] as const);
-   const [, Init] = useChoice("Init", ["", "Alte Ziegelei 2, 76316 Malsch"] as const);
+   const Values = useActions("Init", ["", "Alte Ziegelei 2, 76316 Malsch"] as const);
 
    // The props
    const { ...boxProps } = props;
@@ -62,8 +62,8 @@ const TestAddress = (props: TestAddressProps) => {
             <Local />
          </OptionGroup>
          <NoOptionsText />
-         <Init
-            mayChoose={(description) => {
+         <Values
+            onChosen={(description) => {
                if (description) {
                   setValue({ description });
                } else {

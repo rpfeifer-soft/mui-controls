@@ -41,7 +41,7 @@ export interface Option {
 
 export const useSelectRef = () => React.useRef(new SelectRef());
 
-export interface SelectProps<T extends Option> extends ICtrl<T>, Omit<Mui.BoxProps, "onChange"> {
+export interface SelectProps<T extends Option> extends ICtrl<T> {
    options: T[];
 
    variant?: Mui.TextFieldProps["variant"];
@@ -52,6 +52,8 @@ export interface SelectProps<T extends Option> extends ICtrl<T>, Omit<Mui.BoxPro
 
    onOpen?: () => void;
    groupBy?: (value: T) => string;
+
+   boxProps?: Mui.BoxProps;
 }
 
 function Select<T extends Option>(props: SelectProps<T>) {
@@ -75,7 +77,7 @@ function Select<T extends Option>(props: SelectProps<T>) {
       onOpen = noOpen,
       groupBy = noGroup,
       // Box
-      ...boxProps
+      boxProps,
    } = props;
 
    // The state
