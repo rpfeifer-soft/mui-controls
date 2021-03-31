@@ -166,7 +166,7 @@ const Address = (props: AddressProps) => {
    });
 
    React.useEffect(() => {
-      setState((state) => ({ ...state, value }));
+      setState((state) => ({ ...state, current: value ? value.description : "" }));
    }, [value]);
 
    React.useEffect(() => {

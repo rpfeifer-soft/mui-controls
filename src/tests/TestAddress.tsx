@@ -15,8 +15,10 @@ const TestAddress = (props: TestAddressProps) => {
    const [disabled, Disabled] = useSwitch("Disabled");
    const [readOnly, ReadOnly] = useSwitch("ReadOnly");
    const [required, Required] = useSwitch("Required");
+   const [local, Local] = useSwitch("Local");
    const [variant, Variant] = useChoice("Variant", ["standard", "outlined", "filled"] as const);
    const [noOptionsText, NoOptionsText] = useChoice("NoOptionsText", ["", "nicht gefunden"] as const);
+   const [, Init] = useChoice("Init", ["", "Alte Ziegelei 2, 76316 Malsch"] as const);
 
    // The props
    const { ...boxProps } = props;
@@ -37,8 +39,8 @@ const TestAddress = (props: TestAddressProps) => {
             readOnly={readOnly}
             required={required}
             variant={variant}
-            lat={48.87}
-            lon={8.34}
+            lat={local ? 48.87 : undefined}
+            lon={local ? 8.34 : undefined}
             onChange={onChange}
             noOptionsText={noOptionsText || undefined}
          />
@@ -57,8 +59,19 @@ const TestAddress = (props: TestAddressProps) => {
             <Disabled />
             <ReadOnly />
             <Required />
+            <Local />
          </OptionGroup>
          <NoOptionsText />
+         <Init
+            mayChoose={(description) => {
+               if (description) {
+                  setValue({ description });
+               } else {
+                  setValue(null);
+               }
+               return true;
+            }}
+         />
       </Mui.Box>
    );
 };
