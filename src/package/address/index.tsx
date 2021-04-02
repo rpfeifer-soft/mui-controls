@@ -2,121 +2,8 @@
 
 import * as React from "react";
 import * as Mui from "@material-ui/core";
-import { ICtrl, noChange } from "../types";
-
-export interface IAddress {
-   description: string;
-   lat?: number;
-   lon?: number;
-}
-
-const debugMode = false;
-const useLocalStorage = debugMode;
-
-interface IRequestCache {
-   [searchUrl: string]: IAddress[];
-}
-
-const requestCache: IRequestCache = {};
-
-function addRequest(searchUrl: string, result: IAddress[]): IAddress[] {
-   if (useLocalStorage) {
-      localStorage.setItem(searchUrl, JSON.stringify(result));
-   } else {
-      requestCache[searchUrl] = result;
-   }
-   return result;
-}
-function getRequest(searchUrl: string): IAddress[] | undefined {
-   if (useLocalStorage) {
-      const json = localStorage.getItem(searchUrl);
-      return json ? JSON.parse(json) : undefined;
-   } else {
-      return requestCache[searchUrl];
-   }
-}
-
-function photonUrl(searchFor: string, limit: number, lat?: number, lon?: number) {
-   if (searchFor.length < 4) return "";
-
-   const location = lat !== undefined && lon !== undefined ? `lat=${lat}&lon=${lon}&` : "";
-   return `https://photon.komoot.io/api?limit=${limit}&${location}q=${encodeURIComponent(searchFor)}`;
-}
-
-function cachedAddress(searchFor: string, limit: number, lat?: number, lon?: number) {
-   const searchUrl = photonUrl(searchFor, limit, lat, lon);
-   if (!searchUrl) {
-      return [];
-   }
-   return getRequest(searchUrl);
-}
-
-async function searchAddress(searchFor: string, limit: number, lat?: number, lon?: number): Promise<IAddress[]> {
-   const searchUrl = photonUrl(searchFor, limit, lat, lon);
-   if (!searchUrl) {
-      return [];
-   }
-
-   const response = await fetch(searchUrl);
-   if (!response.ok) return [];
-
-   const json = JSON.parse(await response.text());
-   if (debugMode) {
-      console.log(json);
-   }
-   if (json.type === "FeatureCollection" && Array.isArray(json.features) && json.features.length > 0) {
-      const addresses = json.features.map((feature: any) => {
-         const [longitude, latitude] =
-            feature.geometry && feature.geometry.coordinates ? feature.geometry.coordinates : [];
-         let description = searchFor;
-         const { type, name, country, county, postcode, city, street, housenumber } = feature.properties;
-
-         if (debugMode) {
-            console.log(type, feature.properties);
-         }
-         switch (type) {
-            case "city":
-               description = county ? `${name}, ${county}, ${country}` : `${name}, ${country}`;
-               break;
-            case "locality":
-               description = city ? `${name}, ${city}, ${country}` : `${name}, ${country}`;
-               break;
-            case "street":
-               description = housenumber
-                  ? `${name} ${housenumber}, ${postcode} ${city}, ${country}`
-                  : `${name}, ${postcode} ${city}, ${country}`;
-               break;
-            case "house":
-               if (housenumber) {
-                  description = `${street} ${housenumber}, ${postcode} ${city}, ${country}`;
-               } else if (street) {
-                  description = `${name}, ${street}, ${postcode} ${city}, ${country}`;
-               } else {
-                  return null;
-               }
-               break;
-         }
-         if (debugMode) {
-            console.log(description);
-         }
-         const address: IAddress = {
-            description,
-            lat: latitude,
-            lon: longitude,
-         };
-         return address;
-      });
-      const valids = addresses.filter((address: IAddress | null) => Boolean(address)) as IAddress[];
-      const uniques: IAddress[] = [];
-      valids.forEach((valid) => {
-         if (!uniques.find((unique) => unique.description === valid.description)) {
-            uniques.push(valid);
-         }
-      });
-      return addRequest(searchUrl, uniques);
-   }
-   return addRequest(searchUrl, searchFor ? [{ description: searchFor }] : []);
-}
+import { IAddress, ICtrl, noChange } from "../types";
+import { useUIContext } from "../UIContext";
 
 interface IState {
    current: string;
@@ -143,10 +30,7 @@ const ArrowDropDown = Mui.createSvgIcon(<path d="M7 10l5 5 5-5z"></path>, "Arrow
 export interface AddressProps extends ICtrl<IAddress> {
    variant?: Mui.TextFieldProps["variant"];
 
-   requestLimit?: number;
    requestDelay?: number;
-   lat?: number;
-   lon?: number;
 
    noOptionsText?: string;
 
@@ -166,16 +50,14 @@ const Address = (props: AddressProps) => {
       autoFocus,
       // Address
       variant,
-      requestLimit = 3,
       requestDelay = 500,
-      lat,
-      lon,
       noOptionsText = "-",
       // Box
       boxProps,
    } = props;
 
    // The state
+   const context = useUIContext();
    const [state, setState] = React.useState<IState>({
       current: value ? value.description : "",
       options: [],
@@ -194,7 +76,7 @@ const Address = (props: AddressProps) => {
          // Only search when open or not cached
          return;
       }
-      const cachedAnswer = cachedAddress(state.searchFor, requestLimit, lat, lon);
+      const cachedAnswer = context.cachedAddress(state.searchFor);
       if (cachedAnswer) {
          setState((state) => setOptions(state, cachedAnswer));
          return;
@@ -203,7 +85,7 @@ const Address = (props: AddressProps) => {
 
       // Start the delay
       const timer = setTimeout(async () => {
-         const options = await searchAddress(state.searchFor, requestLimit, lat, lon);
+         const options = await context.searchAddress(state.searchFor);
          setState((state) => setOptions(state, options));
       }, requestDelay);
       // Return clean up function for delay
@@ -211,7 +93,7 @@ const Address = (props: AddressProps) => {
          clearTimeout(timerToClear);
          setState((state) => ({ ...state, loading: false }));
       })(timer);
-   }, [state.open, state.searchFor, requestDelay, requestLimit, lat, lon]);
+   }, [context, state.open, state.searchFor, requestDelay]);
 
    // The functions
    const change = React.useMemo(

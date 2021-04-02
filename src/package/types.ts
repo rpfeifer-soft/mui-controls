@@ -9,4 +9,10 @@ export interface ICtrl<T> {
    onChange?: (value: T | null) => void;
 }
 
+export interface IAddress {
+   description: string;
+   lat?: number;
+   lon?: number;
+}
+
 export function noChange<T>(value: T | null) { }

@@ -2,9 +2,12 @@
 
 import * as React from "react";
 import * as Mui from "@material-ui/core";
-import Address, { IAddress } from "../package/address";
+import Address from "../package/address";
 import { useActions, useChoice, useSwitch } from "../hooks";
 import { OptionGroup } from "../components";
+import UIContext from "../package/UIContext";
+import { IAddress } from "../package/types";
+import { cachedAddress, searchAddress } from "../geoTools";
 
 export interface TestAddressProps extends Mui.BoxProps {}
 
@@ -32,20 +35,26 @@ const TestAddress = (props: TestAddressProps) => {
    // The markup
    return (
       <Mui.Box {...boxProps}>
-         <Address
-            autoFocus
-            label={label}
-            value={value}
-            disabled={disabled}
-            readOnly={readOnly}
-            required={required}
-            variant={variant}
-            requestLimit={limit ? Number(limit) : undefined}
-            lat={local ? 48.87 : undefined}
-            lon={local ? 8.34 : undefined}
-            onChange={onChange}
-            noOptionsText={noOptionsText || undefined}
-         />
+         <UIContext
+            value={{
+               cachedAddress: (text) =>
+                  cachedAddress(text, limit ? Number(limit) : 3, local ? 48.87 : undefined, local ? 8.34 : undefined),
+               searchAddress: (text) =>
+                  searchAddress(text, limit ? Number(limit) : 3, local ? 48.87 : undefined, local ? 8.34 : undefined),
+            }}
+         >
+            <Address
+               autoFocus
+               label={label}
+               value={value}
+               disabled={disabled}
+               readOnly={readOnly}
+               required={required}
+               variant={variant}
+               onChange={onChange}
+               noOptionsText={noOptionsText || undefined}
+            />
+         </UIContext>
          <hr />
          <Mui.Paper
             sx={{

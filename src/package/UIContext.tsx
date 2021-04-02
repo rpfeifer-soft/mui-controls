@@ -4,6 +4,7 @@ import * as React from "react";
 import * as MuiLab from "@material-ui/lab";
 import MomentUtils from "@date-io/moment";
 import moment from "moment";
+import { IAddress } from "./types";
 
 export interface IUIContext {
    // For date components
@@ -12,6 +13,9 @@ export interface IUIContext {
    cancelText?: string;
    clearText?: string;
    todayText?: string;
+   // For address components
+   cachedAddress: (text: string) => IAddress[] | undefined;
+   searchAddress: (text: string) => Promise<IAddress[]>;
 }
 
 // the context component
@@ -26,29 +30,42 @@ export function useUIContext() {
 }
 
 export interface UIContextProps {
-   value: IUIContext;
+   value: Partial<IUIContext>;
    children: React.ReactNode;
 }
 
 const UIContext = (props: UIContextProps) => {
    // The props
    const { value, children } = props;
-   const { locale = "de" } = value;
+
+   // Check for overloading
+   const context = React.useContext(Context);
+   const combine: IUIContext = {
+      locale: "de",
+      cachedAddress: () => {
+         throw new Error("Address functions not initialized in context!");
+      },
+      searchAddress: () => {
+         throw new Error("Address functions not initialized in context!");
+      },
+      ...context,
+      ...value,
+   };
 
    // The state
    const dateUtils = React.useMemo(() => {
       return new MomentUtils({
-         locale: locale,
+         locale: combine.locale,
          instance: moment,
       });
-   }, [locale]);
+   }, [combine.locale]);
 
    // Set the correct locale
-   moment.locale(locale);
+   moment.locale(combine.locale);
 
    // The markup
    return (
-      <Context.Provider value={value}>
+      <Context.Provider value={combine}>
          <MuiLab.MuiPickersAdapterContext.Provider value={dateUtils}>
             {children}
          </MuiLab.MuiPickersAdapterContext.Provider>
