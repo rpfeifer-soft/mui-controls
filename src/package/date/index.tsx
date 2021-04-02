@@ -3,58 +3,12 @@
 import * as React from "react";
 import * as Mui from "@material-ui/core";
 import * as MuiLab from "@material-ui/lab";
-import { default as MomentUtils } from "@date-io/moment";
 import moment from "moment";
 import "moment/locale/de";
 import InputRef from "../InputRef";
 import { css } from "@emotion/css";
 import { ICtrl, noChange } from "../types";
-
-export class DateUtils extends MomentUtils {
-   constructor(
-      params: any,
-      public okText?: string,
-      public cancelText?: string,
-      public clearText?: string,
-      public todayText?: string
-   ) {
-      super(params);
-   }
-}
-
-export interface DateInitProps {
-   children: React.ReactNode;
-   locale?: string;
-   okText?: string;
-   cancelText?: string;
-   clearText?: string;
-   todayText?: string;
-}
-
-export const DateInit = (props: DateInitProps) => {
-   // The props
-   const { children, locale = "de", okText, cancelText, clearText, todayText } = props;
-
-   // The state
-   const dateUtils = React.useMemo(() => {
-      moment.locale(locale);
-      return new DateUtils(
-         {
-            locale,
-            instance: moment,
-         },
-         okText,
-         cancelText,
-         clearText,
-         todayText
-      );
-   }, [locale, okText, cancelText, clearText, todayText]);
-
-   // The markup
-   return (
-      <MuiLab.MuiPickersAdapterContext.Provider value={dateUtils}>{children}</MuiLab.MuiPickersAdapterContext.Provider>
-   );
-};
+import { useUIContext } from "../UIContext";
 
 // Trick the linter
 const memoize = React.useMemo;
@@ -138,8 +92,7 @@ const Date = (props: DateProps) => {
    }
 
    // The state
-   const context = React.useContext(MuiLab.MuiPickersAdapterContext);
-   const dateUtils = context instanceof DateUtils ? context : undefined;
+   const context = useUIContext();
    const [value, setValue] = React.useState<moment.Moment | null>(initValue ? moment(initValue) : null);
    const [inputText, setInputText] = React.useState<string | null | undefined>();
 
@@ -147,13 +100,10 @@ const Date = (props: DateProps) => {
    const handleDateRef = dateRef.current.useHandler();
 
    // Common props
-   let format = "";
-   let weekDays = context?.getWeekdays() || [];
-   if (context && context.moment) {
-      format = timeSteps
-         ? context.moment.localeData().longDateFormat("L") + " " + context.moment.localeData().longDateFormat("LT")
-         : context.moment.localeData().longDateFormat("L");
-   }
+   let format = timeSteps
+      ? moment.localeData().longDateFormat("L") + " " + moment.localeData().longDateFormat("LT")
+      : moment.localeData().longDateFormat("L");
+   let weekDays = moment.weekdaysMin();
 
    React.useEffect(() => {
       setValue(initValue ? moment(initValue) : null);
@@ -280,6 +230,7 @@ const Date = (props: DateProps) => {
    // The functions
    const fixes = {
       className: css({
+         zIndex: 1350,
          "& .MuiPickersToolbar-root": {
             display: "none",
          },
@@ -334,9 +285,9 @@ const Date = (props: DateProps) => {
       onAccept: (date: moment.Moment | null) => {
          onChange(date ? date.toDate() : null);
       },
-      cancelText: dateUtils?.cancelText,
-      clearText: dateUtils?.clearText,
-      todayText: dateUtils?.todayText,
+      cancelText: context.cancelText,
+      clearText: context.clearText,
+      todayText: context.todayText,
       showDaysOutsideCurrentMonth: true,
    };
 
@@ -351,7 +302,7 @@ const Date = (props: DateProps) => {
                showTodayButton
                minutesStep={timeSteps}
                clearable={!required}
-               okText={dateUtils?.okText}
+               okText={context.okText}
             />
          )}
          {mobile && !timeSteps && (
@@ -361,32 +312,13 @@ const Date = (props: DateProps) => {
                showToolbar={false}
                showTodayButton
                clearable={!required}
-               okText={dateUtils?.okText}
+               okText={context.okText}
             />
          )}
          {!mobile && Boolean(timeSteps) && (
-            <MuiLab.DesktopDateTimePicker
-               {...commonProps}
-               PopperProps={{
-                  ...fixes,
-                  className: css({
-                     zIndex: 1350,
-                  }),
-               }}
-               minutesStep={timeSteps}
-            />
+            <MuiLab.DesktopDateTimePicker {...commonProps} PopperProps={fixes} minutesStep={timeSteps} />
          )}
-         {!mobile && !timeSteps && (
-            <MuiLab.DesktopDatePicker
-               {...commonProps}
-               PopperProps={{
-                  ...fixes,
-                  className: css({
-                     zIndex: 1350,
-                  }),
-               }}
-            />
-         )}
+         {!mobile && !timeSteps && <MuiLab.DesktopDatePicker {...commonProps} PopperProps={fixes} />}
       </Mui.Box>
    );
 };

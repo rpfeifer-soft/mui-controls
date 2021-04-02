@@ -2,6 +2,7 @@ import * as React from "react";
 import * as Mui from "@material-ui/core";
 import { absolute } from "../styles";
 import { css } from "@emotion/css";
+import UIContext from "../package/UIContext";
 
 interface ThemeProps {
    children: React.ReactNode;
@@ -47,20 +48,27 @@ const Theme = (props: ThemeProps) => {
    };
    return (
       <Mui.StylesProvider injectFirst>
-         <Mui.ThemeProvider theme={theme}>
-            <Mui.CssBaseline />
-            <Mui.Button variant="outlined" className={css(absolute, { margin: 2 })} onClick={gotoHome}>
-               Home
-            </Mui.Button>
-            <Mui.Button
-               variant="outlined"
-               className={css(absolute, { margin: 2, left: "auto", right: 0 })}
-               onClick={toggleDark}
-            >
-               {!darkMode ? "Dark" : "Light"}
-            </Mui.Button>
-            {children}
-         </Mui.ThemeProvider>
+         <UIContext
+            value={{
+               okText: "OKAY",
+               cancelText: "NO",
+            }}
+         >
+            <Mui.ThemeProvider theme={theme}>
+               <Mui.CssBaseline />
+               <Mui.Button variant="outlined" className={css(absolute, { margin: 2 })} onClick={gotoHome}>
+                  Home
+               </Mui.Button>
+               <Mui.Button
+                  variant="outlined"
+                  className={css(absolute, { margin: 2, left: "auto", right: 0 })}
+                  onClick={toggleDark}
+               >
+                  {!darkMode ? "Dark" : "Light"}
+               </Mui.Button>
+               {children}
+            </Mui.ThemeProvider>
+         </UIContext>
       </Mui.StylesProvider>
    );
 };

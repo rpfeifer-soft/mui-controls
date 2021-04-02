@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import * as Mui from "@material-ui/core";
-import { Date, DateInit, useDateRef } from "../package";
+import { Date, useDateRef } from "../package";
 import { useActions, useChoice, useMessage, useSwitch } from "../hooks";
 import { OptionGroup } from "../components";
 import moment from "moment";
@@ -31,24 +31,22 @@ const TestDate = (props: TestDateProps) => {
    // The markup
    return (
       <Mui.Box {...boxProps}>
-         <DateInit locale="de" okText="OKAY">
-            <Date
-               autoFocus
-               value={value}
-               label={label}
-               variant={variant}
-               disabled={disabled}
-               readOnly={readOnly}
-               required={required}
-               mobile={mobile}
-               timeSteps={Number(timeSteps)}
-               dateRef={dateRef}
-               onChange={(date) => {
-                  setValue(date);
-                  showMessage(JSON.stringify(date));
-               }}
-            />
-         </DateInit>
+         <Date
+            autoFocus
+            value={value}
+            label={label}
+            variant={variant}
+            disabled={disabled}
+            readOnly={readOnly}
+            required={required}
+            mobile={mobile}
+            timeSteps={Number(timeSteps)}
+            dateRef={dateRef}
+            onChange={(date) => {
+               setValue(date);
+               showMessage(JSON.stringify(date));
+            }}
+         />
          <hr />
          <Mui.Paper
             sx={{
