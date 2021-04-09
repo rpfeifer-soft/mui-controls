@@ -1,5 +1,5 @@
 export { default as InputAuthCode, useRefAuthCode } from "./authcode";
-export { default as InputAddress } from "./address";
+export { default as InputAddress, useRefAddress } from "./address";
 export { default as InputDate, useRefDate } from "./date";
 export { default as InputSelect, useRefSelect } from "./select";
 

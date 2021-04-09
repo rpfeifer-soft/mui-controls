@@ -4,6 +4,32 @@ import * as React from "react";
 import * as Mui from "@material-ui/core";
 import { IAddress, ICtrl, noChange } from "../types";
 import { useUIContext } from "../UIContext";
+import InputRef from "../InputRef";
+
+// Trick the linter
+const memoize = React.useMemo;
+
+class RefAddress {
+   // The input control class
+   private inputRef: InputRef = new InputRef();
+
+   focus() {
+      this.inputRef.focusEnd();
+   }
+
+   select() {
+      this.inputRef.focusAll();
+   }
+
+   useHandler = () => {
+      return memoize(() => {
+         // Register the input element
+         return (input: HTMLInputElement) => {
+            this.inputRef.set(input);
+         };
+      }, []);
+   };
+}
 
 interface IState {
    current: string;
@@ -27,12 +53,14 @@ function setOptions(state: IState, options: IAddress[]) {
 
 const ArrowDropDown = Mui.createSvgIcon(<path d="M7 10l5 5 5-5z"></path>, "ArrowDropDown");
 
+export const useRefAddress = () => React.useRef(new RefAddress());
+
 export interface InputAddressProps extends ICtrl<IAddress> {
    variant?: Mui.TextFieldProps["variant"];
 
    requestDelay?: number;
-
    noOptionsText?: string;
+   refAddress?: React.MutableRefObject<RefAddress>;
 
    boxProps?: Mui.BoxProps;
 }
@@ -52,6 +80,7 @@ const InputAddress = (props: InputAddressProps) => {
       variant,
       requestDelay = 500,
       noOptionsText = "-",
+      refAddress: propsRefAddress,
       // Box
       boxProps,
    } = props;
@@ -66,6 +95,14 @@ const InputAddress = (props: InputAddressProps) => {
       open: false,
       selected: -1,
    });
+
+   const addressRef = useRefAddress();
+   const handleRefAddress = addressRef.current.useHandler();
+
+   // Allow the caller to use the address functions
+   if (propsRefAddress) {
+      propsRefAddress.current = addressRef.current;
+   }
 
    React.useEffect(() => {
       setState((state) => ({ ...state, current: value ? value.description : "" }));
@@ -232,6 +269,7 @@ const InputAddress = (props: InputAddressProps) => {
             required={required}
             disabled={disabled}
             variant={variant}
+            inputRef={handleRefAddress}
             InputProps={{
                readOnly,
                endAdornment: (

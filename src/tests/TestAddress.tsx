@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import * as Mui from "@material-ui/core";
-import { InputAddress } from "../package";
+import { InputAddress, useRefAddress } from "../package";
 import { useActions, useChoice, useSwitch } from "../hooks";
 import { OptionGroup } from "../components";
 import UIContext from "../package/UIContext";
@@ -13,6 +13,7 @@ export interface TestAddressProps extends Mui.BoxProps {}
 
 const TestAddress = (props: TestAddressProps) => {
    // The state
+   const refAddress = useRefAddress();
    const [value, setValue] = React.useState<IAddress | null>(null);
    const [label, Label] = useChoice("Label", ["", "Address"] as const);
    const [disabled, Disabled] = useSwitch("Disabled");
@@ -22,6 +23,7 @@ const TestAddress = (props: TestAddressProps) => {
    const [variant, Variant] = useChoice("Variant", ["standard", "outlined", "filled"] as const);
    const [noOptionsText, NoOptionsText] = useChoice("NoOptionsText", ["", "nicht gefunden"] as const);
    const Values = useActions("Init", ["", "Alte Ziegelei 2, 76316 Malsch"] as const);
+   const Actions = useActions("Actions", ["Focus", "Select"] as const);
    const [limit, Limit] = useChoice("Limit", ["", "5", "10"] as const);
 
    // The props
@@ -52,6 +54,7 @@ const TestAddress = (props: TestAddressProps) => {
                required={required}
                variant={variant}
                onChange={onChange}
+               refAddress={refAddress}
                noOptionsText={noOptionsText || undefined}
             />
          </UIContext>
@@ -82,6 +85,15 @@ const TestAddress = (props: TestAddressProps) => {
                   setValue(null);
                }
                return true;
+            }}
+         />
+         <Actions
+            onChosen={(chosen) => {
+               if (chosen === "Focus") {
+                  refAddress.current.focus();
+               } else if (chosen === "Select") {
+                  refAddress.current.select();
+               }
             }}
          />
       </Mui.Box>
