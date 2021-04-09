@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import * as Mui from "@material-ui/core";
-import Address from "../package/address";
+import { InputAddress } from "../package";
 import { useActions, useChoice, useSwitch } from "../hooks";
 import { OptionGroup } from "../components";
 import UIContext from "../package/UIContext";
@@ -43,7 +43,7 @@ const TestAddress = (props: TestAddressProps) => {
                   searchAddress(text, limit ? Number(limit) : 3, local ? 48.87 : undefined, local ? 8.34 : undefined),
             }}
          >
-            <Address
+            <InputAddress
                autoFocus
                label={label}
                value={value}
