@@ -1,19 +1,22 @@
 /** @format */
 
+import * as React from "react";
 import * as Mui from "@material-ui/core";
 import Alert from "../package/alert";
 import { OptionGroup } from "../components";
-import { useChoice, useSwitch } from "../hooks";
+import { useActions, useChoice, useSwitch } from "../hooks";
 import useMessage from "../hooks/useMessage";
 
 export interface TestAlertProps extends Mui.BoxProps {}
 
 const TestAlert = (props: TestAlertProps) => {
    // The state
+   const [content, setContent] = React.useState<Error | string>("The error!");
    const [variant, Variant] = useChoice("Variant", ["standard", "filled", "outlined"]);
    const [severity, Severity] = useChoice("Severity", ["success", "info", "warning", "error"]);
    const [titleType, TitleType] = useChoice("Title", ["comp", "string"]);
    const [close, Close] = useSwitch("close");
+   const Actions = useActions("Content", ["String", "Error"] as const);
    const [showMessage, Message] = useMessage();
 
    // The functions
@@ -37,7 +40,7 @@ const TestAlert = (props: TestAlertProps) => {
                     }
             }
          >
-            This is an alert!
+            {content}
          </Alert>
          <hr />
          <Variant />
@@ -47,6 +50,15 @@ const TestAlert = (props: TestAlertProps) => {
             <Close />
          </OptionGroup>
          <Message />
+         <Actions
+            onChosen={(action) => {
+               if (action === "String") {
+                  setContent("Ein normaler Fehler!");
+               } else {
+                  setContent(new Error("Ein Error Objekt"));
+               }
+            }}
+         />
       </Mui.Box>
    );
 };

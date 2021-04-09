@@ -12,11 +12,18 @@ const Alert = (props: AlertProps) => {
    const { children, alertTitle, ...alertProps } = props;
 
    const titleProps = typeof alertTitle === "string" ? { children: alertTitle } : alertTitle;
+
+   const content = React.useMemo(() => {
+      if (children instanceof Error) {
+         return <div>{children.message}</div>;
+      }
+      return <div>{children}</div>;
+   }, [children]);
    // The markup
    return (
       <Mui.Alert {...alertProps}>
          {alertTitle && <Mui.AlertTitle {...titleProps} />}
-         {children}
+         {content}
       </Mui.Alert>
    );
 };
