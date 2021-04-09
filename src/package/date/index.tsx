@@ -49,7 +49,7 @@ class RefDate {
 
 export const useRefDate = () => React.useRef(new RefDate());
 
-export interface DateProps extends ICtrl<Date> {
+export interface InputDateProps extends ICtrl<Date> {
    variant?: Mui.TextFieldProps["variant"];
 
    mobile?: boolean;
@@ -66,7 +66,7 @@ function dateInTime(date: Date | null) {
    return date ? date.getTime() : 0;
 }
 
-const Date = (props: DateProps) => {
+const InputDate = (props: InputDateProps) => {
    // The props
    const {
       // ICtrl
@@ -323,4 +323,4 @@ const Date = (props: DateProps) => {
    );
 };
 
-export default Date;
+export default InputDate;
