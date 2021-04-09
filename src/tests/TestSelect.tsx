@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import * as Mui from "@material-ui/core";
-import { Select, useSelectRef } from "../package";
+import { InputSelect, useRefSelect } from "../package";
 import { useActions, useChoice, useMessage, useSwitch } from "../hooks";
 import { OptionGroup } from "../components";
 
@@ -120,7 +120,7 @@ export interface TestSelectProps extends Mui.BoxProps {}
 
 const TestSelect = (props: TestSelectProps) => {
    // The state
-   const selectRef = useSelectRef();
+   const refSelect = useRefSelect();
    const [showMessage, Message] = useMessage();
    const [label, Label] = useChoice("Label", ["", "Select"] as const);
    const [disabled, Disabled] = useSwitch("Disabled");
@@ -156,7 +156,7 @@ const TestSelect = (props: TestSelectProps) => {
    // The markup
    return (
       <Mui.Box {...boxProps}>
-         <Select
+         <InputSelect
             autoFocus
             label={label}
             value={value}
@@ -170,7 +170,7 @@ const TestSelect = (props: TestSelectProps) => {
                ownFilter ? (options, text) => options.filter((option) => option.label.includes(text)) : undefined
             }
             loading={loading}
-            selectRef={selectRef}
+            refSelect={refSelect}
             onChange={(value) => {
                setValue(value);
                showMessage(JSON.stringify(value));
@@ -203,9 +203,9 @@ const TestSelect = (props: TestSelectProps) => {
          <Actions
             onChosen={(chosen) => {
                if (chosen === "Focus") {
-                  selectRef.current.focus();
+                  refSelect.current.focus();
                } else if (chosen === "Select") {
-                  selectRef.current.select();
+                  refSelect.current.select();
                } else {
                   setValue(options.find((option) => option.label === chosen) || null);
                }

@@ -13,7 +13,7 @@ function noGroup<T>(value: T) {
 // Trick the linter
 const memoize = React.useMemo;
 
-class SelectRef {
+class RefSelect {
    // The input control class
    private inputRef: InputRef = new InputRef();
 
@@ -43,15 +43,15 @@ function getOptionLabel(option: IOption) {
    return option.label;
 }
 
-export const useSelectRef = () => React.useRef(new SelectRef());
+export const useRefSelect = () => React.useRef(new RefSelect());
 
-export interface SelectProps<T extends IOption> extends ICtrl<T> {
+export interface InputSelectProps<T extends IOption> extends ICtrl<T> {
    options: T[];
 
    variant?: Mui.TextFieldProps["variant"];
    onInputChange?: Mui.TextFieldProps["onChange"];
    loading?: boolean;
-   selectRef?: React.MutableRefObject<SelectRef>;
+   refSelect?: React.MutableRefObject<RefSelect>;
 
    onOpen?: () => void;
    filterOptions?: (options: T[], inputValue: string) => T[];
@@ -62,7 +62,7 @@ export interface SelectProps<T extends IOption> extends ICtrl<T> {
    boxProps?: Mui.BoxProps;
 }
 
-function Select<T extends IOption>(props: SelectProps<T>) {
+function InputSelect<T extends IOption>(props: InputSelectProps<T>) {
    // The props
    const {
       // ICtrl
@@ -78,7 +78,7 @@ function Select<T extends IOption>(props: SelectProps<T>) {
       variant,
       onInputChange,
       loading = false,
-      selectRef: propsSelectRef,
+      refSelect: propsRefSelect,
       onOpen = noOpen,
       filterOptions,
       groupBy = noGroup,
@@ -89,19 +89,19 @@ function Select<T extends IOption>(props: SelectProps<T>) {
    } = props;
 
    // The state
-   const selectRef = useSelectRef();
-   const handleSelectRef = selectRef.current.useHandler();
+   const selectRef = useRefSelect();
+   const handleRefSelect = selectRef.current.useHandler();
 
    // Allow the caller to use the select functions
-   if (propsSelectRef) {
-      propsSelectRef.current = selectRef.current;
+   if (propsRefSelect) {
+      propsRefSelect.current = selectRef.current;
    }
 
    const renderInput = React.useMemo(() => {
       return (params: Mui.TextFieldProps) => {
          return (
             <Mui.TextField
-               inputRef={handleSelectRef}
+               inputRef={handleRefSelect}
                {...params}
                InputProps={{
                   ...params.InputProps,
@@ -115,7 +115,7 @@ function Select<T extends IOption>(props: SelectProps<T>) {
             />
          );
       };
-   }, [autoFocus, handleSelectRef, label, readOnly, variant, onInputChange]);
+   }, [autoFocus, handleRefSelect, label, readOnly, variant, onInputChange]);
 
    const getOptionSelected = React.useMemo(
       () => (getSelected ? getSelected : (option: T, value: T) => getLabel(option) === getLabel(value)),
@@ -148,4 +148,4 @@ function Select<T extends IOption>(props: SelectProps<T>) {
    );
 }
 
-export default Select;
+export default InputSelect;
