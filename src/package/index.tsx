@@ -1,4 +1,4 @@
-export { default as AuthCode, useAuthCodeRef } from "./authcode";
+export { default as InputAuthCode, useRefAuthCode } from "./authcode";
 export { default as Alert } from "./alert";
 export { default as InputAddress } from "./address";
 export { default as Date, useDateRef } from "./date";

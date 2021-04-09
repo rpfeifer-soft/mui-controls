@@ -13,7 +13,7 @@ type DSetSelected = (selected: boolean) => void;
 const memoize = React.useMemo;
 const noOp = (value: string) => {};
 
-class AuthCodeRef {
+class RefAuthCode {
    // The input control class
    private inputRef: InputRef = new InputRef();
 
@@ -42,17 +42,17 @@ class AuthCodeRef {
    };
 }
 
-export const useAuthCodeRef = () => React.useRef(new AuthCodeRef());
+export const useRefAuthCode = () => React.useRef(new RefAuthCode());
 
-export interface AuthCodeProps extends Omit<ICtrl<string>, "label" | "readOnly" | "required"> {
-   authCodeRef?: React.MutableRefObject<AuthCodeRef>;
+export interface InputAuthCodeProps extends Omit<ICtrl<string>, "label" | "readOnly" | "required"> {
+   refAuthCode?: React.MutableRefObject<RefAuthCode>;
 
    onSubmit?: (value: string) => void;
 
    boxProps?: Mui.BoxProps;
 }
 
-const AuthCode = (props: AuthCodeProps) => {
+const InputAuthCode = (props: InputAuthCodeProps) => {
    // The props
    const {
       // ICtrl
@@ -61,7 +61,7 @@ const AuthCode = (props: AuthCodeProps) => {
       autoFocus = false,
       onChange = noChange,
       // AuthCode
-      authCodeRef: propsAuthCodeRef,
+      refAuthCode: propsRefAuthCode,
       onSubmit = noOp,
       // Box
       boxProps,
@@ -74,12 +74,12 @@ const AuthCode = (props: AuthCodeProps) => {
    const theme = Mui.useTheme();
    const [value, setValue] = React.useState(toValue(propsValue));
    const [selected, setSelected] = React.useState(false);
-   const authCodeRef = useAuthCodeRef();
-   const handleAuthCodeRef = authCodeRef.current.useHandler(setSelected);
+   const refAuthCode = useRefAuthCode();
+   const handleRefAuthCode = refAuthCode.current.useHandler(setSelected);
 
    // Allow the caller to use the authcode functions
-   if (propsAuthCodeRef) {
-      propsAuthCodeRef.current = authCodeRef.current;
+   if (propsRefAuthCode) {
+      propsRefAuthCode.current = refAuthCode.current;
    }
 
    // The hooks
@@ -161,7 +161,7 @@ const AuthCode = (props: AuthCodeProps) => {
    return (
       <Mui.Box {...boxProps} className={focusCss}>
          <Mui.Input
-            inputRef={handleAuthCodeRef}
+            inputRef={handleRefAuthCode}
             type="tel"
             autoFocus={autoFocus}
             value={value}
@@ -174,7 +174,7 @@ const AuthCode = (props: AuthCodeProps) => {
             })}
          />
          <Mui.Box
-            onClick={() => authCodeRef.current.focus()}
+            onClick={() => refAuthCode.current.focus()}
             className="box"
             sx={{
                display: "grid",
@@ -204,4 +204,4 @@ const AuthCode = (props: AuthCodeProps) => {
    );
 };
 
-export default AuthCode;
+export default InputAuthCode;
