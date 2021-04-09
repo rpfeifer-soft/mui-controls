@@ -13,7 +13,7 @@ import { useUIContext } from "../UIContext";
 // Trick the linter
 const memoize = React.useMemo;
 
-class DateRef {
+class RefDate {
    // The input control class
    private inputRef: InputRef = new InputRef();
    private otherRef?: React.Ref<any>;
@@ -47,14 +47,14 @@ class DateRef {
    };
 }
 
-export const useDateRef = () => React.useRef(new DateRef());
+export const useRefDate = () => React.useRef(new RefDate());
 
 export interface DateProps extends ICtrl<Date> {
    variant?: Mui.TextFieldProps["variant"];
 
    mobile?: boolean;
    timeSteps?: number;
-   dateRef?: React.MutableRefObject<DateRef>;
+   refDate?: React.MutableRefObject<RefDate>;
 
    boxProps?: Mui.BoxProps;
 }
@@ -81,7 +81,7 @@ const Date = (props: DateProps) => {
       variant,
       mobile = false,
       timeSteps = 0,
-      dateRef: propsDateRef,
+      refDate: propsRefDate,
       // Box
       boxProps,
    } = props;
@@ -96,8 +96,8 @@ const Date = (props: DateProps) => {
    const [value, setValue] = React.useState<moment.Moment | null>(initValue ? moment(initValue) : null);
    const [inputText, setInputText] = React.useState<string | null | undefined>();
 
-   const dateRef = useDateRef();
-   const handleDateRef = dateRef.current.useHandler();
+   const dateRef = useRefDate();
+   const handleRefDate = dateRef.current.useHandler();
 
    // Common props
    let format = timeSteps
@@ -110,8 +110,8 @@ const Date = (props: DateProps) => {
    }, [initValue]);
 
    // Allow the caller to use the date functions
-   if (propsDateRef) {
-      propsDateRef.current = dateRef.current;
+   if (propsRefDate) {
+      propsRefDate.current = dateRef.current;
    }
 
    const onEndInput = React.useMemo(
@@ -187,7 +187,7 @@ const Date = (props: DateProps) => {
          return (
             <Mui.TextField
                autoFocus={autoFocus}
-               inputRef={handleDateRef}
+               inputRef={handleRefDate}
                InputProps={{
                   ...params.InputProps,
                   endAdornment: !readOnly && params.InputProps ? params.InputProps.endAdornment : undefined,
@@ -225,7 +225,7 @@ const Date = (props: DateProps) => {
             />
          );
       };
-   }, [variant, onKeyDown, onEndInput, dateRef, mobile, value, autoFocus, disabled, readOnly, handleDateRef]);
+   }, [variant, onKeyDown, onEndInput, dateRef, mobile, value, autoFocus, disabled, readOnly, handleRefDate]);
 
    // The functions
    const fixes = {

@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import * as Mui from "@material-ui/core";
-import { Date, useDateRef } from "../package";
+import { InputDate, useRefDate } from "../package";
 import { useActions, useChoice, useMessage, useSwitch } from "../hooks";
 import { OptionGroup } from "../components";
 import moment from "moment";
@@ -11,7 +11,7 @@ export interface TestDateProps extends Mui.BoxProps {}
 
 const TestDate = (props: TestDateProps) => {
    // The state
-   const dateRef = useDateRef();
+   const refDate = useRefDate();
    const [showMessage, Message] = useMessage();
    const [label, Label] = useChoice("Label", ["", "Date"] as const);
    const [disabled, Disabled] = useSwitch("Disabled");
@@ -31,7 +31,7 @@ const TestDate = (props: TestDateProps) => {
    // The markup
    return (
       <Mui.Box {...boxProps}>
-         <Date
+         <InputDate
             autoFocus
             value={value}
             label={label}
@@ -41,7 +41,7 @@ const TestDate = (props: TestDateProps) => {
             required={required}
             mobile={mobile}
             timeSteps={Number(timeSteps)}
-            dateRef={dateRef}
+            refDate={refDate}
             onChange={(date) => {
                setValue(date);
                showMessage(JSON.stringify(date));
@@ -87,10 +87,10 @@ const TestDate = (props: TestDateProps) => {
                      setValue(moment().add(1, "day").toDate());
                      break;
                   case "Focus":
-                     dateRef.current.focus();
+                     refDate.current.focus();
                      break;
                   case "Select":
-                     dateRef.current.select();
+                     refDate.current.select();
                      break;
                }
             }}
