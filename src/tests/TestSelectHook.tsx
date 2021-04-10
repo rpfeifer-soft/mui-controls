@@ -129,7 +129,7 @@ const TestSelect = (props: TestSelectProps) => {
    const [grouped, Grouped] = useSwitch("Grouped");
    const [ownLabels, OwnLabels] = useSwitch("OwnLabels");
    const [ownFilter, OwnFilter] = useSwitch("OwnFilter");
-   const [variant, Variant] = useChoice("Variant", ["standard", "outlined", "filled"] as const);
+   const [variant, Variant] = useChoice("Variant", ["standard", "outlined", "filled", "square"] as const);
    const [options, setOptions] = React.useState<Option[]>([]);
    const [loading, setLoading] = React.useState(false);
    const Actions = useActions("Actions", ["", "René", "Yvonne", "Focus", "Select"] as const);

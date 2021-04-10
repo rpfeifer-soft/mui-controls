@@ -47,9 +47,6 @@ export const useRefSelect = () => React.useRef(new RefSelect());
 
 export interface InputSelectProps<T extends IOption> extends ICtrl<T> {
    options: T[];
-
-   variant?: Mui.TextFieldProps["variant"];
-   onInputChange?: Mui.TextFieldProps["onChange"];
    loading?: boolean;
    refSelect?: React.MutableRefObject<RefSelect>;
 
@@ -59,6 +56,13 @@ export interface InputSelectProps<T extends IOption> extends ICtrl<T> {
    getLabel?: (value: T) => string;
    getSelected?: (option: T, value: T) => boolean;
 
+   // Allow to overload text field props
+   variant?: Mui.TextFieldProps["variant"] | "square";
+   className?: Mui.TextFieldProps["className"];
+   sx?: Mui.TextFieldProps["sx"];
+   onInputChange?: Mui.TextFieldProps["onChange"];
+
+   // Allow to overload box props
    boxProps?: Mui.BoxProps;
 }
 
@@ -75,8 +79,6 @@ function InputSelect<T extends IOption>(props: InputSelectProps<T>) {
       onChange = noChange,
       // Select
       options,
-      variant,
-      onInputChange,
       loading = false,
       refSelect: propsRefSelect,
       onOpen = noOpen,
@@ -84,6 +86,11 @@ function InputSelect<T extends IOption>(props: InputSelectProps<T>) {
       groupBy = noGroup,
       getLabel = getOptionLabel,
       getSelected,
+      // Text
+      variant,
+      className,
+      sx,
+      onInputChange,
       // Box
       boxProps,
    } = props;
@@ -101,21 +108,30 @@ function InputSelect<T extends IOption>(props: InputSelectProps<T>) {
       return (params: Mui.TextFieldProps) => {
          return (
             <Mui.TextField
+               className={className}
+               sx={sx}
                inputRef={handleRefSelect}
                {...params}
                InputProps={{
                   ...params.InputProps,
                   endAdornment: !readOnly && params.InputProps ? params.InputProps.endAdornment : undefined,
                   readOnly,
+                  sx:
+                     variant === "square"
+                        ? {
+                             borderTopLeftRadius: 0,
+                             borderTopRightRadius: 0,
+                          }
+                        : undefined,
                }}
                onChange={onInputChange}
                autoFocus={autoFocus}
                label={label}
-               variant={variant}
+               variant={variant === "square" ? "filled" : variant}
             />
          );
       };
-   }, [autoFocus, handleRefSelect, label, readOnly, variant, onInputChange]);
+   }, [autoFocus, handleRefSelect, className, sx, label, readOnly, variant, onInputChange]);
 
    const getOptionSelected = React.useMemo(
       () => (getSelected ? getSelected : (option: T, value: T) => getLabel(option) === getLabel(value)),
