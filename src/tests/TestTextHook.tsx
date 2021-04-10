@@ -10,7 +10,7 @@ export interface TestTextHookProps extends Mui.BoxProps {}
 
 const TestTextHook = (props: TestTextHookProps) => {
    // The state
-   const Text = useInputText("test", "Label");
+   const Text = useInputText(null, "Label");
    const [disabled, Disabled] = useSwitch("Disabled");
    const [readOnly, ReadOnly] = useSwitch("ReadOnly");
    const [required, Required] = useSwitch("Required");

@@ -149,3 +149,58 @@ function InputSelect<T extends IOption>(props: InputSelectProps<T>) {
 }
 
 export default InputSelect;
+
+// Allow to use hooks
+interface InputSelectHookProps<T extends IOption>
+   extends Omit<InputSelectProps<T>, "value" | "label" | "onChange" | "refSelect"> {}
+
+export function useInputSelect<T extends IOption>(initValue: T | null, initLabel?: string) {
+   const [value, setValue] = React.useState(initValue);
+   const [label, setLabel] = React.useState(initLabel);
+   const refSelect = useRefSelect();
+
+   const [state] = React.useState({
+      // Internal members
+      refSelect,
+      // Access values
+      value,
+      label,
+      // Access functions
+      setValue,
+      setLabel,
+      onChange: (value: T | null) => value,
+      focus: () => refSelect.current.focus(),
+      select: () => refSelect.current.select(),
+      // The control
+      Box: (undefined as unknown) as (props: InputSelectHookProps<T>) => JSX.Element,
+   });
+
+   // Update the volatile values
+   state.value = value;
+   state.label = label;
+
+   // We have to create the handlers here
+   const onChange = React.useCallback(
+      (value) => {
+         state.setValue(state.onChange(value));
+      },
+      [state]
+   );
+
+   // Allow to create the element
+   state.Box = React.useCallback(
+      (props: InputSelectHookProps<T>) => {
+         const inputTextProps = {
+            ...props,
+            // Our props are priorized
+            value: state.value,
+            label: state.label,
+            refSelect: state.refSelect,
+            onChange: onChange,
+         };
+         return <InputSelect {...inputTextProps} />;
+      },
+      [onChange, state]
+   );
+   return state as Omit<typeof state, "refSelect">;
+}

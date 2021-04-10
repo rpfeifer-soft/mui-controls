@@ -6,8 +6,9 @@ import { TestAlert, TestAuthCode, TestDate, TestSelect, TestText } from "../test
 import OptionGroup from "./OptionGroup";
 import TestAddress from "../tests/TestAddress";
 import TestTextHook from "../tests/TestTextHook";
+import TestSelectHook from "../tests/TestSelectHook";
 
-const choices = ["Address", "Alert", "AuthCode", "DateTime", "Select", "Text", "TextHook"] as const;
+const choices = ["Address", "Alert", "AuthCode", "DateTime", "Select", "SelectHook", "Text", "TextHook"] as const;
 
 interface AppProps {}
 
@@ -27,6 +28,7 @@ const App = (props: AppProps) => {
             {type === "Alert" && <TestAlert />}
             {type === "AuthCode" && <TestAuthCode />}
             {type === "Select" && <TestSelect />}
+            {type === "SelectHook" && <TestSelectHook />}
             {type === "Text" && <TestText />}
             {type === "TextHook" && <TestTextHook />}
             {type === "DateTime" && <TestDate />}
