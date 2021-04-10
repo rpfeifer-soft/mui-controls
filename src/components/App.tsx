@@ -2,13 +2,30 @@ import * as React from "react";
 import * as Mui from "@material-ui/core";
 import Theme from "./Theme";
 import { useChoice, useSwitch } from "../hooks";
-import { TestAlert, TestAuthCode, TestDate, TestSelect, TestText } from "../tests";
+import {
+   TestAddress,
+   TestAlert,
+   TestAuthCode,
+   TestDate,
+   TestDateHook,
+   TestSelect,
+   TestSelectHook,
+   TestText,
+   TestTextHook,
+} from "../tests";
 import OptionGroup from "./OptionGroup";
-import TestAddress from "../tests/TestAddress";
-import TestTextHook from "../tests/TestTextHook";
-import TestSelectHook from "../tests/TestSelectHook";
 
-const choices = ["Address", "Alert", "AuthCode", "DateTime", "Select", "SelectHook", "Text", "TextHook"] as const;
+const choices = [
+   "Address",
+   "Alert",
+   "AuthCode",
+   "DateTime",
+   "DateTimeHook",
+   "Select",
+   "SelectHook",
+   "Text",
+   "TextHook",
+] as const;
 
 interface AppProps {}
 
@@ -32,6 +49,7 @@ const App = (props: AppProps) => {
             {type === "Text" && <TestText />}
             {type === "TextHook" && <TestTextHook />}
             {type === "DateTime" && <TestDate />}
+            {type === "DateTimeHook" && <TestDateHook />}
          </Mui.Paper>
       </React.Fragment>
    );

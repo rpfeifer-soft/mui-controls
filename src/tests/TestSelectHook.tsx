@@ -116,9 +116,9 @@ const allOptions: Option[] = [
    { label: "Yvonne", id: "Y" },
 ];
 
-export interface TestSelectProps extends Mui.BoxProps {}
+export interface TestSelectHookProps extends Mui.BoxProps {}
 
-const TestSelect = (props: TestSelectProps) => {
+const TestSelectHook = (props: TestSelectHookProps) => {
    // The state
    const Select = useInputSelect<Option>(null, "Label");
    const [showMessage, Message] = useMessage();
@@ -214,4 +214,4 @@ const TestSelect = (props: TestSelectProps) => {
    );
 };
 
-export default TestSelect;
+export default TestSelectHook;
