@@ -1,4 +1,5 @@
 export { default as TestAddress } from './TestAddress'
+export { default as TestAddressHook } from './TestAddressHook'
 export { default as TestAlert } from './TestAlert'
 export { default as TestAuthCode } from './TestAuthCode'
 export { default as TestAuthCodeHook } from './TestAuthCodeHook'

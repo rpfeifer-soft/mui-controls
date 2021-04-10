@@ -4,6 +4,7 @@ import Theme from "./Theme";
 import { useChoice, useSwitch } from "../hooks";
 import {
    TestAddress,
+   TestAddressHook,
    TestAlert,
    TestAuthCode,
    TestAuthCodeHook,
@@ -18,7 +19,7 @@ import OptionGroup from "./OptionGroup";
 
 const choices = [
    "Address",
-   "Alert",
+   "AddressHook",
    "AuthCode",
    "AuthCodeHook",
    "DateTime",
@@ -27,6 +28,7 @@ const choices = [
    "SelectHook",
    "Text",
    "TextHook",
+   "Alert",
 ] as const;
 
 interface AppProps {}
@@ -44,6 +46,7 @@ const App = (props: AppProps) => {
          {!dialog && <hr />}
          <Mui.Paper elevation={5} sx={{ padding: 2 }}>
             {type === "Address" && <TestAddress />}
+            {type === "AddressHook" && <TestAddressHook />}
             {type === "Alert" && <TestAlert />}
             {type === "AuthCode" && <TestAuthCode />}
             {type === "AuthCodeHook" && <TestAuthCodeHook />}
@@ -66,7 +69,13 @@ const App = (props: AppProps) => {
                borderTop: "1px solid rgba(128,128,128,0.3)",
             }}
          >
-            <Type />
+            <Type include={(option) => !option.endsWith("Hook")} />
+            <br />
+            <Type
+               include={(option) => option.endsWith("Hook")}
+               text={(choice) => choice.substr(0, choice.length - 4)}
+               title="Hooks"
+            />
             <OptionGroup title="Options">
                <Dialog />
             </OptionGroup>

@@ -56,12 +56,16 @@ const ArrowDropDown = Mui.createSvgIcon(<path d="M7 10l5 5 5-5z"></path>, "Arrow
 export const useRefAddress = () => React.useRef(new RefAddress());
 
 export interface InputAddressProps extends ICtrl<IAddress> {
-   variant?: Mui.TextFieldProps["variant"];
-
    requestDelay?: number;
    noOptionsText?: string;
    refAddress?: React.MutableRefObject<RefAddress>;
 
+   // Allow to overload text field props
+   variant?: Mui.TextFieldProps["variant"] | "square";
+   className?: Mui.TextFieldProps["className"];
+   sx?: Mui.TextFieldProps["sx"];
+
+   // Allow to overload box props
    boxProps?: Mui.BoxProps;
 }
 
@@ -77,10 +81,13 @@ const InputAddress = (props: InputAddressProps) => {
       required,
       autoFocus,
       // Address
-      variant,
       requestDelay = 500,
       noOptionsText = "-",
       refAddress: propsRefAddress,
+      // Text
+      variant,
+      className,
+      sx,
       // Box
       boxProps,
    } = props;
@@ -266,12 +273,21 @@ const InputAddress = (props: InputAddressProps) => {
       <Mui.Box {...boxProps} sx={{ position: "relative" }}>
          <Mui.TextField
             label={label}
+            className={className}
+            sx={sx}
             required={required}
             disabled={disabled}
-            variant={variant}
+            variant={variant === "square" ? "filled" : variant}
             inputRef={handleRefAddress}
             InputProps={{
                readOnly,
+               sx:
+                  variant === "square"
+                     ? {
+                          borderTopLeftRadius: 0,
+                          borderTopRightRadius: 0,
+                       }
+                     : undefined,
                endAdornment: (
                   <Mui.IconButton
                      size="small"
@@ -320,3 +336,57 @@ const InputAddress = (props: InputAddressProps) => {
 };
 
 export default InputAddress;
+
+// Allow to use hooks
+interface InputAddressHookProps extends Omit<InputAddressProps, "value" | "label" | "onChange" | "refAddress"> {}
+
+export function useInputAddress(initValue: IAddress | null, initLabel?: string) {
+   const [value, setValue] = React.useState(initValue);
+   const [label, setLabel] = React.useState(initLabel);
+   const refAddress = useRefAddress();
+
+   const [state] = React.useState({
+      // Internal members
+      refAddress,
+      // Access values
+      value,
+      label,
+      // Access functions
+      setValue,
+      setLabel,
+      onChange: (value: IAddress | null) => value,
+      focus: () => refAddress.current.focus(),
+      select: () => refAddress.current.select(),
+      // The control
+      Box: (undefined as unknown) as (props: InputAddressHookProps) => JSX.Element,
+   });
+
+   // Update the volatile values
+   state.value = value;
+   state.label = label;
+
+   // We have to create the handlers here
+   const onChange = React.useCallback(
+      (value) => {
+         state.setValue(state.onChange(value));
+      },
+      [state]
+   );
+
+   // Allow to create the element
+   state.Box = React.useCallback(
+      (props: InputAddressHookProps) => {
+         const inputTextProps = {
+            ...props,
+            // Our props are priorized
+            value: state.value,
+            label: state.label,
+            refAddress: state.refAddress,
+            onChange: onChange,
+         };
+         return <InputAddress {...inputTextProps} />;
+      },
+      [onChange, state]
+   );
+   return state as Omit<typeof state, "refAddress">;
+}

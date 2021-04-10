@@ -5,7 +5,10 @@ import * as Mui from "@material-ui/core";
 import { OptionButton, OptionGroup } from "../components";
 
 export interface ChoiceProps<T extends string> extends Omit<Mui.ButtonProps, "variant" | "onClick"> {
+   title?: string;
+   include?: (choice: T) => boolean;
    mayChoose?: (choice: T) => boolean;
+   text?: (choice: T) => string;
 }
 
 function createRender<T extends string>(
@@ -16,7 +19,7 @@ function createRender<T extends string>(
 ) {
    return (props: ChoiceProps<T>) => {
       // The props
-      const { mayChoose, ...btnProps } = props;
+      const { title: propsTitle, include = () => true, text = (choice: T) => choice, mayChoose, ...btnProps } = props;
       // The functions
       const onClick = (what: T) => {
          if (mayChoose && !mayChoose(what)) {
@@ -26,15 +29,15 @@ function createRender<T extends string>(
       };
       // The markup
       return (
-         <OptionGroup title={title}>
-            {all.map((choice, index) => (
+         <OptionGroup title={propsTitle || title}>
+            {all.filter(include).map((choice, index) => (
                <OptionButton
                   key={index}
                   {...btnProps}
                   onClick={() => onClick(choice)}
                   variant={current === choice ? "contained" : "outlined"}
                >
-                  {choice || "- empty -"}
+                  {text(choice) || "- empty -"}
                </OptionButton>
             ))}
          </OptionGroup>
