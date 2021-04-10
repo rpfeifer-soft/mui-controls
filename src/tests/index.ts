@@ -1,6 +1,7 @@
 export { default as TestAddress } from './TestAddress'
 export { default as TestAlert } from './TestAlert'
 export { default as TestAuthCode } from './TestAuthCode'
+export { default as TestAuthCodeHook } from './TestAuthCodeHook'
 export { default as TestDate } from './TestDate'
 export { default as TestDateHook } from './TestDateHook'
 export { default as TestSelect } from './TestSelect'

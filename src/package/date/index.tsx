@@ -373,6 +373,7 @@ export function useInputDate(initValue: Date | null, initLabel?: string) {
       setValue,
       setLabel,
       onChange: (value: Date | null) => value,
+      blur: () => refDate.current.blur(),
       focus: () => refDate.current.focus(),
       select: () => refDate.current.select(),
       // The control

@@ -6,6 +6,7 @@ import {
    TestAddress,
    TestAlert,
    TestAuthCode,
+   TestAuthCodeHook,
    TestDate,
    TestDateHook,
    TestSelect,
@@ -19,6 +20,7 @@ const choices = [
    "Address",
    "Alert",
    "AuthCode",
+   "AuthCodeHook",
    "DateTime",
    "DateTimeHook",
    "Select",
@@ -44,6 +46,7 @@ const App = (props: AppProps) => {
             {type === "Address" && <TestAddress />}
             {type === "Alert" && <TestAlert />}
             {type === "AuthCode" && <TestAuthCode />}
+            {type === "AuthCodeHook" && <TestAuthCodeHook />}
             {type === "Select" && <TestSelect />}
             {type === "SelectHook" && <TestSelectHook />}
             {type === "Text" && <TestText />}

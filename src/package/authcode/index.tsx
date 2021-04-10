@@ -205,3 +205,57 @@ const InputAuthCode = (props: InputAuthCodeProps) => {
 };
 
 export default InputAuthCode;
+
+// Allow to use hooks
+interface InputAuthCodeHookProps extends Omit<InputAuthCodeProps, "value" | "label" | "onChange" | "refAuthCode"> {}
+
+export function useInputAuthCode(initValue: string | null, initLabel?: string) {
+   const [value, setValue] = React.useState(initValue);
+   const [label, setLabel] = React.useState(initLabel);
+   const refAuthCode = useRefAuthCode();
+
+   const [state] = React.useState({
+      // Internal members
+      refAuthCode,
+      // Access values
+      value,
+      label,
+      // Access functions
+      setValue,
+      setLabel,
+      onChange: (value: string | null) => value,
+      focus: () => refAuthCode.current.focus(),
+      select: () => refAuthCode.current.select(),
+      // The control
+      Box: (undefined as unknown) as (props: InputAuthCodeHookProps) => JSX.Element,
+   });
+
+   // Update the volatile values
+   state.value = value;
+   state.label = label;
+
+   // We have to create the handlers here
+   const onChange = React.useCallback(
+      (value) => {
+         state.setValue(state.onChange(value));
+      },
+      [state]
+   );
+
+   // Allow to create the element
+   state.Box = React.useCallback(
+      (props: InputAuthCodeHookProps) => {
+         const inputTextProps = {
+            ...props,
+            // Our props are priorized
+            value: state.value,
+            label: state.label,
+            refAuthCode: state.refAuthCode,
+            onChange: onChange,
+         };
+         return <InputAuthCode {...inputTextProps} />;
+      },
+      [onChange, state]
+   );
+   return state as Omit<typeof state, "refAuthCode">;
+}
