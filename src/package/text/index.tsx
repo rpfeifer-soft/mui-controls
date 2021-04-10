@@ -115,7 +115,12 @@ export default InputText;
 // Allow to use hooks
 interface InputTextHookProps extends Omit<InputTextProps, "value" | "label" | "onChange" | "refText"> {}
 
-export function useInputText(initValue: string | null, initLabel?: string) {
+interface HookOptions {
+   updateLabel?: boolean;
+   updateValue?: boolean;
+}
+
+export function useInputText(initValue: string | null, initLabel?: string, options?: HookOptions) {
    const [value, setValue] = React.useState(initValue);
    const [label, setLabel] = React.useState(initLabel);
    const refText = useRefText();
@@ -137,8 +142,8 @@ export function useInputText(initValue: string | null, initLabel?: string) {
    });
 
    // Update the volatile values
-   state.value = value;
-   state.label = label;
+   state.value = options && options.updateValue ? initValue : value;
+   state.label = options && options.updateLabel ? initLabel : label;
 
    // We have to create the handlers here
    const onChange = React.useCallback(
