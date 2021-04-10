@@ -288,7 +288,7 @@ const InputAddress = (props: InputAddressProps) => {
                           borderTopRightRadius: 0,
                        }
                      : undefined,
-               endAdornment: (
+               endAdornment: !readOnly ? (
                   <Mui.IconButton
                      size="small"
                      className="dropdown"
@@ -301,7 +301,7 @@ const InputAddress = (props: InputAddressProps) => {
                   >
                      <ArrowDropDown />
                   </Mui.IconButton>
-               ),
+               ) : undefined,
             }}
             autoFocus={autoFocus}
             value={state.current}
