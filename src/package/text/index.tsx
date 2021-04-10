@@ -3,7 +3,7 @@
 import * as React from "react";
 import * as Mui from "@material-ui/core";
 import InputRef from "../InputRef";
-import { ICtrl, noChange } from "../types";
+import { HookOptions, ICtrl, noChange } from "../types";
 
 // Trick the linter
 const memoize = React.useMemo;
@@ -115,11 +115,6 @@ export default InputText;
 // Allow to use hooks
 interface InputTextHookProps extends Omit<InputTextProps, "value" | "label" | "onChange" | "refText"> {}
 
-interface HookOptions {
-   updateLabel?: boolean;
-   updateValue?: boolean;
-}
-
 export function useInputText(initValue: string | null, initLabel?: string, options?: HookOptions) {
    const [value, setValue] = React.useState(initValue);
    const [label, setLabel] = React.useState(initLabel);
@@ -142,8 +137,8 @@ export function useInputText(initValue: string | null, initLabel?: string, optio
    });
 
    // Update the volatile values
-   state.value = options && options.updateValue ? initValue : value;
-   state.label = options && options.updateLabel ? initLabel : label;
+   state.value = options && options.fixValue ? initValue : value;
+   state.label = options && options.fixLabel ? initLabel : label;
 
    // We have to create the handlers here
    const onChange = React.useCallback(

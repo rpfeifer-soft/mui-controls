@@ -7,7 +7,7 @@ import moment from "moment";
 import "moment/locale/de";
 import InputRef from "../InputRef";
 import { css } from "@emotion/css";
-import { ICtrl, noChange } from "../types";
+import { HookOptions, ICtrl, noChange } from "../types";
 import { useUIContext } from "../UIContext";
 
 // Trick the linter
@@ -358,7 +358,7 @@ export default InputDate;
 // Allow to use hooks
 interface InputDateHookProps extends Omit<InputDateProps, "value" | "label" | "onChange" | "refDate"> {}
 
-export function useInputDate(initValue: Date | null, initLabel?: string) {
+export function useInputDate(initValue: Date | null, initLabel?: string, options?: HookOptions) {
    const [value, setValue] = React.useState(initValue);
    const [label, setLabel] = React.useState(initLabel);
    const refDate = useRefDate();
@@ -381,8 +381,8 @@ export function useInputDate(initValue: Date | null, initLabel?: string) {
    });
 
    // Update the volatile values
-   state.value = value;
-   state.label = label;
+   state.value = options && options.fixValue ? initValue : value;
+   state.label = options && options.fixLabel ? initLabel : label;
 
    // We have to create the handlers here
    const onChange = React.useCallback(

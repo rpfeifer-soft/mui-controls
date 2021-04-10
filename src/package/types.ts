@@ -16,3 +16,7 @@ export interface IAddress {
 }
 
 export function noChange<T>(value: T | null) { }
+
+type HookOption = "fixLabel" | "fixValue";
+export type HookOptions = Partial<{ [id in HookOption]: boolean }>;
+

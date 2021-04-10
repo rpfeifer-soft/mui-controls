@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import * as Mui from "@material-ui/core";
-import { IAddress, ICtrl, noChange } from "../types";
+import { HookOptions, IAddress, ICtrl, noChange } from "../types";
 import { useUIContext } from "../UIContext";
 import InputRef from "../InputRef";
 
@@ -340,7 +340,7 @@ export default InputAddress;
 // Allow to use hooks
 interface InputAddressHookProps extends Omit<InputAddressProps, "value" | "label" | "onChange" | "refAddress"> {}
 
-export function useInputAddress(initValue: IAddress | null, initLabel?: string) {
+export function useInputAddress(initValue: IAddress | null, initLabel?: string, options?: HookOptions) {
    const [value, setValue] = React.useState(initValue);
    const [label, setLabel] = React.useState(initLabel);
    const refAddress = useRefAddress();
@@ -362,8 +362,8 @@ export function useInputAddress(initValue: IAddress | null, initLabel?: string) 
    });
 
    // Update the volatile values
-   state.value = value;
-   state.label = label;
+   state.value = options && options.fixValue ? initValue : value;
+   state.label = options && options.fixLabel ? initLabel : label;
 
    // We have to create the handlers here
    const onChange = React.useCallback(

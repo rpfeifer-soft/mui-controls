@@ -5,7 +5,7 @@ import * as Mui from "@material-ui/core";
 import { css } from "@emotion/css";
 import InputRef from "../InputRef";
 import clsx from "clsx";
-import { ICtrl, noChange } from "../types";
+import { HookOptions, ICtrl, noChange } from "../types";
 
 type DSetSelected = (selected: boolean) => void;
 
@@ -209,7 +209,7 @@ export default InputAuthCode;
 // Allow to use hooks
 interface InputAuthCodeHookProps extends Omit<InputAuthCodeProps, "value" | "label" | "onChange" | "refAuthCode"> {}
 
-export function useInputAuthCode(initValue: string | null, initLabel?: string) {
+export function useInputAuthCode(initValue: string | null, initLabel?: string, options?: HookOptions) {
    const [value, setValue] = React.useState(initValue);
    const [label, setLabel] = React.useState(initLabel);
    const refAuthCode = useRefAuthCode();
@@ -231,8 +231,8 @@ export function useInputAuthCode(initValue: string | null, initLabel?: string) {
    });
 
    // Update the volatile values
-   state.value = value;
-   state.label = label;
+   state.value = options && options.fixValue ? initValue : value;
+   state.label = options && options.fixLabel ? initLabel : label;
 
    // We have to create the handlers here
    const onChange = React.useCallback(

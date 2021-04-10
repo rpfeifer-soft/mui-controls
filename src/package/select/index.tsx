@@ -3,7 +3,7 @@
 import * as React from "react";
 import * as Mui from "@material-ui/core";
 import InputRef from "../InputRef";
-import { ICtrl, noChange } from "../types";
+import { HookOptions, ICtrl, noChange } from "../types";
 
 function noOpen() {}
 function noGroup<T>(value: T) {
@@ -170,7 +170,7 @@ export default InputSelect;
 interface InputSelectHookProps<T extends IOption>
    extends Omit<InputSelectProps<T>, "value" | "label" | "onChange" | "refSelect"> {}
 
-export function useInputSelect<T extends IOption>(initValue: T | null, initLabel?: string) {
+export function useInputSelect<T extends IOption>(initValue: T | null, initLabel?: string, options?: HookOptions) {
    const [value, setValue] = React.useState(initValue);
    const [label, setLabel] = React.useState(initLabel);
    const refSelect = useRefSelect();
@@ -192,8 +192,8 @@ export function useInputSelect<T extends IOption>(initValue: T | null, initLabel
    });
 
    // Update the volatile values
-   state.value = value;
-   state.label = label;
+   state.value = options && options.fixValue ? initValue : value;
+   state.label = options && options.fixLabel ? initLabel : label;
 
    // We have to create the handlers here
    const onChange = React.useCallback(
