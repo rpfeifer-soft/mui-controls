@@ -9,7 +9,7 @@ import { genericHook } from "../genericHook";
 // Trick the linter
 const memoize = React.useMemo;
 
-class RefText implements IRefCtrl {
+export class RefText implements IRefCtrl {
    // The input control class
    private inputRef: InputRef = new InputRef();
 
@@ -40,6 +40,7 @@ export interface InputTextProps extends ICtrl<string> {
    variant?: Mui.TextFieldProps["variant"] | "square";
    className?: Mui.TextFieldProps["className"];
    sx?: Mui.TextFieldProps["sx"];
+   onBlur?: () => void;
 
    // Allow to overload box props
    boxProps?: Mui.BoxProps;
@@ -60,6 +61,7 @@ function InputText(props: InputTextProps) {
       variant,
       className,
       sx,
+      onBlur: propsOnBlur,
       refCtrl: propsRefText,
       // Box
       boxProps,
@@ -81,6 +83,15 @@ function InputText(props: InputTextProps) {
       [onChange, required]
    );
 
+   const onBlur = React.useCallback<React.FocusEventHandler<HTMLInputElement>>(
+      (event) => {
+         if (propsOnBlur) {
+            propsOnBlur();
+         }
+      },
+      [propsOnBlur]
+   );
+
    // The markup
    return (
       <Mui.Box {...boxProps}>
@@ -95,6 +106,7 @@ function InputText(props: InputTextProps) {
             inputRef={handleRefText}
             InputProps={{
                readOnly,
+               onBlur,
                sx:
                   variant === "square"
                      ? {

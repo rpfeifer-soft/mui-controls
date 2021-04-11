@@ -10,6 +10,8 @@ import {
    TestAuthCodeHook,
    TestDate,
    TestDateHook,
+   TestNumber,
+   TestNumberHook,
    TestSelect,
    TestSelectHook,
    TestText,
@@ -24,6 +26,8 @@ const choices = [
    "AuthCodeHook",
    "DateTime",
    "DateTimeHook",
+   "Number",
+   "NumberHook",
    "Select",
    "SelectHook",
    "Text",
@@ -50,6 +54,8 @@ const App = (props: AppProps) => {
             {type === "Alert" && <TestAlert />}
             {type === "AuthCode" && <TestAuthCode />}
             {type === "AuthCodeHook" && <TestAuthCodeHook />}
+            {type === "Number" && <TestNumber />}
+            {type === "NumberHook" && <TestNumberHook />}
             {type === "Select" && <TestSelect />}
             {type === "SelectHook" && <TestSelectHook />}
             {type === "Text" && <TestText />}
