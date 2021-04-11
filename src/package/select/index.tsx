@@ -47,6 +47,7 @@ function getOptionLabel(option: IOption) {
 export const useRefSelect = () => React.useRef(new RefSelect());
 
 export interface InputSelectProps<T extends IOption> extends ICtrl<T> {
+   type: "Single";
    options: T[];
    loading?: boolean;
    refCtrl?: React.MutableRefObject<RefSelect>;
@@ -67,17 +68,21 @@ export interface InputSelectProps<T extends IOption> extends ICtrl<T> {
    boxProps?: Mui.BoxProps;
 }
 
-function InputSelect<T extends IOption>(props: InputSelectProps<T>) {
+export interface InputMultiProps<T extends IOption>
+   extends Omit<InputSelectProps<T>, "type" | "value" | "onChange">,
+      ICtrl<T[]> {
+   type: "Multi";
+}
+
+function InputSelect<T extends IOption>(props: InputSelectProps<T> | InputMultiProps<T>) {
    // The props
    const {
       // ICtrl
       label,
-      value = null,
       disabled = false,
       readOnly = false,
       required = false,
       autoFocus = false,
-      onChange = noChange,
       // Select
       options,
       loading = false,
@@ -142,25 +147,48 @@ function InputSelect<T extends IOption>(props: InputSelectProps<T>) {
    // The markup
    return (
       <Mui.Box {...boxProps}>
-         <Mui.Autocomplete
-            renderInput={renderInput}
-            fullWidth
-            value={value}
-            options={options}
-            filterOptions={filterOptions ? (options, state) => filterOptions(options, state.inputValue) : undefined}
-            getOptionLabel={getLabel}
-            getOptionSelected={getOptionSelected}
-            groupBy={groupBy}
-            loading={loading}
-            disabled={disabled}
-            disableClearable={readOnly || required}
-            openOnFocus={false}
-            onChange={(event, value) => onChange(value)}
-            onOpen={() => onOpen()}
-            sx={{
-               pointerEvents: readOnly ? "none" : undefined,
-            }}
-         />
+         {props.type === "Single" ? (
+            <Mui.Autocomplete
+               renderInput={renderInput}
+               fullWidth
+               value={props.value}
+               options={options}
+               filterOptions={filterOptions ? (options, state) => filterOptions(options, state.inputValue) : undefined}
+               getOptionLabel={getLabel}
+               getOptionSelected={getOptionSelected}
+               groupBy={groupBy}
+               loading={loading}
+               disabled={disabled}
+               disableClearable={readOnly || required}
+               openOnFocus={false}
+               onChange={(event, value) => (props.onChange ? props.onChange(value) : noChange(value))}
+               onOpen={() => onOpen()}
+               sx={{
+                  pointerEvents: readOnly ? "none" : undefined,
+               }}
+            />
+         ) : (
+            <Mui.Autocomplete
+               renderInput={renderInput}
+               fullWidth
+               value={props.value ? props.value : []}
+               multiple
+               options={options}
+               filterOptions={filterOptions ? (options, state) => filterOptions(options, state.inputValue) : undefined}
+               getOptionLabel={getLabel}
+               getOptionSelected={getOptionSelected}
+               groupBy={groupBy}
+               loading={loading}
+               disabled={disabled}
+               disableClearable={readOnly || required}
+               openOnFocus={false}
+               onChange={(event, value) => (props.onChange ? props.onChange(value) : noChange(value))}
+               onOpen={() => onOpen()}
+               sx={{
+                  pointerEvents: readOnly ? "none" : undefined,
+               }}
+            />
+         )}
       </Mui.Box>
    );
 }
@@ -168,5 +196,7 @@ function InputSelect<T extends IOption>(props: InputSelectProps<T>) {
 export default InputSelect;
 
 // Allow to use hooks (typescript does not support partial inference - so use function chaining)
-export const useInputSelect = <T extends IOption>() =>
+export const useSingleSelect = <T extends IOption>() =>
    genericHook<InputSelectProps<T>, RefSelect, T>(InputSelect, useRefSelect);
+export const useMultiSelect = <T extends IOption>() =>
+   genericHook<InputMultiProps<T>, RefSelect, T[]>(InputSelect, useRefSelect);

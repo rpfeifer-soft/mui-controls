@@ -158,6 +158,7 @@ const TestSelect = (props: TestSelectProps) => {
       <Mui.Box {...boxProps}>
          <InputSelect
             autoFocus
+            type="Single"
             label={label}
             value={value}
             variant={variant}

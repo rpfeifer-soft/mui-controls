@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import * as Mui from "@material-ui/core";
-import { useSingleSelect } from "../package";
+import { useMultiSelect } from "../package";
 import { useActions, useChoice, useMessage, useSwitch } from "../hooks";
 import { OptionGroup } from "../components";
 
@@ -120,7 +120,7 @@ export interface TestSelectHookProps extends Mui.BoxProps {}
 
 const TestSelectHook = (props: TestSelectHookProps) => {
    // The state
-   const Select = useSingleSelect<Option>()(null, "Label");
+   const Select = useMultiSelect<Option>()(null, "Label");
    const [showMessage, Message] = useMessage();
    const [disabled, Disabled] = useSwitch("Disabled");
    const [readOnly, ReadOnly] = useSwitch("ReadOnly");
@@ -163,7 +163,7 @@ const TestSelectHook = (props: TestSelectHookProps) => {
    return (
       <Mui.Box {...boxProps}>
          <Select.Box
-            type="Single"
+            type="Multi"
             autoFocus
             variant={variant}
             disabled={disabled}
@@ -206,7 +206,7 @@ const TestSelectHook = (props: TestSelectHookProps) => {
                } else if (chosen === "Select") {
                   Select.select();
                } else {
-                  Select.setValue(options.find((option) => option.label === chosen) || null);
+                  Select.setValue(options.filter((option) => option.label === chosen) || null);
                }
             }}
          />

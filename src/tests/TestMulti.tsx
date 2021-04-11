@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import * as Mui from "@material-ui/core";
-import { useSingleSelect } from "../package";
+import { InputSelect, useRefSelect } from "../package";
 import { useActions, useChoice, useMessage, useSwitch } from "../hooks";
 import { OptionGroup } from "../components";
 
@@ -116,12 +116,13 @@ const allOptions: Option[] = [
    { label: "Yvonne", id: "Y" },
 ];
 
-export interface TestSelectHookProps extends Mui.BoxProps {}
+export interface TestSelectProps extends Mui.BoxProps {}
 
-const TestSelectHook = (props: TestSelectHookProps) => {
+const TestSelect = (props: TestSelectProps) => {
    // The state
-   const Select = useSingleSelect<Option>()(null, "Label");
+   const refSelect = useRefSelect();
    const [showMessage, Message] = useMessage();
+   const [label, Label] = useChoice("Label", ["", "Select"] as const);
    const [disabled, Disabled] = useSwitch("Disabled");
    const [readOnly, ReadOnly] = useSwitch("ReadOnly");
    const [required, Required] = useSwitch("Required");
@@ -129,7 +130,8 @@ const TestSelectHook = (props: TestSelectHookProps) => {
    const [grouped, Grouped] = useSwitch("Grouped");
    const [ownLabels, OwnLabels] = useSwitch("OwnLabels");
    const [ownFilter, OwnFilter] = useSwitch("OwnFilter");
-   const [variant, Variant] = useChoice("Variant", ["standard", "outlined", "filled", "square"] as const);
+   const [value, setValue] = React.useState<Option[] | null>(null);
+   const [variant, Variant] = useChoice("Variant", ["standard", "outlined", "filled"] as const);
    const [options, setOptions] = React.useState<Option[]>([]);
    const [loading, setLoading] = React.useState(false);
    const Actions = useActions("Actions", ["", "René", "Yvonne", "Focus", "Select"] as const);
@@ -151,20 +153,14 @@ const TestSelectHook = (props: TestSelectHookProps) => {
       }
    };
 
-   Select.onChange = React.useCallback(
-      (value) => {
-         showMessage(JSON.stringify(value));
-         return value;
-      },
-      [showMessage]
-   );
-
    // The markup
    return (
       <Mui.Box {...boxProps}>
-         <Select.Box
-            type="Single"
+         <InputSelect
             autoFocus
+            type="Multi"
+            label={label}
+            value={value}
             variant={variant}
             disabled={disabled}
             readOnly={readOnly}
@@ -175,6 +171,11 @@ const TestSelectHook = (props: TestSelectHookProps) => {
                ownFilter ? (options, text) => options.filter((option) => option.label.includes(text)) : undefined
             }
             loading={loading}
+            refCtrl={refSelect}
+            onChange={(value) => {
+               setValue(value);
+               showMessage(JSON.stringify(value));
+            }}
             onOpen={onOpen}
             groupBy={grouped ? (value) => value.id : undefined}
          />
@@ -185,8 +186,9 @@ const TestSelectHook = (props: TestSelectHookProps) => {
             }}
             variant="outlined"
          >
-            value: '{JSON.stringify(Select.value)}'
+            value: '{JSON.stringify(value)}'
          </Mui.Paper>
+         <Label />
          <Variant />
          <OptionGroup title="Options">
             <Disabled />
@@ -202,11 +204,11 @@ const TestSelectHook = (props: TestSelectHookProps) => {
          <Actions
             onChosen={(chosen) => {
                if (chosen === "Focus") {
-                  Select.focus();
+                  refSelect.current.focus();
                } else if (chosen === "Select") {
-                  Select.select();
+                  refSelect.current.select();
                } else {
-                  Select.setValue(options.find((option) => option.label === chosen) || null);
+                  setValue(options.filter((option) => option.label === chosen) || null);
                }
             }}
          />
@@ -215,4 +217,4 @@ const TestSelectHook = (props: TestSelectHookProps) => {
    );
 };
 
-export default TestSelectHook;
+export default TestSelect;

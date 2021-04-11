@@ -2,7 +2,7 @@ export { default as InputAddress, useRefAddress, useInputAddress } from "./addre
 export { default as InputAuthCode, useRefAuthCode, useInputAuthCode } from "./authcode";
 export { default as InputDate, useRefDate, useInputDate } from "./date";
 export { default as InputNumber, useRefNumber, useInputNumber } from "./number";
-export { default as InputSelect, useRefSelect, useInputSelect } from "./select";
+export { default as InputSelect, useRefSelect, useSingleSelect, useMultiSelect } from "./select";
 export { default as InputText, useRefText, useInputText } from "./text";
 
 export { default as Alert } from "./alert";
