@@ -120,7 +120,7 @@ export interface TestSelectHookProps extends Mui.BoxProps {}
 
 const TestSelectHook = (props: TestSelectHookProps) => {
    // The state
-   const Select = useInputSelect<Option>(null, "Label");
+   const Select = useInputSelect<Option>()(null, "Label");
    const [showMessage, Message] = useMessage();
    const [disabled, Disabled] = useSwitch("Disabled");
    const [readOnly, ReadOnly] = useSwitch("ReadOnly");

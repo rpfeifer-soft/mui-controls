@@ -2,14 +2,15 @@
 
 import * as React from "react";
 import * as Mui from "@material-ui/core";
-import { HookOptions, IAddress, ICtrl, noChange } from "../types";
+import { IAddress, ICtrl, IRefCtrl, noChange } from "../types";
 import { useUIContext } from "../UIContext";
 import InputRef from "../InputRef";
+import { genericHook } from "../genericHook";
 
 // Trick the linter
 const memoize = React.useMemo;
 
-class RefAddress {
+class RefAddress implements IRefCtrl {
    // The input control class
    private inputRef: InputRef = new InputRef();
 
@@ -58,7 +59,7 @@ export const useRefAddress = () => React.useRef(new RefAddress());
 export interface InputAddressProps extends ICtrl<IAddress> {
    requestDelay?: number;
    noOptionsText?: string;
-   refAddress?: React.MutableRefObject<RefAddress>;
+   refCtrl?: React.MutableRefObject<RefAddress>;
 
    // Allow to overload text field props
    variant?: Mui.TextFieldProps["variant"] | "square";
@@ -83,7 +84,7 @@ const InputAddress = (props: InputAddressProps) => {
       // Address
       requestDelay = 500,
       noOptionsText = "-",
-      refAddress: propsRefAddress,
+      refCtrl: propsRefAddress,
       // Text
       variant,
       className,
@@ -338,55 +339,4 @@ const InputAddress = (props: InputAddressProps) => {
 export default InputAddress;
 
 // Allow to use hooks
-interface InputAddressHookProps extends Omit<InputAddressProps, "value" | "label" | "onChange" | "refAddress"> {}
-
-export function useInputAddress(initValue: IAddress | null, initLabel?: string, options?: HookOptions) {
-   const [value, setValue] = React.useState(initValue);
-   const [label, setLabel] = React.useState(initLabel);
-   const refAddress = useRefAddress();
-
-   const [state] = React.useState({
-      // Internal members
-      refAddress,
-      // Access values
-      value,
-      label,
-      // Access functions
-      setValue,
-      setLabel,
-      onChange: (value: IAddress | null) => value,
-      focus: () => refAddress.current.focus(),
-      select: () => refAddress.current.select(),
-      // The control
-      Box: (undefined as unknown) as (props: InputAddressHookProps) => JSX.Element,
-   });
-
-   // Update the volatile values
-   state.value = options && options.fixValue ? initValue : value;
-   state.label = options && options.fixLabel ? initLabel : label;
-
-   // We have to create the handlers here
-   const onChange = React.useCallback(
-      (value) => {
-         state.setValue(state.onChange(value));
-      },
-      [state]
-   );
-
-   // Allow to create the element
-   state.Box = React.useCallback(
-      (props: InputAddressHookProps) => {
-         const inputTextProps = {
-            ...props,
-            // Our props are priorized
-            value: state.value,
-            label: state.label,
-            refAddress: state.refAddress,
-            onChange: onChange,
-         };
-         return <InputAddress {...inputTextProps} />;
-      },
-      [onChange, state]
-   );
-   return state as Omit<typeof state, "refAddress">;
-}
+export const useInputAddress = genericHook(InputAddress, useRefAddress);

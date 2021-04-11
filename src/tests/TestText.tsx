@@ -40,7 +40,7 @@ const TestText = (props: TestTextProps) => {
             required={required}
             variant={variant}
             onChange={onChange}
-            refText={refText}
+            refCtrl={refText}
          />
          <hr />
          <Mui.Paper

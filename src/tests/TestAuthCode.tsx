@@ -24,7 +24,7 @@ const TestAuthCode = (props: TestAuthCodeProps) => {
             autoFocus
             value={value}
             disabled={disabled}
-            refAuthCode={refAuthCode}
+            refCtrl={refAuthCode}
             onChange={setValue}
             onSubmit={(value) => {
                showMessage(`You submitted the value: '${value}'`);

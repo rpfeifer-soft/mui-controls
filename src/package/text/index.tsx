@@ -3,12 +3,13 @@
 import * as React from "react";
 import * as Mui from "@material-ui/core";
 import InputRef from "../InputRef";
-import { HookOptions, ICtrl, noChange } from "../types";
+import { ICtrl, IRefCtrl, noChange } from "../types";
+import { genericHook } from "../genericHook";
 
 // Trick the linter
 const memoize = React.useMemo;
 
-class RefText {
+class RefText implements IRefCtrl {
    // The input control class
    private inputRef: InputRef = new InputRef();
 
@@ -33,7 +34,7 @@ class RefText {
 export const useRefText = () => React.useRef(new RefText());
 
 export interface InputTextProps extends ICtrl<string> {
-   refText?: React.MutableRefObject<RefText>;
+   refCtrl?: React.MutableRefObject<RefText>;
 
    // Allow to overload text field props
    variant?: Mui.TextFieldProps["variant"] | "square";
@@ -59,7 +60,7 @@ function InputText(props: InputTextProps) {
       variant,
       className,
       sx,
-      refText: propsRefText,
+      refCtrl: propsRefText,
       // Box
       boxProps,
    } = props;
@@ -113,55 +114,4 @@ function InputText(props: InputTextProps) {
 export default InputText;
 
 // Allow to use hooks
-interface InputTextHookProps extends Omit<InputTextProps, "value" | "label" | "onChange" | "refText"> {}
-
-export function useInputText(initValue: string | null, initLabel?: string, options?: HookOptions) {
-   const [value, setValue] = React.useState(initValue);
-   const [label, setLabel] = React.useState(initLabel);
-   const refText = useRefText();
-
-   const [state] = React.useState({
-      // Internal members
-      refText,
-      // Access values
-      value,
-      label,
-      // Access functions
-      setValue,
-      setLabel,
-      onChange: (value: string | null) => value,
-      focus: () => refText.current.focus(),
-      select: () => refText.current.select(),
-      // The control
-      Box: (undefined as unknown) as (props: InputTextHookProps) => JSX.Element,
-   });
-
-   // Update the volatile values
-   state.value = options && options.fixValue ? initValue : value;
-   state.label = options && options.fixLabel ? initLabel : label;
-
-   // We have to create the handlers here
-   const onChange = React.useCallback(
-      (value) => {
-         state.setValue(state.onChange(value));
-      },
-      [state]
-   );
-
-   // Allow to create the element
-   state.Box = React.useCallback(
-      (props: InputTextHookProps) => {
-         const inputTextProps = {
-            ...props,
-            // Our props are priorized
-            value: state.value,
-            label: state.label,
-            refText: state.refText,
-            onChange: onChange,
-         };
-         return <InputText {...inputTextProps} />;
-      },
-      [onChange, state]
-   );
-   return state as Omit<typeof state, "refText">;
-}
+export const useInputText = genericHook(InputText, useRefText);

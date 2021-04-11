@@ -54,7 +54,7 @@ const TestAddress = (props: TestAddressProps) => {
                required={required}
                variant={variant}
                onChange={onChange}
-               refAddress={refAddress}
+               refCtrl={refAddress}
                noOptionsText={noOptionsText || undefined}
             />
          </UIContext>

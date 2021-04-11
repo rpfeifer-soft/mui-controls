@@ -7,13 +7,14 @@ import moment from "moment";
 import "moment/locale/de";
 import InputRef from "../InputRef";
 import { css } from "@emotion/css";
-import { HookOptions, ICtrl, noChange } from "../types";
+import { ICtrl, IRefCtrl, noChange } from "../types";
 import { useUIContext } from "../UIContext";
+import { genericHook } from "../genericHook";
 
 // Trick the linter
 const memoize = React.useMemo;
 
-class RefDate {
+class RefDate implements IRefCtrl {
    // The input control class
    private inputRef: InputRef = new InputRef();
    private otherRef?: React.Ref<any>;
@@ -52,7 +53,7 @@ export const useRefDate = () => React.useRef(new RefDate());
 export interface InputDateProps extends ICtrl<Date> {
    mobile?: boolean;
    timeSteps?: number;
-   refDate?: React.MutableRefObject<RefDate>;
+   refCtrl?: React.MutableRefObject<RefDate>;
 
    // Allow to overload text field props
    variant?: Mui.TextFieldProps["variant"] | "square";
@@ -84,7 +85,7 @@ const InputDate = (props: InputDateProps) => {
       // Date
       mobile = false,
       timeSteps = 0,
-      refDate: propsRefDate,
+      refCtrl: propsRefDate,
       // Test
       variant,
       className,
@@ -356,56 +357,4 @@ const InputDate = (props: InputDateProps) => {
 export default InputDate;
 
 // Allow to use hooks
-interface InputDateHookProps extends Omit<InputDateProps, "value" | "label" | "onChange" | "refDate"> {}
-
-export function useInputDate(initValue: Date | null, initLabel?: string, options?: HookOptions) {
-   const [value, setValue] = React.useState(initValue);
-   const [label, setLabel] = React.useState(initLabel);
-   const refDate = useRefDate();
-
-   const [state] = React.useState({
-      // Internal members
-      refDate,
-      // Access values
-      value,
-      label,
-      // Access functions
-      setValue,
-      setLabel,
-      onChange: (value: Date | null) => value,
-      blur: () => refDate.current.blur(),
-      focus: () => refDate.current.focus(),
-      select: () => refDate.current.select(),
-      // The control
-      Box: (undefined as unknown) as (props: InputDateHookProps) => JSX.Element,
-   });
-
-   // Update the volatile values
-   state.value = options && options.fixValue ? initValue : value;
-   state.label = options && options.fixLabel ? initLabel : label;
-
-   // We have to create the handlers here
-   const onChange = React.useCallback(
-      (value) => {
-         state.setValue(state.onChange(value));
-      },
-      [state]
-   );
-
-   // Allow to create the element
-   state.Box = React.useCallback(
-      (props: InputDateHookProps) => {
-         const inputTextProps = {
-            ...props,
-            // Our props are priorized
-            value: state.value,
-            label: state.label,
-            refDate: state.refDate,
-            onChange: onChange,
-         };
-         return <InputDate {...inputTextProps} />;
-      },
-      [onChange, state]
-   );
-   return state as Omit<typeof state, "refDate">;
-}
+export const useInputDate = genericHook(InputDate, useRefDate);

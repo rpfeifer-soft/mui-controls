@@ -41,7 +41,7 @@ const TestDate = (props: TestDateProps) => {
             required={required}
             mobile={mobile}
             timeSteps={Number(timeSteps)}
-            refDate={refDate}
+            refCtrl={refDate}
             onChange={(date) => {
                setValue(date);
                showMessage(JSON.stringify(date));

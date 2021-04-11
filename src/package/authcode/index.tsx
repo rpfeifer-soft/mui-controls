@@ -5,7 +5,8 @@ import * as Mui from "@material-ui/core";
 import { css } from "@emotion/css";
 import InputRef from "../InputRef";
 import clsx from "clsx";
-import { HookOptions, ICtrl, noChange } from "../types";
+import { ICtrl, IRefCtrl, noChange } from "../types";
+import { genericHook } from "../genericHook";
 
 type DSetSelected = (selected: boolean) => void;
 
@@ -13,7 +14,7 @@ type DSetSelected = (selected: boolean) => void;
 const memoize = React.useMemo;
 const noOp = (value: string) => {};
 
-class RefAuthCode {
+class RefAuthCode implements IRefCtrl {
    // The input control class
    private inputRef: InputRef = new InputRef();
 
@@ -45,7 +46,7 @@ class RefAuthCode {
 export const useRefAuthCode = () => React.useRef(new RefAuthCode());
 
 export interface InputAuthCodeProps extends Omit<ICtrl<string>, "label" | "readOnly" | "required"> {
-   refAuthCode?: React.MutableRefObject<RefAuthCode>;
+   refCtrl?: React.MutableRefObject<RefAuthCode>;
 
    onSubmit?: (value: string) => void;
 
@@ -61,7 +62,7 @@ const InputAuthCode = (props: InputAuthCodeProps) => {
       autoFocus = false,
       onChange = noChange,
       // AuthCode
-      refAuthCode: propsRefAuthCode,
+      refCtrl: propsRefAuthCode,
       onSubmit = noOp,
       // Box
       boxProps,
@@ -207,55 +208,4 @@ const InputAuthCode = (props: InputAuthCodeProps) => {
 export default InputAuthCode;
 
 // Allow to use hooks
-interface InputAuthCodeHookProps extends Omit<InputAuthCodeProps, "value" | "label" | "onChange" | "refAuthCode"> {}
-
-export function useInputAuthCode(initValue: string | null, initLabel?: string, options?: HookOptions) {
-   const [value, setValue] = React.useState(initValue);
-   const [label, setLabel] = React.useState(initLabel);
-   const refAuthCode = useRefAuthCode();
-
-   const [state] = React.useState({
-      // Internal members
-      refAuthCode,
-      // Access values
-      value,
-      label,
-      // Access functions
-      setValue,
-      setLabel,
-      onChange: (value: string | null) => value,
-      focus: () => refAuthCode.current.focus(),
-      select: () => refAuthCode.current.select(),
-      // The control
-      Box: (undefined as unknown) as (props: InputAuthCodeHookProps) => JSX.Element,
-   });
-
-   // Update the volatile values
-   state.value = options && options.fixValue ? initValue : value;
-   state.label = options && options.fixLabel ? initLabel : label;
-
-   // We have to create the handlers here
-   const onChange = React.useCallback(
-      (value) => {
-         state.setValue(state.onChange(value));
-      },
-      [state]
-   );
-
-   // Allow to create the element
-   state.Box = React.useCallback(
-      (props: InputAuthCodeHookProps) => {
-         const inputTextProps = {
-            ...props,
-            // Our props are priorized
-            value: state.value,
-            label: state.label,
-            refAuthCode: state.refAuthCode,
-            onChange: onChange,
-         };
-         return <InputAuthCode {...inputTextProps} />;
-      },
-      [onChange, state]
-   );
-   return state as Omit<typeof state, "refAuthCode">;
-}
+export const useInputAuthCode = genericHook(InputAuthCode, useRefAuthCode);

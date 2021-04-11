@@ -170,7 +170,7 @@ const TestSelect = (props: TestSelectProps) => {
                ownFilter ? (options, text) => options.filter((option) => option.label.includes(text)) : undefined
             }
             loading={loading}
-            refSelect={refSelect}
+            refCtrl={refSelect}
             onChange={(value) => {
                setValue(value);
                showMessage(JSON.stringify(value));
