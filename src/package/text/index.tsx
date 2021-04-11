@@ -40,6 +40,9 @@ export interface InputTextProps extends ICtrl<string> {
    variant?: Mui.TextFieldProps["variant"] | "square";
    className?: Mui.TextFieldProps["className"];
    sx?: Mui.TextFieldProps["sx"];
+   multiline?: boolean;
+   rows?: number;
+   maxRows?: number;
    onBlur?: () => void;
 
    // Allow to overload box props
@@ -61,6 +64,9 @@ function InputText(props: InputTextProps) {
       variant,
       className,
       sx,
+      multiline = false,
+      rows,
+      maxRows,
       onBlur: propsOnBlur,
       refCtrl: propsRefText,
       // Box
@@ -102,6 +108,9 @@ function InputText(props: InputTextProps) {
             value={value || ""}
             disabled={disabled}
             required={required}
+            multiline={multiline}
+            rows={rows}
+            maxRows={maxRows}
             onChange={changeValue}
             inputRef={handleRefText}
             InputProps={{
