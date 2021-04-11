@@ -17,7 +17,7 @@ const TestNumber = (props: TestNumberProps) => {
    const [readOnly, ReadOnly] = useSwitch("ReadOnly");
    const [required, Required] = useSwitch("Required");
    const [variant, Variant] = useChoice("Variant", ["standard", "outlined", "filled", "square"] as const);
-   const Values = useActions("Init", ["", "21", "21.10", "-19.78"] as const);
+   const Values = useActions("Init", ["", "21", "21.10", "-19.78", "+0004.4"] as const);
    const Actions = useActions("Actions", ["Focus", "Select"] as const);
 
    // The props

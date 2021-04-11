@@ -14,6 +14,8 @@ import {
    TestMultiHook,
    TestNumber,
    TestNumberHook,
+   TestPhone,
+   TestPhoneHook,
    TestSelect,
    TestSelectHook,
    TestText,
@@ -32,6 +34,8 @@ const choices = [
    "MultiHook",
    "Number",
    "NumberHook",
+   "Phone",
+   "PhoneHook",
    "Select",
    "SelectHook",
    "Text",
@@ -62,6 +66,8 @@ const App = (props: AppProps) => {
             {type === "MultiHook" && <TestMultiHook />}
             {type === "Number" && <TestNumber />}
             {type === "NumberHook" && <TestNumberHook />}
+            {type === "Phone" && <TestPhone />}
+            {type === "PhoneHook" && <TestPhoneHook />}
             {type === "Select" && <TestSelect />}
             {type === "SelectHook" && <TestSelectHook />}
             {type === "Text" && <TestText />}

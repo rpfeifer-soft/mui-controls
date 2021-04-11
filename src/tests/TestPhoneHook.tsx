@@ -2,32 +2,32 @@
 
 import * as React from "react";
 import * as Mui from "@material-ui/core";
-import { useInputNumber } from "../package";
+import { useInputPhone } from "../package";
 import { useActions, useChoice, useSwitch } from "../hooks";
 import { OptionGroup } from "../components";
 
-export interface TestNumberHookProps extends Mui.BoxProps {}
+export interface TestPhoneHookProps extends Mui.BoxProps {}
 
-const TestNumberHook = (props: TestNumberHookProps) => {
+const TestPhoneHook = (props: TestPhoneHookProps) => {
    // The state
-   const Number = useInputNumber(null, "Label");
+   const Phone = useInputPhone(null, "Label");
    const [disabled, Disabled] = useSwitch("Disabled");
    const [readOnly, ReadOnly] = useSwitch("ReadOnly");
    const [required, Required] = useSwitch("Required");
    const [variant, Variant] = useChoice("Variant", ["standard", "outlined", "filled", "square"] as const);
-   const Values = useActions("Init", ["", "21", "21.10", "-19.78", "+0004.4"] as const);
-   const Actions = useActions("Actions", ["Focus", "Select", "OnlyNumber"] as const);
+   const Values = useActions("Init", ["", "+49 7246 913229", "0336223792", "0305014034"] as const);
+   const Actions = useActions("Actions", ["Focus", "Select", "OnlyDigits"] as const);
 
    // The props
    const { ...boxProps } = props;
 
    // Do not allow to empty Text
-   const onPositive = React.useCallback((value: number | null) => (value ? Math.abs(value) : value), []);
+   const onDigit = React.useCallback((value: string | null) => (value ? value.replaceAll(/ /g, "") : value), []);
 
    // The markup
    return (
       <Mui.Box {...boxProps}>
-         <Number.Box autoFocus disabled={disabled} readOnly={readOnly} required={required} variant={variant} />
+         <Phone.Box autoFocus disabled={disabled} readOnly={readOnly} required={required} variant={variant} />
          <hr />
          <Mui.Paper
             sx={{
@@ -35,7 +35,7 @@ const TestNumberHook = (props: TestNumberHookProps) => {
             }}
             variant="outlined"
          >
-            value: '{JSON.stringify(Number.value)}'
+            value: '{JSON.stringify(Phone.value)}'
          </Mui.Paper>
          <Variant />
          <OptionGroup title="Options">
@@ -46,9 +46,9 @@ const TestNumberHook = (props: TestNumberHookProps) => {
          <Values
             onChosen={(text) => {
                if (text) {
-                  Number.setValue(+text);
+                  Phone.setValue(text);
                } else {
-                  Number.setValue(null);
+                  Phone.setValue(null);
                }
                return true;
             }}
@@ -56,11 +56,11 @@ const TestNumberHook = (props: TestNumberHookProps) => {
          <Actions
             onChosen={(chosen) => {
                if (chosen === "Focus") {
-                  Number.focus();
+                  Phone.focus();
                } else if (chosen === "Select") {
-                  Number.select();
-               } else if (chosen === "OnlyNumber") {
-                  Number.onChange = onPositive;
+                  Phone.select();
+               } else if (chosen === "OnlyDigits") {
+                  Phone.onChange = onDigit;
                }
             }}
          />
@@ -68,4 +68,4 @@ const TestNumberHook = (props: TestNumberHookProps) => {
    );
 };
 
-export default TestNumberHook;
+export default TestPhoneHook;

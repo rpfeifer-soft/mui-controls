@@ -21,19 +21,37 @@ function InputNumber(props: InputNumberProps) {
    } = props;
 
    const [value, setValue] = React.useState(propsValue ? String(propsValue) : null);
+   const [auto, setAuto] = React.useState<number | null>(null);
 
    const changeValue = React.useCallback(
       (text: string | null) => {
          if (text === "-") {
             setValue(text);
+            return;
          }
          if (!isNaN(Number(text))) {
+            if (text && Number(text) === 0 && text.match(/^[-0]/)) {
+               // Do not convert, or we lose the -
+               setValue(text);
+               return;
+            }
+            const newValue = text ? Number(text) : null;
             setValue(text);
-            onChange(text ? Number(text) : null);
+            setAuto(newValue);
+            onChange(newValue);
          }
       },
       [onChange]
    );
+
+   React.useEffect(() => {
+      if (!propsValue || auto !== propsValue) {
+         const newValue = propsValue ? Number(propsValue) : null;
+         setValue(newValue ? String(newValue) : null);
+         setAuto(newValue);
+         onChange(newValue);
+      }
+   }, [propsValue, auto, onChange]);
 
    const onBlur = React.useCallback(() => {
       setValue(propsValue ? String(propsValue) : null);
