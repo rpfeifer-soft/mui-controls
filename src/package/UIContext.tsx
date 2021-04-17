@@ -4,7 +4,7 @@ import * as React from "react";
 import * as MuiLab from "@material-ui/lab";
 import MomentUtils from "@date-io/moment";
 import moment from "moment";
-import { IAddress } from "./types";
+import { IAddress, NumberParser } from "./types";
 
 export interface IUIContext {
    // For date components
@@ -16,6 +16,8 @@ export interface IUIContext {
    // For address components
    cachedAddress: (text: string) => IAddress[] | undefined;
    searchAddress: (text: string) => Promise<IAddress[]>;
+   parseNumber: (text: string) => number;
+   formatNumber: (value: number) => string;
 }
 
 // the context component
@@ -34,6 +36,8 @@ export interface UIContextProps {
    children: React.ReactNode;
 }
 
+const NumberParserDE = new NumberParser("de");
+
 const UIContext = (props: UIContextProps) => {
    // The props
    const { value, children } = props;
@@ -48,6 +52,8 @@ const UIContext = (props: UIContextProps) => {
       searchAddress: () => {
          throw new Error("Address functions not initialized in context!");
       },
+      parseNumber: (text) => NumberParserDE.parse(text),
+      formatNumber: (value) => value.toLocaleString(),
       ...context,
       ...value,
    };
