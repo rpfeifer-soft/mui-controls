@@ -1,7 +1,7 @@
 /** @format */
 
 import * as React from "react";
-import * as MuiLab from "@material-ui/lab";
+import { MuiPickersAdapterContext } from "@material-ui/lab/LocalizationProvider";
 import MomentUtils from "@date-io/moment";
 import moment from "moment";
 import { IAddress, NumberParser } from "./types";
@@ -72,9 +72,7 @@ const UIContext = (props: UIContextProps) => {
    // The markup
    return (
       <Context.Provider value={combine}>
-         <MuiLab.MuiPickersAdapterContext.Provider value={dateUtils}>
-            {children}
-         </MuiLab.MuiPickersAdapterContext.Provider>
+         <MuiPickersAdapterContext.Provider value={dateUtils}>{children}</MuiPickersAdapterContext.Provider>
       </Context.Provider>
    );
 };

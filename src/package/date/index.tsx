@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import * as Mui from "@material-ui/core";
-import * as MuiLab from "@material-ui/lab";
 import moment from "moment";
 import "moment/locale/de";
 import InputRef from "../InputRef";
@@ -10,6 +9,10 @@ import { css } from "@emotion/css";
 import { ICtrl, IRefCtrl, noChange } from "../types";
 import { useUIContext } from "../UIContext";
 import { genericHook } from "../genericHook";
+import MobileDateTimePicker from "@material-ui/lab/MobileDateTimePicker";
+import DesktopDateTimePicker from "@material-ui/lab/DesktopDateTimePicker";
+import MobileDatePicker from "@material-ui/lab/MobileDatePicker";
+import DesktopDatePicker from "@material-ui/lab/DesktopDatePicker";
 
 // Trick the linter
 const memoize = React.useMemo;
@@ -326,7 +329,7 @@ const InputDate = (props: InputDateProps) => {
    return (
       <Mui.Box {...boxProps}>
          {mobile && Boolean(timeSteps) && (
-            <MuiLab.MobileDateTimePicker
+            <MobileDateTimePicker
                {...commonProps}
                DialogProps={fixes}
                showToolbar={true}
@@ -337,7 +340,7 @@ const InputDate = (props: InputDateProps) => {
             />
          )}
          {mobile && !timeSteps && (
-            <MuiLab.MobileDatePicker
+            <MobileDatePicker
                {...commonProps}
                DialogProps={fixes}
                showToolbar={false}
@@ -347,9 +350,9 @@ const InputDate = (props: InputDateProps) => {
             />
          )}
          {!mobile && Boolean(timeSteps) && (
-            <MuiLab.DesktopDateTimePicker {...commonProps} PopperProps={fixes} minutesStep={timeSteps} />
+            <DesktopDateTimePicker {...commonProps} PopperProps={fixes} minutesStep={timeSteps} />
          )}
-         {!mobile && !timeSteps && <MuiLab.DesktopDatePicker {...commonProps} PopperProps={fixes} />}
+         {!mobile && !timeSteps && <DesktopDatePicker {...commonProps} PopperProps={fixes} />}
       </Mui.Box>
    );
 };
