@@ -8,6 +8,8 @@ import {
    TestAlert,
    TestAuthCode,
    TestAuthCodeHook,
+   TestBoolean,
+   TestBooleanHook,
    TestDate,
    TestDateHook,
    TestMarkdown,
@@ -30,6 +32,8 @@ const choices = [
    "AddressHook",
    "AuthCode",
    "AuthCodeHook",
+   "Boolean",
+   "BooleanHook",
    "DateTime",
    "DateTimeHook",
    "Markdown",
@@ -66,6 +70,8 @@ const App = (props: AppProps) => {
             {type === "Alert" && <TestAlert />}
             {type === "AuthCode" && <TestAuthCode />}
             {type === "AuthCodeHook" && <TestAuthCodeHook />}
+            {type === "Boolean" && <TestBoolean />}
+            {type === "BooleanHook" && <TestBooleanHook />}
             {type === "Markdown" && <TestMarkdown />}
             {type === "MarkdownHook" && <TestMarkdownHook />}
             {type === "Multi" && <TestMulti />}
