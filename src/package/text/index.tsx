@@ -47,6 +47,7 @@ export interface InputTextProps extends ICtrl<string> {
 
    // Allow to overload box props
    boxProps?: Mui.BoxProps;
+   boxContent?: React.ReactNode;
 }
 
 function InputText(props: InputTextProps) {
@@ -71,6 +72,7 @@ function InputText(props: InputTextProps) {
       refCtrl: propsRefText,
       // Box
       boxProps,
+      boxContent,
    } = props;
 
    // The state
@@ -128,6 +130,7 @@ function InputText(props: InputTextProps) {
             label={label}
             variant={variant === "square" ? "filled" : variant}
          />
+         {boxContent}
       </Mui.Box>
    );
 }

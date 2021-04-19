@@ -5,6 +5,7 @@ import * as Mui from "@material-ui/core";
 import { InputMarkdown, useRefMarkdown } from "../package";
 import { useActions, useChoice, useSwitch } from "../hooks";
 import { OptionGroup } from "../components";
+import marked from "marked";
 
 export interface TestMarkdownProps extends Mui.BoxProps {}
 
@@ -83,6 +84,8 @@ const TestMarkdown = (props: TestMarkdownProps) => {
                }
             }}
          />
+         <hr />
+         <div dangerouslySetInnerHTML={{ __html: marked(value || "") }} />
       </Mui.Box>
    );
 };
