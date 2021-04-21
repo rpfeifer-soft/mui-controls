@@ -14,7 +14,11 @@ export interface IUIContext {
    clearText?: string;
    todayText?: string;
    // For markdown components
+   previewText?: string;
    boldText?: string;
+   italicText?: string;
+   underlineText?: string;
+   linkText?: string;
    // For address components
    cachedAddress: (text: string) => IAddress[] | undefined;
    searchAddress: (text: string) => Promise<IAddress[]>;

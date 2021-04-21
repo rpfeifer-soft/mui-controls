@@ -15,6 +15,8 @@ const TestMarkdownHook = (props: TestMarkdownHookProps) => {
    const [readOnly, ReadOnly] = useSwitch("ReadOnly");
    const [required, Required] = useSwitch("Required");
    const [variant, Variant] = useChoice("Variant", ["standard", "outlined", "filled", "square"] as const);
+   const [rows, Rows] = useChoice("Rows", ["", "3", "5", "10"] as const);
+   const [maxRows, MaxRows] = useChoice("MaxRows", ["", "3", "5", "10"] as const);
    const Values = useActions("Init", ["", "Lorem ipsum"] as const);
    const Actions = useActions("Actions", ["Focus", "Select", "OnlyDigits"] as const);
 
@@ -27,7 +29,15 @@ const TestMarkdownHook = (props: TestMarkdownHookProps) => {
    // The markup
    return (
       <Mui.Box {...boxProps}>
-         <Markdown.Box autoFocus disabled={disabled} readOnly={readOnly} required={required} variant={variant} />
+         <Markdown.Box
+            autoFocus
+            disabled={disabled}
+            readOnly={readOnly}
+            required={required}
+            variant={variant}
+            rows={rows ? +rows : undefined}
+            maxRows={maxRows ? +maxRows : undefined}
+         />
          <hr />
          <Mui.Paper
             sx={{
@@ -38,6 +48,8 @@ const TestMarkdownHook = (props: TestMarkdownHookProps) => {
             value: '{JSON.stringify(Markdown.value)}'
          </Mui.Paper>
          <Variant />
+         <Rows />
+         <MaxRows />
          <OptionGroup title="Options">
             <Disabled />
             <ReadOnly />

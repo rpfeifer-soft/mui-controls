@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import * as Mui from "@material-ui/core";
-import InputRef from "../InputRef";
+import InputRef, { DSetRangeUpdate } from "../InputRef";
 import { ICtrl, IRefCtrl, noChange } from "../types";
 import { genericHook } from "../genericHook";
 
@@ -14,11 +14,15 @@ export class RefText implements IRefCtrl {
    private inputRef: InputRef = new InputRef();
 
    focus() {
-      this.inputRef.focusEnd();
+      this.inputRef.focus();
    }
 
    select() {
       this.inputRef.focusAll();
+   }
+
+   setRange(replace: DSetRangeUpdate) {
+      this.inputRef.setRange(replace);
    }
 
    useHandler = () => {
