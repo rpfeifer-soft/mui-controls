@@ -15,7 +15,6 @@ import {
    TestMarkdown,
    TestMarkdownHook,
    TestMulti,
-   TestMultiHook,
    TestNumber,
    TestPhone,
    TestSelect,
@@ -71,7 +70,7 @@ const App = (props: AppProps) => {
             {type === "Markdown" && <TestMarkdown />}
             {type === "MarkdownHook" && <TestMarkdownHook />}
             {type === "Multi" && <TestMulti />}
-            {type === "MultiHook" && <TestMultiHook />}
+            {type === "MultiHook" && <TestMulti hook />}
             {type === "Number" && <TestNumber />}
             {type === "NumberHook" && <TestNumber hook />}
             {type === "Phone" && <TestPhone />}
