@@ -125,7 +125,9 @@ const TestSelect = (props: TestSelectProps) => {
    const refSelect = useRefSelect();
    const [value, setValue] = React.useState<Option | null>(null);
    const [label, Label] = useChoice("Label", ["", "Label"] as const, "Label");
+
    const Select = useSingleSelect<Option>()(null, "Label");
+
    const [showMessage, Message] = useMessage();
    const [disabled, Disabled] = useSwitch("Disabled");
    const [readOnly, ReadOnly] = useSwitch("ReadOnly");

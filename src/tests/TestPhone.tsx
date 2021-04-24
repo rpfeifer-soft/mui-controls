@@ -15,7 +15,9 @@ const TestPhone = (props: TestPhoneProps) => {
    const refPhone = useRefPhone();
    const [value, setValue] = React.useState<string | null>(null);
    const [label, Label] = useChoice("Label", ["", "Label"] as const, "Label");
+
    const Phone = useInputPhone(null, "Label");
+
    const [disabled, Disabled] = useSwitch("Disabled");
    const [readOnly, ReadOnly] = useSwitch("ReadOnly");
    const [required, Required] = useSwitch("Required");
