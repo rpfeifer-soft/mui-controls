@@ -2,18 +2,23 @@
 
 import * as React from "react";
 import * as Mui from "@material-ui/core";
-import { InputMarkdown, useRefMarkdown } from "../package";
+import { InputMarkdown, useInputMarkdown, useRefMarkdown } from "../package";
 import { useActions, useChoice, useSwitch } from "../hooks";
 import { OptionGroup } from "../components";
 import marked from "marked";
 
-export interface TestMarkdownProps extends Mui.BoxProps {}
+export interface TestMarkdownProps extends Mui.BoxProps {
+   hook?: boolean;
+}
 
 const TestMarkdown = (props: TestMarkdownProps) => {
    // The state
    const refMarkdown = useRefMarkdown();
    const [value, setValue] = React.useState<string | null>(null);
    const [label, Label] = useChoice("Label", ["", "Text"] as const);
+
+   const Markdown = useInputMarkdown(null, "Label");
+
    const [disabled, Disabled] = useSwitch("Disabled");
    const [readOnly, ReadOnly] = useSwitch("ReadOnly");
    const [required, Required] = useSwitch("Required");
@@ -24,29 +29,44 @@ const TestMarkdown = (props: TestMarkdownProps) => {
    const Actions = useActions("Actions", ["Focus", "Select"] as const);
 
    // The props
-   const { ...boxProps } = props;
+   const { hook = false, ...boxProps } = props;
 
    // The functions
    const onChange = (value: string | null) => {
       setValue(value);
    };
 
+   // Do not allow to empty Text
+   const onDigit = React.useCallback((value: string | null) => (value ? value.replaceAll(/ /g, "") : value), []);
+
    // The markup
    return (
       <Mui.Box {...boxProps}>
-         <InputMarkdown
-            autoFocus
-            label={label}
-            value={value}
-            disabled={disabled}
-            readOnly={readOnly}
-            required={required}
-            variant={variant}
-            rows={rows ? +rows : undefined}
-            maxRows={maxRows ? +maxRows : undefined}
-            onChange={onChange}
-            refCtrl={refMarkdown}
-         />
+         {hook ? (
+            <Markdown.Box
+               autoFocus
+               disabled={disabled}
+               readOnly={readOnly}
+               required={required}
+               variant={variant}
+               rows={rows ? +rows : undefined}
+               maxRows={maxRows ? +maxRows : undefined}
+            />
+         ) : (
+            <InputMarkdown
+               autoFocus
+               label={label}
+               value={value}
+               disabled={disabled}
+               readOnly={readOnly}
+               required={required}
+               variant={variant}
+               rows={rows ? +rows : undefined}
+               maxRows={maxRows ? +maxRows : undefined}
+               onChange={onChange}
+               refCtrl={refMarkdown}
+            />
+         )}
          <hr />
          <Mui.Paper
             sx={{
@@ -54,9 +74,9 @@ const TestMarkdown = (props: TestMarkdownProps) => {
             }}
             variant="outlined"
          >
-            value: '{JSON.stringify(value)}'
+            value: '{JSON.stringify(hook ? Markdown.value : value)}'
          </Mui.Paper>
-         <Label />
+         {!hook && <Label />}
          <Variant />
          <Rows />
          <MaxRows />
@@ -68,9 +88,9 @@ const TestMarkdown = (props: TestMarkdownProps) => {
          <Values
             onChosen={(text) => {
                if (text) {
-                  setValue(text);
+                  (hook ? Markdown.setValue : setValue)(text);
                } else {
-                  setValue(null);
+                  (hook ? Markdown.setValue : setValue)(null);
                }
                return true;
             }}
@@ -78,14 +98,16 @@ const TestMarkdown = (props: TestMarkdownProps) => {
          <Actions
             onChosen={(chosen) => {
                if (chosen === "Focus") {
-                  refMarkdown.current.focus();
+                  (hook ? Markdown : refMarkdown.current).focus();
                } else if (chosen === "Select") {
-                  refMarkdown.current.select();
+                  (hook ? Markdown : refMarkdown.current).select();
+               } else if (hook && chosen === "OnlyDigits") {
+                  Markdown.onChange = onDigit;
                }
             }}
          />
          <hr />
-         <div dangerouslySetInnerHTML={{ __html: marked(value || "") }} />
+         <div dangerouslySetInnerHTML={{ __html: marked((hook ? Markdown.value : value) || "") }} />
       </Mui.Box>
    );
 };

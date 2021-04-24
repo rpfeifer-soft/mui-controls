@@ -13,7 +13,6 @@ import {
    TestDate,
    TestDateHook,
    TestMarkdown,
-   TestMarkdownHook,
    TestMulti,
    TestNumber,
    TestPhone,
@@ -68,7 +67,7 @@ const App = (props: AppProps) => {
             {type === "Boolean" && <TestBoolean />}
             {type === "BooleanHook" && <TestBooleanHook />}
             {type === "Markdown" && <TestMarkdown />}
-            {type === "MarkdownHook" && <TestMarkdownHook />}
+            {type === "MarkdownHook" && <TestMarkdown hook />}
             {type === "Multi" && <TestMulti />}
             {type === "MultiHook" && <TestMulti hook />}
             {type === "Number" && <TestNumber />}
