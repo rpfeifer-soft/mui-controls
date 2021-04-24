@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import * as Mui from "@material-ui/core";
-import { InputSelect, useRefSelect } from "../package";
+import { InputSelect, useRefSelect, useSingleSelect } from "../package";
 import { useActions, useChoice, useMessage, useSwitch } from "../hooks";
 import { OptionGroup } from "../components";
 
@@ -116,13 +116,17 @@ const allOptions: Option[] = [
    { label: "Yvonne", id: "Y" },
 ];
 
-export interface TestSelectProps extends Mui.BoxProps {}
+export interface TestSelectProps extends Mui.BoxProps {
+   hook?: boolean;
+}
 
 const TestSelect = (props: TestSelectProps) => {
    // The state
    const refSelect = useRefSelect();
+   const [value, setValue] = React.useState<Option | null>(null);
+   const [label, Label] = useChoice("Label", ["", "Label"] as const, "Label");
+   const Select = useSingleSelect<Option>()(null, "Label");
    const [showMessage, Message] = useMessage();
-   const [label, Label] = useChoice("Label", ["", "Select"] as const);
    const [disabled, Disabled] = useSwitch("Disabled");
    const [readOnly, ReadOnly] = useSwitch("ReadOnly");
    const [required, Required] = useSwitch("Required");
@@ -130,7 +134,6 @@ const TestSelect = (props: TestSelectProps) => {
    const [grouped, Grouped] = useSwitch("Grouped");
    const [ownLabels, OwnLabels] = useSwitch("OwnLabels");
    const [ownFilter, OwnFilter] = useSwitch("OwnFilter");
-   const [value, setValue] = React.useState<Option | null>(null);
    const [variant, Variant] = useChoice("Variant", ["standard", "outlined", "filled"] as const);
    const [options, setOptions] = React.useState<Option[]>([]);
    const [loading, setLoading] = React.useState(false);
@@ -141,7 +144,7 @@ const TestSelect = (props: TestSelectProps) => {
    }, [async]);
 
    // The props
-   const { ...boxProps } = props;
+   const { hook = false, ...boxProps } = props;
 
    // The functions
    const onOpen = () => {
@@ -153,32 +156,59 @@ const TestSelect = (props: TestSelectProps) => {
       }
    };
 
+   Select.onChange = React.useCallback(
+      (value) => {
+         showMessage(JSON.stringify(value));
+         return value;
+      },
+      [showMessage]
+   );
+
    // The markup
    return (
       <Mui.Box {...boxProps}>
-         <InputSelect
-            autoFocus
-            type="Single"
-            label={label}
-            value={value}
-            variant={variant}
-            disabled={disabled}
-            readOnly={readOnly}
-            required={required}
-            options={options}
-            getLabel={ownLabels ? (option) => option.label.toUpperCase() : undefined}
-            filterOptions={
-               ownFilter ? (options, text) => options.filter((option) => option.label.includes(text)) : undefined
-            }
-            loading={loading}
-            refCtrl={refSelect}
-            onChange={(value) => {
-               setValue(value);
-               showMessage(JSON.stringify(value));
-            }}
-            onOpen={onOpen}
-            groupBy={grouped ? (value) => value.id : undefined}
-         />
+         {hook ? (
+            <Select.Box
+               type="Single"
+               autoFocus
+               variant={variant}
+               disabled={disabled}
+               readOnly={readOnly}
+               required={required}
+               options={options}
+               getLabel={ownLabels ? (option) => option.label.toUpperCase() : undefined}
+               filterOptions={
+                  ownFilter ? (options, text) => options.filter((option) => option.label.includes(text)) : undefined
+               }
+               loading={loading}
+               onOpen={onOpen}
+               groupBy={grouped ? (value) => value.id : undefined}
+            />
+         ) : (
+            <InputSelect
+               autoFocus
+               type="Single"
+               label={label}
+               value={value}
+               variant={variant}
+               disabled={disabled}
+               readOnly={readOnly}
+               required={required}
+               options={options}
+               getLabel={ownLabels ? (option) => option.label.toUpperCase() : undefined}
+               filterOptions={
+                  ownFilter ? (options, text) => options.filter((option) => option.label.includes(text)) : undefined
+               }
+               loading={loading}
+               refCtrl={refSelect}
+               onChange={(value) => {
+                  setValue(value);
+                  showMessage(JSON.stringify(value));
+               }}
+               onOpen={onOpen}
+               groupBy={grouped ? (value) => value.id : undefined}
+            />
+         )}
          <hr />
          <Mui.Paper
             sx={{
@@ -186,9 +216,9 @@ const TestSelect = (props: TestSelectProps) => {
             }}
             variant="outlined"
          >
-            value: '{JSON.stringify(value)}'
+            value: '{JSON.stringify(hook ? Select.value : value)}'
          </Mui.Paper>
-         <Label />
+         {!hook && <Label />}
          <Variant />
          <OptionGroup title="Options">
             <Disabled />
@@ -204,11 +234,11 @@ const TestSelect = (props: TestSelectProps) => {
          <Actions
             onChosen={(chosen) => {
                if (chosen === "Focus") {
-                  refSelect.current.focus();
+                  hook ? Select.focus() : refSelect.current.focus();
                } else if (chosen === "Select") {
-                  refSelect.current.select();
+                  hook ? Select.select() : refSelect.current.select();
                } else {
-                  setValue(options.find((option) => option.label === chosen) || null);
+                  (hook ? Select.setValue : setValue)(options.find((option) => option.label === chosen) || null);
                }
             }}
          />

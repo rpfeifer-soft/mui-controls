@@ -64,7 +64,7 @@ const TestText = (props: TestTextProps) => {
          >
             value: '{JSON.stringify(hook ? Text.value : value)}'
          </Mui.Paper>
-         <Label />
+         {!hook && <Label />}
          <Variant />
          <OptionGroup title="Options">
             <Disabled />

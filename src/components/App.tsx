@@ -21,7 +21,6 @@ import {
    TestPhone,
    TestPhoneHook,
    TestSelect,
-   TestSelectHook,
    TestText,
 } from "../tests";
 import OptionGroup from "./OptionGroup";
@@ -80,7 +79,7 @@ const App = (props: AppProps) => {
             {type === "Phone" && <TestPhone />}
             {type === "PhoneHook" && <TestPhoneHook />}
             {type === "Select" && <TestSelect />}
-            {type === "SelectHook" && <TestSelectHook />}
+            {type === "SelectHook" && <TestSelect hook />}
             {type === "Text" && <TestText />}
             {type === "TextHook" && <TestText hook />}
             {type === "DateTime" && <TestDate />}
