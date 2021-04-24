@@ -84,7 +84,7 @@ function InputBoolean(props: InputBooleanProps) {
          if (!readOnly) {
             if (type === "radio") {
                onChange(true);
-            } else if (required || type === "checkbox") {
+            } else if (required || type === "switch") {
                onChange(checked);
             } else {
                onChange(value === true ? null : value === false ? true : false);

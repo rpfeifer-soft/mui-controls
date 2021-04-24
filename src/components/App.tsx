@@ -9,7 +9,6 @@ import {
    TestAuthCode,
    TestAuthCodeHook,
    TestBoolean,
-   TestBooleanHook,
    TestDate,
    TestMarkdown,
    TestMulti,
@@ -64,7 +63,7 @@ const App = (props: AppProps) => {
             {type === "AuthCode" && <TestAuthCode />}
             {type === "AuthCodeHook" && <TestAuthCodeHook />}
             {type === "Boolean" && <TestBoolean />}
-            {type === "BooleanHook" && <TestBooleanHook />}
+            {type === "BooleanHook" && <TestBoolean hook />}
             {type === "Markdown" && <TestMarkdown />}
             {type === "MarkdownHook" && <TestMarkdown hook />}
             {type === "Multi" && <TestMulti />}
