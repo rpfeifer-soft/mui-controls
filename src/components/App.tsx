@@ -11,7 +11,6 @@ import {
    TestBoolean,
    TestBooleanHook,
    TestDate,
-   TestDateHook,
    TestMarkdown,
    TestMulti,
    TestNumber,
@@ -79,7 +78,7 @@ const App = (props: AppProps) => {
             {type === "Text" && <TestText />}
             {type === "TextHook" && <TestText hook />}
             {type === "DateTime" && <TestDate />}
-            {type === "DateTimeHook" && <TestDateHook />}
+            {type === "DateTimeHook" && <TestDate hook />}
          </Mui.Paper>
       </React.Fragment>
    );
