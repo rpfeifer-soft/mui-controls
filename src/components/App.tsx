@@ -7,7 +7,6 @@ import {
    TestAddressHook,
    TestAlert,
    TestAuthCode,
-   TestAuthCodeHook,
    TestBoolean,
    TestDate,
    TestMarkdown,
@@ -61,7 +60,7 @@ const App = (props: AppProps) => {
             {type === "AddressHook" && <TestAddressHook />}
             {type === "Alert" && <TestAlert />}
             {type === "AuthCode" && <TestAuthCode />}
-            {type === "AuthCodeHook" && <TestAuthCodeHook />}
+            {type === "AuthCodeHook" && <TestAuthCode hook />}
             {type === "Boolean" && <TestBoolean />}
             {type === "BooleanHook" && <TestBoolean hook />}
             {type === "Markdown" && <TestMarkdown />}

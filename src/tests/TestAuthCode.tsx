@@ -2,34 +2,51 @@
 
 import * as React from "react";
 import * as Mui from "@material-ui/core";
-import { InputAuthCode, useRefAuthCode } from "../package";
+import { InputAuthCode, useInputAuthCode, useRefAuthCode } from "../package";
 import { useActions, useMessage, useSwitch } from "../hooks";
 import { OptionGroup } from "../components";
 
-export interface TestAuthCodeProps extends Mui.BoxProps {}
+export interface TestAuthCodeProps extends Mui.BoxProps {
+   hook?: boolean;
+}
 
 const TestAuthCode = (props: TestAuthCodeProps) => {
    // The state
    const refAuthCode = useRefAuthCode();
    const [value, setValue] = React.useState<string | null>(null);
+
+   const AuthCode = useInputAuthCode(null, "Label");
+
    const [disabled, Disabled] = useSwitch("Disabled");
    const Values = useActions("Values", ["", "123456", "2bcd34"] as const);
    const States = useActions("States", ["Focus", "Select"] as const);
    const [showMessage, Message] = useMessage();
 
+   const { hook = false, ...boxProps } = props;
+
    // The markup
    return (
-      <Mui.Box {...props}>
-         <InputAuthCode
-            autoFocus
-            value={value}
-            disabled={disabled}
-            refCtrl={refAuthCode}
-            onChange={setValue}
-            onSubmit={(value) => {
-               showMessage(`You submitted the value: '${value}'`);
-            }}
-         />
+      <Mui.Box {...boxProps}>
+         {hook ? (
+            <AuthCode.Box
+               autoFocus
+               disabled={disabled}
+               onSubmit={(value) => {
+                  showMessage(`You submitted the value: '${value}'`);
+               }}
+            />
+         ) : (
+            <InputAuthCode
+               autoFocus
+               value={value}
+               disabled={disabled}
+               refCtrl={refAuthCode}
+               onChange={setValue}
+               onSubmit={(value) => {
+                  showMessage(`You submitted the value: '${value}'`);
+               }}
+            />
+         )}
          <hr />
          <Mui.Paper
             sx={{
@@ -37,12 +54,12 @@ const TestAuthCode = (props: TestAuthCodeProps) => {
             }}
             variant="outlined"
          >
-            value: '{value}'
+            value: '{hook ? AuthCode.value : value}'
          </Mui.Paper>
          <Values
             onChosen={(what) => {
-               setValue(what);
-               refAuthCode.current.focus();
+               (hook ? AuthCode.setValue : setValue)(what);
+               (hook ? AuthCode : refAuthCode.current).focus();
             }}
          />
          <OptionGroup title="Options">
@@ -52,10 +69,10 @@ const TestAuthCode = (props: TestAuthCodeProps) => {
             onChosen={(what) => {
                switch (what) {
                   case "Focus":
-                     refAuthCode.current.focus();
+                     (hook ? AuthCode : refAuthCode.current).focus();
                      break;
                   case "Select":
-                     refAuthCode.current.select();
+                     (hook ? AuthCode : refAuthCode.current).select();
                      break;
                }
             }}
