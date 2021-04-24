@@ -13,8 +13,8 @@ export interface TestNumberProps extends Mui.BoxProps {
 const TestNumber = (props: TestNumberProps) => {
    // The state
    const refNumber = useRefNumber();
-   const [value, setValue] = React.useState<number | null>(null);
    const [label, Label] = useChoice("Label", ["", "Label"] as const, "Label");
+   const [value, setValue] = React.useState<number | null>(null);
 
    const Number = useInputNumber(null, "Label");
 

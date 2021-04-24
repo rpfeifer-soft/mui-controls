@@ -14,8 +14,8 @@ export interface TestMarkdownProps extends Mui.BoxProps {
 const TestMarkdown = (props: TestMarkdownProps) => {
    // The state
    const refMarkdown = useRefMarkdown();
-   const [value, setValue] = React.useState<string | null>(null);
    const [label, Label] = useChoice("Label", ["", "Text"] as const);
+   const [value, setValue] = React.useState<string | null>(null);
 
    const Markdown = useInputMarkdown(null, "Label");
 

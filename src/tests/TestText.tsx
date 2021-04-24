@@ -13,8 +13,8 @@ export interface TestTextProps extends Mui.BoxProps {
 const TestText = (props: TestTextProps) => {
    // The state
    const refText = useRefText();
-   const [value, setValue] = React.useState<string | null>(null);
    const [label, Label] = useChoice("Label", ["", "Label"] as const, "Label");
+   const [value, setValue] = React.useState<string | null>(null);
 
    const Text = useInputText(null, "Label");
 

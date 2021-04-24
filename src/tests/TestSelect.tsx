@@ -123,8 +123,8 @@ export interface TestSelectProps extends Mui.BoxProps {
 const TestSelect = (props: TestSelectProps) => {
    // The state
    const refSelect = useRefSelect();
-   const [value, setValue] = React.useState<Option | null>(null);
    const [label, Label] = useChoice("Label", ["", "Label"] as const, "Label");
+   const [value, setValue] = React.useState<Option | null>(null);
 
    const Select = useSingleSelect<Option>()(null, "Label");
 

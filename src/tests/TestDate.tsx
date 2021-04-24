@@ -14,8 +14,8 @@ export interface TestDateProps extends Mui.BoxProps {
 const TestDate = (props: TestDateProps) => {
    // The state
    const refDate = useRefDate();
-   const [label, Label] = useChoice("Label", ["", "Label"] as const, "Label");
    const [value, setValue] = React.useState<Date | null>(null);
+   const [label, Label] = useChoice("Label", ["", "Label"] as const, "Label");
 
    const Date = useInputDate(null, "Label");
 

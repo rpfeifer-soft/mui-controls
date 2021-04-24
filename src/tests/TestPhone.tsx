@@ -13,8 +13,8 @@ export interface TestPhoneProps extends Mui.BoxProps {
 const TestPhone = (props: TestPhoneProps) => {
    // The state
    const refPhone = useRefPhone();
-   const [value, setValue] = React.useState<string | null>(null);
    const [label, Label] = useChoice("Label", ["", "Label"] as const, "Label");
+   const [value, setValue] = React.useState<string | null>(null);
 
    const Phone = useInputPhone(null, "Label");
 
