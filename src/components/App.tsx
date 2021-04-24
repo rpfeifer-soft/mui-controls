@@ -4,7 +4,6 @@ import Theme from "./Theme";
 import { useChoice, useSwitch } from "../hooks";
 import {
    TestAddress,
-   TestAddressHook,
    TestAlert,
    TestAuthCode,
    TestBoolean,
@@ -57,7 +56,7 @@ const App = (props: AppProps) => {
          {!dialog && <hr />}
          <Mui.Paper elevation={5} sx={{ padding: 2 }}>
             {type === "Address" && <TestAddress />}
-            {type === "AddressHook" && <TestAddressHook />}
+            {type === "AddressHook" && <TestAddress hook />}
             {type === "Alert" && <TestAlert />}
             {type === "AuthCode" && <TestAuthCode />}
             {type === "AuthCodeHook" && <TestAuthCode hook />}

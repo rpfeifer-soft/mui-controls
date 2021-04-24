@@ -2,20 +2,25 @@
 
 import * as React from "react";
 import * as Mui from "@material-ui/core";
-import { InputAddress, useRefAddress } from "../package";
+import { InputAddress, useInputAddress, useRefAddress } from "../package";
 import { useActions, useChoice, useSwitch } from "../hooks";
 import { OptionGroup } from "../components";
 import UIContext from "../package/UIContext";
 import { IAddress } from "../package/types";
 import { cachedAddress, searchAddress } from "../geoTools";
 
-export interface TestAddressProps extends Mui.BoxProps {}
+export interface TestAddressProps extends Mui.BoxProps {
+   hook?: boolean;
+}
 
 const TestAddress = (props: TestAddressProps) => {
    // The state
    const refAddress = useRefAddress();
+   const [label, Label] = useChoice("Label", ["", "Label"] as const, "Label");
    const [value, setValue] = React.useState<IAddress | null>(null);
-   const [label, Label] = useChoice("Label", ["", "Address"] as const);
+
+   const Address = useInputAddress(null, "Label");
+
    const [disabled, Disabled] = useSwitch("Disabled");
    const [readOnly, ReadOnly] = useSwitch("ReadOnly");
    const [required, Required] = useSwitch("Required");
@@ -27,7 +32,7 @@ const TestAddress = (props: TestAddressProps) => {
    const [limit, Limit] = useChoice("Limit", ["", "5", "10"] as const);
 
    // The props
-   const { ...boxProps } = props;
+   const { hook = false, ...boxProps } = props;
 
    // The functions
    const onChange = (address: IAddress | null) => {
@@ -45,18 +50,29 @@ const TestAddress = (props: TestAddressProps) => {
                   searchAddress(text, limit ? Number(limit) : 3, local ? 48.87 : undefined, local ? 8.34 : undefined),
             }}
          >
-            <InputAddress
-               autoFocus
-               label={label}
-               value={value}
-               disabled={disabled}
-               readOnly={readOnly}
-               required={required}
-               variant={variant}
-               onChange={onChange}
-               refCtrl={refAddress}
-               noOptionsText={noOptionsText || undefined}
-            />
+            {hook ? (
+               <Address.Box
+                  autoFocus
+                  disabled={disabled}
+                  readOnly={readOnly}
+                  required={required}
+                  variant={variant}
+                  noOptionsText={noOptionsText || undefined}
+               />
+            ) : (
+               <InputAddress
+                  autoFocus
+                  label={label}
+                  value={value}
+                  disabled={disabled}
+                  readOnly={readOnly}
+                  required={required}
+                  variant={variant}
+                  onChange={onChange}
+                  refCtrl={refAddress}
+                  noOptionsText={noOptionsText || undefined}
+               />
+            )}
          </UIContext>
          <hr />
          <Mui.Paper
@@ -65,9 +81,9 @@ const TestAddress = (props: TestAddressProps) => {
             }}
             variant="outlined"
          >
-            value: '{JSON.stringify(value)}'
+            value: '{JSON.stringify(hook ? Address.value : value)}'
          </Mui.Paper>
-         <Label />
+         {!hook && <Label />}
          <Variant />
          <OptionGroup title="Options">
             <Disabled />
@@ -80,9 +96,9 @@ const TestAddress = (props: TestAddressProps) => {
          <Values
             onChosen={(description) => {
                if (description) {
-                  setValue({ description });
+                  (hook ? Address.setValue : setValue)({ description });
                } else {
-                  setValue(null);
+                  (hook ? Address.setValue : setValue)(null);
                }
                return true;
             }}
@@ -90,9 +106,9 @@ const TestAddress = (props: TestAddressProps) => {
          <Actions
             onChosen={(chosen) => {
                if (chosen === "Focus") {
-                  refAddress.current.focus();
+                  (hook ? Address : refAddress.current).focus();
                } else if (chosen === "Select") {
-                  refAddress.current.select();
+                  (hook ? Address : refAddress.current).select();
                }
             }}
          />
