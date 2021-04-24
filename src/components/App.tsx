@@ -19,7 +19,6 @@ import {
    TestNumber,
    TestNumberHook,
    TestPhone,
-   TestPhoneHook,
    TestSelect,
    TestText,
 } from "../tests";
@@ -77,7 +76,7 @@ const App = (props: AppProps) => {
             {type === "Number" && <TestNumber />}
             {type === "NumberHook" && <TestNumberHook />}
             {type === "Phone" && <TestPhone />}
-            {type === "PhoneHook" && <TestPhoneHook />}
+            {type === "PhoneHook" && <TestPhone hook />}
             {type === "Select" && <TestSelect />}
             {type === "SelectHook" && <TestSelect hook />}
             {type === "Text" && <TestText />}

@@ -13,9 +13,9 @@ export interface TestTextProps extends Mui.BoxProps {
 const TestText = (props: TestTextProps) => {
    // The state
    const refText = useRefText();
-   const Text = useInputText(null, "Label");
    const [value, setValue] = React.useState<string | null>(null);
    const [label, Label] = useChoice("Label", ["", "Label"] as const, "Label");
+   const Text = useInputText(null, "Label");
    const [disabled, Disabled] = useSwitch("Disabled");
    const [readOnly, ReadOnly] = useSwitch("ReadOnly");
    const [required, Required] = useSwitch("Required");
