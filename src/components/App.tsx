@@ -23,7 +23,6 @@ import {
    TestSelect,
    TestSelectHook,
    TestText,
-   TestTextHook,
 } from "../tests";
 import OptionGroup from "./OptionGroup";
 
@@ -83,7 +82,7 @@ const App = (props: AppProps) => {
             {type === "Select" && <TestSelect />}
             {type === "SelectHook" && <TestSelectHook />}
             {type === "Text" && <TestText />}
-            {type === "TextHook" && <TestTextHook />}
+            {type === "TextHook" && <TestText hook />}
             {type === "DateTime" && <TestDate />}
             {type === "DateTimeHook" && <TestDateHook />}
          </Mui.Paper>
