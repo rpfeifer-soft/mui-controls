@@ -3,7 +3,7 @@
 import * as React from "react";
 import * as Mui from "@material-ui/core";
 
-import { ICtrl, IRefCtrl, noChange } from "../types";
+import { ICtrl, IRefCtrl } from "../types";
 import InputRef from "../InputRef";
 import { genericHook } from "../genericHook";
 import { css } from "@emotion/css";
@@ -36,6 +36,7 @@ export class RefSlider implements IRefCtrl {
 export const useRefSlider = () => React.useRef(new RefSlider());
 
 export interface InputSliderProps extends Omit<ICtrl<number>, "readOnly" | "required"> {
+   type?: "Slider";
    refCtrl?: React.MutableRefObject<RefSlider>;
 
    // Allow to overload slider props
@@ -50,9 +51,18 @@ export interface InputSliderProps extends Omit<ICtrl<number>, "readOnly" | "requ
    // Allow to overload text props
    variant?: Mui.TextFieldProps["variant"] | "square";
    className?: Mui.TextFieldProps["className"];
+
+   // Allow to overload box props
+   boxProps?: Mui.BoxProps;
 }
 
-const InputSlider = (props: InputSliderProps) => {
+export interface InputRangeProps extends Omit<InputSliderProps, "value" | "type" | "onChange">, ICtrl<number[]> {
+   type: "Range";
+
+   disableSwap?: Mui.SliderProps["disableSwap"];
+}
+
+const InputSlider = (props: InputSliderProps | InputRangeProps) => {
    // The state
    const theme = Mui.useTheme();
 
@@ -63,7 +73,6 @@ const InputSlider = (props: InputSliderProps) => {
       value,
       disabled = false,
       autoFocus = false,
-      onChange = noChange,
       // Slider
       marks,
       min,
@@ -77,7 +86,7 @@ const InputSlider = (props: InputSliderProps) => {
       variant,
       className,
       // BoxProps
-      ...boxProps
+      boxProps,
    } = props;
 
    // The state
@@ -93,13 +102,22 @@ const InputSlider = (props: InputSliderProps) => {
    // sliderfunctions
    const changeValue = React.useCallback<Required<Mui.SliderProps>["onChange"]>(
       (event, value, activeThumb) => {
-         if (typeof value === "number") {
-            onChange(value);
-         } else {
-            onChange(null);
+         if ((!props.type || props.type === "Slider") && props.onChange) {
+            if (typeof value === "number") {
+               props.onChange(value);
+            } else {
+               props.onChange(null);
+            }
+         }
+         if (props.type === "Range" && props.onChange) {
+            if (Array.isArray(value)) {
+               props.onChange(value);
+            } else {
+               props.onChange(null);
+            }
          }
       },
-      [onChange]
+      [props]
    );
 
    const handleRefSpan = React.useCallback(
@@ -120,6 +138,7 @@ const InputSlider = (props: InputSliderProps) => {
    );
 
    const offset = variant === "filled" || variant === "square";
+   const disableSwap = props.type === "Range" ? props.disableSwap : undefined;
    // The markup
    return (
       <Mui.Box
@@ -190,6 +209,7 @@ const InputSlider = (props: InputSliderProps) => {
             scale={scale}
             step={step}
             track={track}
+            disableSwap={disableSwap}
             valueLabelDisplay={valueLabelDisplay}
             onChange={changeValue}
             disabled={disabled}
@@ -222,4 +242,5 @@ const InputSlider = (props: InputSliderProps) => {
 export default InputSlider;
 
 // Allow to use hooks
-export const useInputSlider = genericHook(InputSlider, useRefSlider);
+export const useInputSlider = genericHook<InputSliderProps, RefSlider, number>(InputSlider, useRefSlider);
+export const useInputRange = genericHook<InputRangeProps, RefSlider, number[]>(InputSlider, useRefSlider);

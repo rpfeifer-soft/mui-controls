@@ -171,8 +171,8 @@ const TestSelect = (props: TestSelectProps) => {
       <Mui.Box {...boxProps}>
          {hook ? (
             <Select.Box
-               type="Multi"
                autoFocus
+               type="Multi"
                variant={variant}
                disabled={disabled}
                readOnly={readOnly}

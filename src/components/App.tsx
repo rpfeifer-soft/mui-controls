@@ -12,6 +12,7 @@ import {
    TestMulti,
    TestNumber,
    TestPhone,
+   TestRange,
    TestSelect,
    TestSlider,
    TestText,
@@ -35,6 +36,8 @@ const choices = [
    "NumberHook",
    "Phone",
    "PhoneHook",
+   "Range",
+   "RangeHook",
    "Select",
    "SelectHook",
    "Slider",
@@ -73,6 +76,8 @@ const App = (props: AppProps) => {
             {type === "NumberHook" && <TestNumber hook />}
             {type === "Phone" && <TestPhone />}
             {type === "PhoneHook" && <TestPhone hook />}
+            {type === "Range" && <TestRange />}
+            {type === "RangeHook" && <TestRange hook />}
             {type === "Select" && <TestSelect />}
             {type === "SelectHook" && <TestSelect hook />}
             {type === "Slider" && <TestSlider />}
