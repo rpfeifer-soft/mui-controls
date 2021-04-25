@@ -6,6 +6,7 @@ export { default as InputMarkdown, useRefMarkdown, useInputMarkdown } from "./ma
 export { default as InputNumber, useRefNumber, useInputNumber } from "./number";
 export { default as InputPhone, useRefPhone, useInputPhone } from "./phone";
 export { default as InputSelect, useRefSelect, useSingleSelect, useMultiSelect } from "./select";
+export { default as InputSlider, useRefSlider, useInputSlider } from "./slider";
 export { default as InputText, useRefText, useInputText } from "./text";
 
 export { default as Alert } from "./alert";
