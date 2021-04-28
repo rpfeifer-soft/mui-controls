@@ -2,6 +2,7 @@ export { default as InputAddress, useRefAddress, useInputAddress } from "./addre
 export { default as InputAuthCode, useRefAuthCode, useInputAuthCode } from "./authcode";
 export { default as InputBoolean, useRefBoolean, useInputBoolean } from "./boolean";
 export { default as InputDate, useRefDate, useInputDate } from "./date";
+export { default as InputFile, useRefFile, useInputFile } from "./file";
 export { default as InputMarkdown, useRefMarkdown, useInputMarkdown } from "./markdown";
 export { default as InputNumber, useRefNumber, useInputNumber } from "./number";
 export { default as InputPhone, useRefPhone, useInputPhone } from "./phone";

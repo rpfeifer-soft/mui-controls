@@ -16,6 +16,19 @@ export interface IAddress {
    lon?: number;
 }
 
+export enum FileType {
+   image,
+   pdf,
+   other
+};
+
+export interface IFile {
+   name: string;
+   size: number;
+   type: FileType;
+   previewUrl: string;
+}
+
 export function noChange<T>(value: T | null) { }
 
 type HookOption = "fixLabel" | "fixValue";

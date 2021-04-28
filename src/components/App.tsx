@@ -8,6 +8,7 @@ import {
    TestAuthCode,
    TestBoolean,
    TestDate,
+   TestFile,
    TestMarkdown,
    TestMulti,
    TestNumber,
@@ -28,6 +29,8 @@ const choices = [
    "BooleanHook",
    "DateTime",
    "DateTimeHook",
+   "File",
+   "FileHook",
    "Markdown",
    "MarkdownHook",
    "Multi",
@@ -68,6 +71,8 @@ const App = (props: AppProps) => {
             {type === "AuthCodeHook" && <TestAuthCode hook />}
             {type === "Boolean" && <TestBoolean />}
             {type === "BooleanHook" && <TestBoolean hook />}
+            {type === "File" && <TestFile />}
+            {type === "FileHook" && <TestFile hook />}
             {type === "Markdown" && <TestMarkdown />}
             {type === "MarkdownHook" && <TestMarkdown hook />}
             {type === "Multi" && <TestMulti />}
