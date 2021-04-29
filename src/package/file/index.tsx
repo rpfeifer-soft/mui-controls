@@ -24,13 +24,24 @@ const DeleteIcon = Mui.createSvgIcon(
    "DeleteIcon"
 );
 
+const StopIcon = Mui.createSvgIcon(
+   <path
+      fillRule="evenodd"
+      d="M8 16h8V8H8v8zm4-14C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"
+   ></path>,
+   "StopIcon"
+);
+
 // Trick the linter
 const memoize = React.useMemo;
 
 export class RefFile implements IRefCtrl {
    // The input control class
    private inputRef: InputRef = new InputRef();
+
+   public value: IFile[] | null = null;
    public click = () => {};
+   public reset = () => {};
 
    focus() {
       this.inputRef.focus();
@@ -50,6 +61,11 @@ export class RefFile implements IRefCtrl {
                     input.click();
                  }
                : () => {};
+            this.reset = input
+               ? () => {
+                    input.value = "";
+                 }
+               : () => {};
          };
       }, []);
    };
@@ -57,12 +73,23 @@ export class RefFile implements IRefCtrl {
 
 export const useRefFile = () => React.useRef(new RefFile());
 
+export interface IFileUpload {
+   file: File;
+
+   progress: (part: number) => void;
+   isStopped: () => boolean;
+
+   canceled: () => void;
+   added: (file: IFile) => IFile[];
+}
+
 export interface InputFileProps extends ICtrl<IFile[]> {
    refCtrl?: React.MutableRefObject<RefFile>;
 
    // File props
    lineHeight: number;
-   onUpload?: (file: File) => void;
+   multiple?: boolean;
+   onUpload?: (state: IFileUpload) => void;
 
    // Allow to overload the boxprops
    boxProps?: Mui.BoxProps;
@@ -84,6 +111,7 @@ const InputFile = (props: InputFileProps) => {
       required = false,
       // File
       lineHeight,
+      multiple = false,
       onUpload,
       refCtrl: propsRefFile,
       // Box
@@ -91,13 +119,53 @@ const InputFile = (props: InputFileProps) => {
    } = props;
 
    const [focus, setFocus] = React.useState(false);
+   const [files, setFiles] = React.useState<File[]>([]);
+   const [progress, setProgress] = React.useState(0);
+   const [stopUpload, setStopUpload] = React.useState<(() => void) | null>(null);
    const fileRef = useRefFile();
    const handleRefFile = fileRef.current.useHandler();
+   // We need the value later
+   fileRef.current.value = value;
 
    // Allow the caller to use the select functions
    if (propsRefFile) {
       propsRefFile.current = fileRef.current;
    }
+
+   React.useEffect(() => {
+      if (!files.length) return;
+
+      async function upload() {
+         if (!onUpload) return;
+
+         const file = files[0];
+         let stopped = false;
+         setStopUpload(() => () => (stopped = true));
+         setProgress(0);
+
+         const endUpload = () => {
+            const remaining = files.filter((p) => p !== file);
+            setStopUpload(() => null);
+            setFiles(remaining);
+            if (!remaining.length) {
+               fileRef.current.reset();
+            }
+         };
+
+         const state: IFileUpload = {
+            file,
+            progress: (part) => setProgress(part),
+            isStopped: () => stopped,
+            canceled: endUpload,
+            added: (newFile: IFile) => {
+               endUpload();
+               return fileRef.current.value ? [...fileRef.current.value, newFile] : [newFile];
+            },
+         };
+         onUpload(state);
+      }
+      upload();
+   }, [fileRef, files, onUpload, onChange, setStopUpload]);
 
    // The functions
    const handleRefInput = React.useCallback(
@@ -107,13 +175,25 @@ const InputFile = (props: InputFileProps) => {
             input.onfocus = () => setFocus(true);
             input.onblur = () => setFocus(false);
             if (onUpload) {
-               input.onchange = () => {
-                  if (input.files && input.files.length > 0) {
-                     const file = input.files.item(0);
-                     if (file) {
-                        onUpload(file);
-                     }
+               input.onchange = async () => {
+                  if (!input.files || !input.files.length) {
+                     return;
                   }
+                  const inputFiles = input.files;
+                  // Save the files
+                  setFiles((files) => {
+                     if (!inputFiles) {
+                        return files;
+                     }
+                     const newFiles = [...files];
+                     for (let i = 0; i < inputFiles.length; i++) {
+                        const newFile = inputFiles.item(i);
+                        if (newFile) {
+                           newFiles.push(newFile);
+                        }
+                     }
+                     return newFiles;
+                  });
                };
             }
             if (autoFocus && fileRef.current) {
@@ -193,7 +273,8 @@ const InputFile = (props: InputFileProps) => {
             />
          </Mui.FormControl>
          <input
-            type="file"
+            type={disabled || readOnly ? "text" : "file"}
+            multiple={multiple}
             ref={handleRefInput}
             className={css({
                position: "absolute",
@@ -268,7 +349,66 @@ const InputFile = (props: InputFileProps) => {
                      </Mui.Box>
                   </Mui.Paper>
                ))}
-            {!readOnly && !disabled && (
+            {files.map((file, index) => (
+               <Mui.Paper key={index} elevation={0} square variant="outlined">
+                  <Mui.Box position="relative" height={lineHeight}>
+                     {stopUpload && !index && (
+                        <Mui.IconButton
+                           size="small"
+                           sx={{
+                              float: "right",
+                              opacity: 0.3,
+                           }}
+                           className={css({
+                              "&:hover": {
+                                 opacity: 0.9,
+                              },
+                           })}
+                           onClick={stopUpload}
+                        >
+                           <StopIcon fontSize="small" />
+                        </Mui.IconButton>
+                     )}
+                     <Mui.Box
+                        display="flex"
+                        fontSize="0.8em"
+                        padding="4px 6px 2px 6px"
+                        position="absolute"
+                        left={0}
+                        right={0}
+                        bottom={0}
+                     >
+                        <Mui.Box
+                           position="absolute"
+                           left={0}
+                           right={0}
+                           top={0}
+                           bottom={0}
+                           bgcolor={Mui.alpha(theme.palette.primary.light, 0.2)}
+                           borderTop={`1px solid ${Mui.alpha(theme.palette.primary.light, 0.4)}`}
+                        >
+                           {!index && (
+                              <Mui.LinearProgress
+                                 key={file.name}
+                                 variant="determinate"
+                                 value={progress * 100}
+                                 sx={{
+                                    top: -5,
+                                 }}
+                              />
+                           )}
+                        </Mui.Box>
+                        <Mui.Box flexGrow={1}>{file.name}</Mui.Box>
+                        <Mui.Box>
+                           {file.size > 1024 * 1024
+                              ? `${Math.floor(file.size / 1024 / 1024)} kB`
+                              : `${Math.floor(file.size / 1024)} kB`}
+                        </Mui.Box>
+                     </Mui.Box>
+                  </Mui.Box>
+               </Mui.Paper>
+            ))}
+            {!readOnly && !disabled && !files.length && (
                <Mui.Paper elevation={0} square variant="outlined">
                   <Mui.Box
                      height={lineHeight}
