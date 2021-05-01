@@ -3,7 +3,7 @@
 import * as React from "react";
 import * as Mui from "@material-ui/core";
 import { InputFile, useInputFile, useRefFile } from "../package";
-import { useActions, useChoice, useSwitch } from "../hooks";
+import { useActions, useChoice, useMessage, useSwitch } from "../hooks";
 import { OptionGroup } from "../components";
 import { FileType, IFile } from "../package/types";
 import { InputFileProps, IFileUpload } from "../package/file";
@@ -34,8 +34,10 @@ const TestFile = (props: TestFileProps) => {
    const [readOnly, ReadOnly] = useSwitch("ReadOnly");
    const [required, Required] = useSwitch("Required");
    const [multiple, Multiple] = useSwitch("Multiple");
+   const [moreInfo, MoreInfo] = useSwitch("MoreInfo");
    const [lineHeight, LineHeight] = useChoice("Height", ["60", "120", "240"] as const, "120");
    const Actions = useActions("Actions", ["Focus"] as const);
+   const [showMessage, Message] = useMessage();
 
    // The props
    const { hook = false, ...boxProps } = props;
@@ -46,6 +48,11 @@ const TestFile = (props: TestFileProps) => {
       },
       [File, hook]
    );
+
+   const onMore = React.useMemo(() => (moreInfo ? (file: IFile) => showMessage(file.name) : undefined), [
+      moreInfo,
+      showMessage,
+   ]);
 
    const onUpload = React.useCallback(
       async (upload: IFileUpload) => {
@@ -83,6 +90,7 @@ const TestFile = (props: TestFileProps) => {
                lineHeight={+lineHeight}
                multiple={multiple}
                onUpload={onUpload}
+               onMore={onMore}
             />
          ) : (
             <InputFile
@@ -91,6 +99,7 @@ const TestFile = (props: TestFileProps) => {
                value={value}
                onChange={onChange}
                onUpload={onUpload}
+               onMore={onMore}
                disabled={disabled}
                readOnly={readOnly}
                required={required}
@@ -114,7 +123,10 @@ const TestFile = (props: TestFileProps) => {
             <Disabled />
             <ReadOnly />
             <Required />
+         </OptionGroup>
+         <OptionGroup title="Settings">
             <Multiple />
+            <MoreInfo />
          </OptionGroup>
          <Actions
             onChosen={(chosen) => {
@@ -125,6 +137,7 @@ const TestFile = (props: TestFileProps) => {
                }
             }}
          />
+         <Message />
       </Mui.Box>
    );
 };

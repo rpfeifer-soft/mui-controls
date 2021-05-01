@@ -8,6 +8,7 @@ import InputRef from "../InputRef";
 import { genericHook } from "../genericHook";
 import { css } from "@emotion/css";
 
+// https://next.material-ui.com/components/material-icons/
 const AddFileIcon = Mui.createSvgIcon(
    <React.Fragment>
       <path
@@ -30,6 +31,11 @@ const StopIcon = Mui.createSvgIcon(
       d="M8 16h8V8H8v8zm4-14C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"
    ></path>,
    "StopIcon"
+);
+
+const MoreIcon = Mui.createSvgIcon(
+   <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path>,
+   "MoreIcon"
 );
 
 // Trick the linter
@@ -73,6 +79,59 @@ export class RefFile implements IRefCtrl {
 
 export const useRefFile = () => React.useRef(new RefFile());
 
+interface InputInfoProps {
+   file: IFile | File;
+
+   progress?: number;
+}
+
+const InputInfo = (props: InputInfoProps) => {
+   const theme = Mui.useTheme();
+   // Get the props
+   const { file, progress } = props;
+
+   return (
+      <Mui.Box
+         display="flex"
+         fontSize="0.8em"
+         padding="4px 6px 2px 6px"
+         position="absolute"
+         left={0}
+         right={0}
+         bottom={0}
+      >
+         <Mui.Box
+            position="absolute"
+            left={0}
+            right={0}
+            top={0}
+            bottom={0}
+            bgcolor={Mui.alpha(theme.palette.primary.light, 0.2)}
+            borderTop={`1px solid ${Mui.alpha(theme.palette.primary.light, 0.4)}`}
+         >
+            {progress !== undefined && (
+               <Mui.LinearProgress
+                  key={file.name}
+                  variant="determinate"
+                  value={progress * 100}
+                  sx={{
+                     top: -5,
+                  }}
+               />
+            )}
+         </Mui.Box>
+         <Mui.Box whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden" flexGrow={1}>
+            {file.name}
+         </Mui.Box>
+         <Mui.Box whiteSpace="nowrap">
+            {file.size > 1024 * 1024
+               ? `${Math.floor((file.size * 10) / 1024 / 1024) / 10} MB`
+               : `${Math.floor((file.size * 10) / 1024) / 10} kB`}
+         </Mui.Box>
+      </Mui.Box>
+   );
+};
+
 export interface IFileUpload {
    file: File;
 
@@ -90,6 +149,7 @@ export interface InputFileProps extends ICtrl<IFile[]> {
    lineHeight: number;
    multiple?: boolean;
    onUpload?: (state: IFileUpload) => void;
+   onMore?: (file: IFile) => void;
 
    // Allow to overload the boxprops
    boxProps?: Mui.BoxProps;
@@ -113,6 +173,7 @@ const InputFile = (props: InputFileProps) => {
       lineHeight,
       multiple = false,
       onUpload,
+      onMore,
       refCtrl: propsRefFile,
       // Box
       boxProps,
@@ -316,36 +377,12 @@ const InputFile = (props: InputFileProps) => {
                                     opacity: 0.9,
                                  },
                               })}
-                              onClick={() => onDeleteFile(file)}
+                              onClick={onMore ? () => onMore(file) : () => onDeleteFile(file)}
                            >
-                              <DeleteIcon fontSize="small" />
+                              {onMore ? <MoreIcon fontSize="small" /> : <DeleteIcon fontSize="small" />}
                            </Mui.IconButton>
                         )}
-                        <Mui.Box
-                           display="flex"
-                           fontSize="0.8em"
-                           padding="4px 6px 2px 6px"
-                           position="absolute"
-                           left={0}
-                           right={0}
-                           bottom={0}
-                        >
-                           <Mui.Box
-                              position="absolute"
-                              left={0}
-                              right={0}
-                              top={0}
-                              bottom={0}
-                              bgcolor={Mui.alpha(theme.palette.primary.light, 0.2)}
-                              borderTop={`1px solid ${Mui.alpha(theme.palette.primary.light, 0.4)}`}
-                           />
-                           <Mui.Box flexGrow={1}>{file.name}</Mui.Box>
-                           <Mui.Box>
-                              {file.size > 1024 * 1024
-                                 ? `${Math.floor(file.size / 1024 / 1024)} kB`
-                                 : `${Math.floor(file.size / 1024)} kB`}
-                           </Mui.Box>
-                        </Mui.Box>
+                        <InputInfo file={file} />
                      </Mui.Box>
                   </Mui.Paper>
                ))}
@@ -369,42 +406,7 @@ const InputFile = (props: InputFileProps) => {
                            <StopIcon fontSize="small" />
                         </Mui.IconButton>
                      )}
-                     <Mui.Box
-                        display="flex"
-                        fontSize="0.8em"
-                        padding="4px 6px 2px 6px"
-                        position="absolute"
-                        left={0}
-                        right={0}
-                        bottom={0}
-                     >
-                        <Mui.Box
-                           position="absolute"
-                           left={0}
-                           right={0}
-                           top={0}
-                           bottom={0}
-                           bgcolor={Mui.alpha(theme.palette.primary.light, 0.2)}
-                           borderTop={`1px solid ${Mui.alpha(theme.palette.primary.light, 0.4)}`}
-                        >
-                           {!index && (
-                              <Mui.LinearProgress
-                                 key={file.name}
-                                 variant="determinate"
-                                 value={progress * 100}
-                                 sx={{
-                                    top: -5,
-                                 }}
-                              />
-                           )}
-                        </Mui.Box>
-                        <Mui.Box flexGrow={1}>{file.name}</Mui.Box>
-                        <Mui.Box>
-                           {file.size > 1024 * 1024
-                              ? `${Math.floor(file.size / 1024 / 1024)} kB`
-                              : `${Math.floor(file.size / 1024)} kB`}
-                        </Mui.Box>
-                     </Mui.Box>
+                     <InputInfo file={file} progress={!index ? progress : undefined} />
                   </Mui.Box>
                </Mui.Paper>
             ))}
